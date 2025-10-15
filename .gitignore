@@ -1,0 +1,15 @@
+scrvenv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.sqlite3
+*.log
+.cache/
+dist/
+build/
+.env
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
