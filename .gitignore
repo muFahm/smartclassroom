@@ -1,4 +1,5 @@
 scrvenv/
+screnv/
 __pycache__/
 *.pyc
 *.pyo

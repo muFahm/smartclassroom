@@ -1,23 +1,35 @@
 import React from "react";
+import Navbar from "./components/Navbar";
+import Card from "./components/Card";
+import "./Dashboard.css";
 
 export default function Dashboard() {
-  const user = JSON.parse(localStorage.getItem("user"));
-
-  const handleLogout = async () => {
-    await fetch("http://localhost:8000/api/accounts/logout/", {
-      method: "POST",
-    });
-    localStorage.removeItem("user");
-    window.location.href = "/";
-  };
-
-  if (!user) return <p>Silakan login terlebih dahulu.</p>;
-
   return (
-    <div style={{ textAlign: "center", marginTop: "100px" }}>
-      <h2>Selamat datang, {user.username}</h2>
-      <h4>Role: {user.role === "lecturer" ? "Dosen/Admin 👨‍🏫" : "Mahasiswa 👩‍🎓"}</h4>
-      <button onClick={handleLogout}>Logout</button>
-    </div>
+    <>
+      <Navbar />
+
+      <div className="dashboard-container">
+        <h2 className="dashboard-title">Dashboard Content</h2>
+
+        <div className="dashboard-grid">
+          <Card title="Card dengan Title">
+            <p>Ini adalah contoh card dengan title</p>
+          </Card>
+
+          <Card
+            title="Card dengan Button"
+            headerAction={
+              <button className="card-action-button">Action</button>
+            }
+          >
+            <p>Card ini punya button di header</p>
+          </Card>
+
+          <Card>
+            <p>Card tanpa title</p>
+          </Card>
+        </div>
+      </div>
+    </>
   );
 }

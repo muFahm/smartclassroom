@@ -1,17 +1,20 @@
 import React from "react";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Login from "./Login";
-import Register from "./Register";
 import Dashboard from "./Dashboard";
+import { 
+  POLLING_DATA, 
+  SENSOR_DATA, 
+  CHAIR_DATA,
+  getCurrentDateTime 
+} from "./utils/mockData";
 
 export default function App() {
-  return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-        <Route path="/dashboard" element={<Dashboard />} />
-      </Routes>
-    </BrowserRouter>
-  );
+  // Test Mock Data - Buka Console (F12) untuk melihat data
+  console.log('=== TESTING MOCK DATA ===');
+  console.log('Polling Data:', POLLING_DATA);
+  console.log('Sensor Data:', SENSOR_DATA);
+  console.log('Chair Data:', CHAIR_DATA);
+  console.log('Date Time:', getCurrentDateTime());
+  console.log('========================');
+
+  return <Dashboard />;
 }
