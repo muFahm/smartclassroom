@@ -1,6 +1,7 @@
 import React from "react";
 import Navbar from "./components/Navbar";
 import Card from "./components/Card";
+import Footer from './components/Footer';
 import "./Dashboard.css";
 
 export default function Dashboard() {
@@ -30,6 +31,8 @@ export default function Dashboard() {
           </Card>
         </div>
       </div>
+
+      <Footer />
     </>
   );
 }
