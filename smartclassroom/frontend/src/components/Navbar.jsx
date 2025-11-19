@@ -1,5 +1,5 @@
-import React from 'react';
-import './Navbar.css';
+import React from "react";
+import "./Navbar.css";
 
 export default function Navbar() {
   return (
@@ -9,11 +9,21 @@ export default function Navbar() {
       </div>
 
       <div className="navbar-center">
-        <a href="#dashboard" className="navbar-link">Dashboard Utama</a>
-        <a href="#kursi" className="navbar-link">Kursi & Polling</a>
-        <a href="#mahasiswa" className="navbar-link">Aktivitas Mahasiswa</a>
-        <a href="#suara" className="navbar-link">Aktivitas Suara</a>
-        <a href="#wajah" className="navbar-link">Aktivitas Wajah</a>
+        <a href="#dashboard" className="navbar-link">
+          Dashboard Utama
+        </a>
+        <a href="#kursi" className="navbar-link">
+          Kursi & Polling
+        </a>
+        <a href="#mahasiswa" className="navbar-link">
+          Aktivitas Mahasiswa
+        </a>
+        <a href="#suara" className="navbar-link">
+          Aktivitas Suara
+        </a>
+        <a href="#wajah" className="navbar-link">
+          Aktivitas Wajah
+        </a>
       </div>
 
       <div className="navbar-right">
