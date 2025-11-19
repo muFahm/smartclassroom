@@ -3,7 +3,7 @@ import Navbar from "./components/Navbar";
 import PilihanKelas from "./components/PilihanKelas";
 import DateTimeCard from "./components/DateTimeCard";
 import Widget from "./components/Widget";
-import Footer from './components/Footer';
+import Footer from "./components/Footer";
 import "./Dashboard.css";
 
 export default function Dashboard() {
@@ -19,7 +19,7 @@ export default function Dashboard() {
             <DateTimeCard />
             <Widget />
           </div>
-          
+
           {/* Kolom Kanan: Konten Utama */}
           <div className="dashboard-right-column">
             {/* Konten dashboard utama bisa ditambahkan di sini */}
