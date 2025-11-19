@@ -1,0 +1,106 @@
+.transkrip-suara-card {
+  background: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e5e7eb;
+  padding: 8px;
+  width: 336px;
+  display: flex;
+  flex-direction: column;
+  flex: 1; /* Mengisi sisa ruang */
+  overflow: hidden;
+}
+
+.transkrip-suara-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.transkrip-suara-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0;
+}
+
+.toggle-button {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  color: #6b7280;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  transition: all 0.2s;
+}
+
+.toggle-button:hover {
+  background: #f3f4f6;
+  color: #1f2937;
+}
+
+.transkrip-content {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  overflow-y: auto;
+  flex: 1; /* Mengisi sisa ruang card */
+  min-height: 0;
+}
+
+.transkrip-item {
+  display: flex;
+  gap: 8px;
+  padding: 4px 0;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.transkrip-item:last-child {
+  border-bottom: none;
+}
+
+.transkrip-time {
+  font-size: 11px;
+  font-weight: 600;
+  color: #6b7280;
+  min-width: 38px;
+  flex-shrink: 0;
+}
+
+.transkrip-text {
+  flex: 1;
+  font-size: 12px;
+  line-height: 1.3;
+  color: #1f2937;
+}
+
+.transkrip-speaker {
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.transkrip-separator {
+  margin: 0 3px;
+  color: #6b7280;
+}
+
+.transkrip-message {
+  color: #4b5563;
+}
+
+/* Custom scrollbar untuk transkrip content */
+.transkrip-content::-webkit-scrollbar {
+  width: 4px;
+}
+.transkrip-content::-webkit-scrollbar-track {
+  background: #f9fafb;
+  border-radius: 4px;
+}
+.transkrip-content::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 4px;
+}

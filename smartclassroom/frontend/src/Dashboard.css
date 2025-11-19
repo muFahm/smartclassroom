@@ -5,49 +5,37 @@
   padding: 20px;
   background-color: #f3f4f6;
   height: calc(100vh - 104px);
-  overflow: hidden; /* Ubah dari overflow-y: auto */
-}
-
-.dashboard-title {
-  margin: 0 0 20px 0;
-  padding: 0;
-  font-size: 24px;
-  font-weight: 700;
-  color: #1f2937;
+  overflow: hidden; /* Prevent scroll */
 }
 
 .dashboard-grid {
   display: grid;
   grid-template-columns: 280px 1fr;
   gap: 20px;
-  align-items: start;
   height: 100%;
 }
 
 .dashboard-left-column {
   display: flex;
   flex-direction: column;
-  gap: 16px; /* Kurangi gap dari 20px ke 16px */
+  gap: 16px;
   height: 100%;
-  overflow-y: auto; /* Hanya kolom kiri yang bisa scroll jika perlu */
+  overflow-y: auto;
   padding-right: 8px;
 }
 
-/* Custom scrollbar untuk kolom kiri */
+/* Scroll style */
 .dashboard-left-column::-webkit-scrollbar {
   width: 6px;
 }
-
 .dashboard-left-column::-webkit-scrollbar-track {
   background: #f3f4f6;
   border-radius: 10px;
 }
-
 .dashboard-left-column::-webkit-scrollbar-thumb {
   background: #d1d5db;
   border-radius: 10px;
 }
-
 .dashboard-left-column::-webkit-scrollbar-thumb:hover {
   background: #9ca3af;
 }
@@ -55,26 +43,65 @@
 .dashboard-right-column {
   width: 100%;
   height: 100%;
-  overflow-y: auto;
+  overflow: hidden; /* No scroll */
   display: flex;
   flex-direction: column;
-  gap: 16px;
-  max-width: 650px;  
+  gap: 8px;
+  max-width: 650px;
+  padding-right: 8px;
 }
+
+/* ====================== */
+/*     BAGIAN GRID ATAS   */
+/* ====================== */
 
 .dashboard-top-row {
+  display: grid;
+  grid-template-columns: 150px 180px 180px;
+  grid-template-rows: 70px 70px;
+  grid-template-areas:
+    "suhu posisi ekspresi"
+    "cahaya posisi ekspresi";
+  column-gap: 6px;
+  row-gap: 6px;
+  margin-bottom: 8px;
+  flex-shrink: 0;
+}
+
+/* Suhu card (baris 1 kiri) */
+.suhu-slot {
+  grid-area: suhu;
+}
+
+/* Cahaya card (baris 2 kiri) */
+.cahaya-slot {
+  grid-area: cahaya;
+}
+
+/* Posisi Kursi: membentang dari baris 1 ke baris 2 di kolom 2 */
+.posisi-slot {
+  grid-area: posisi;
+}
+
+/* Ekspresi Suara: membentang dari baris 1 ke baris 2 di kolom 3 */
+.ekspresi-slot {
+  grid-area: ekspresi;
+}
+
+/* Ukuran card posisi kursi sudah disesuaikan */
+.right-seat-card {
+  width: 100%;
+  height: 100%;
   display: flex;
-  flex-direction: column;
-  gap: 12px;
-  width: 260px;    
+  align-items: stretch;
 }
 
-@media (max-width: 1024px) {
-  .dashboard-top-row {
-    grid-template-columns: 1fr;
-  }
+/* Hasil Polling - compact version */
+.dashboard-middle-row {
+  flex-shrink: 0;
 }
 
+/* Tombol generik */
 .card-action-button {
   padding: 6px 12px;
   font-size: 14px;
@@ -84,10 +111,7 @@
   cursor: pointer;
   transition: all 0.2s;
 }
-
 .card-action-button:hover {
   background-color: #f9fafb;
   border-color: #9ca3af;
 }
-
-
