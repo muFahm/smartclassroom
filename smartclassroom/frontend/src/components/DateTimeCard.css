@@ -1,7 +1,7 @@
 .datetime-card {
   background: #ffffff;
   border-radius: 8px;
-  padding: 14px 16px; /* Kurangi padding */
+  padding: 18px 16px; /* Tambah sedikit padding vertikal */
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   border: 1px solid #e5e7eb;
   text-align: center;
@@ -9,16 +9,17 @@
 }
 
 .datetime-date {
-  font-size: 13px; /* Kurangi sedikit */
+  font-size: 15px; /* Perbesar dari 13px */
   color: #1e40af;
   font-weight: 500;
-  margin-bottom: 6px; /* Kurangi margin */
+  margin-bottom: 8px; /* Tambah margin */
 }
 
 .datetime-time {
-  font-size: 42px; /* Kurangi dari 48px */
+  font-size: 56px; /* Perbesar dari 42px */
   font-weight: 700;
   color: #1e40af;
-  font-family: "Arial", sans-serif;
+  font-family: 'Arial', sans-serif;
   line-height: 1;
+  letter-spacing: -1px; /* Tambah letter spacing untuk estetika */
 }
