@@ -5,8 +5,7 @@
   padding: 20px;
   background-color: #f3f4f6;
   height: calc(100vh - 104px);
-  overflow-y: auto;
-  overflow-x: hidden;
+  overflow: hidden; /* Ubah dari overflow-y: auto */
 }
 
 .dashboard-title {
@@ -22,6 +21,41 @@
   grid-template-columns: 280px 1fr;
   gap: 20px;
   align-items: start;
+  height: 100%;
+}
+
+.dashboard-left-column {
+  display: flex;
+  flex-direction: column;
+  gap: 16px; /* Kurangi gap dari 20px ke 16px */
+  height: 100%;
+  overflow-y: auto; /* Hanya kolom kiri yang bisa scroll jika perlu */
+  padding-right: 8px;
+}
+
+/* Custom scrollbar untuk kolom kiri */
+.dashboard-left-column::-webkit-scrollbar {
+  width: 6px;
+}
+
+.dashboard-left-column::-webkit-scrollbar-track {
+  background: #f3f4f6;
+  border-radius: 10px;
+}
+
+.dashboard-left-column::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 10px;
+}
+
+.dashboard-left-column::-webkit-scrollbar-thumb:hover {
+  background: #9ca3af;
+}
+
+.dashboard-right-column {
+  width: 100%;
+  height: 100%;
+  overflow-y: auto;
 }
 
 .card-action-button {
