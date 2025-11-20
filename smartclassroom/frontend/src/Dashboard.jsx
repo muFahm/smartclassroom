@@ -9,6 +9,9 @@ import PosisiKursi from "./components/PosisiKursi";
 import HasilPolling from "./components/HasilPolling";
 import TranskripSuara from "./components/TranskripSuara";
 import EkspresiSuara from "./components/EkspresiSuara";
+import EkspresiWajah from "./components/EkspresiWajah";
+import KlasifikasiGerakan from "./components/KlasifikasiGerakan";
+import AktivitasMahasiswa from "./components/AktivitasMahasiswa";
 import Footer from "./components/Footer";
 import "./Dashboard.css";
 
@@ -19,45 +22,65 @@ export default function Dashboard() {
 
       <div className="dashboard-container">
         <div className="dashboard-grid">
-          {/* Kolom Kiri */}
+
+          {/* ====================================== */}
+          {/* KOLOM KIRI (Kelas, Jam, Widget)        */}
+          {/* ====================================== */}
           <div className="dashboard-left-column">
             <PilihanKelas />
             <DateTimeCard />
             <Widget />
           </div>
 
-          {/* Kolom Kanan (konten utama) */}
+          {/* ====================================== */}
+          {/* KOLOM KANAN (Konten Utama)             */}
+          {/* ====================================== */}
           <div className="dashboard-right-column">
-            {/* TOP ROW: grid 3 kolom, PosisiKursi dan EkspresiSuara span 2 rows */}
-            <div className="dashboard-top-row">
-              <div className="card-slot suhu-slot">
-                <Suhu />
-              </div>
 
-              <div className="card-slot posisi-slot">
-                <div className="right-seat-card">
-                  <PosisiKursi />
+            {/* -------------------------------------- */}
+            {/* TOP ROW: Suhu, Cahaya, Posisi Kursi + 4 Chart */}
+            {/* -------------------------------------- */}
+            <div className="dashboard-top-row">
+              {/* Suhu & Cahaya (kolom kecil kiri) */}
+              <div className="left-cards-container">
+                <div className="suhu-slot">
+                  <Suhu />
+                </div>
+                <div className="cahaya-slot">
+                  <Cahaya />
                 </div>
               </div>
 
-              <div className="card-slot ekspresi-slot">
-                <EkspresiSuara />
+              {/* Posisi Kursi */}
+              <div className="posisi-slot">
+                <PosisiKursi />
               </div>
 
-              <div className="card-slot cahaya-slot">
-                <Cahaya />
+              {/* Grid 4 Chart */}
+              <div className="charts-grid-slot">
+                <div className="chart-card-wrapper">
+                  <EkspresiSuara />
+                </div>
+                <div className="chart-card-wrapper">
+                  <EkspresiWajah />
+                </div>
+                <div className="chart-card-wrapper">
+                  <KlasifikasiGerakan />
+                </div>
+                <div className="chart-card-wrapper">
+                  <AktivitasMahasiswa />
+                </div>
               </div>
             </div>
 
-            {/* Hasil Polling */}
+            {/* -------------------------------------- */}
+            {/* MID ROW: Hasil Polling + Transkrip Suara */}
+            {/* -------------------------------------- */}
             <div className="dashboard-middle-row">
               <HasilPolling />
-            </div>
-
-            {/* Transkrip Suara - Full height sampai footer */}
-            <div className="dashboard-middle-row" style={{ flex: 1 }}>
               <TranskripSuara />
             </div>
+
           </div>
         </div>
       </div>

@@ -1,6 +1,6 @@
-import React from 'react';
-import './PosisiKursi.css';
-import { CHAIR_DATA } from '../utils/mockData';
+import React from "react";
+import "./PosisiKursi.css";
+import { CHAIR_DATA } from "../utils/mockData";
 
 export default function PosisiKursi() {
   const { occupied, total } = CHAIR_DATA;
@@ -31,7 +31,9 @@ export default function PosisiKursi() {
 
       <div className="kursi-content">
         <div className="kursi-display-box">
-          <span className="kursi-count">Kursi : {occupied} / {total}</span>
+          <span className="kursi-count">
+            Kursi : {occupied} / {total}
+          </span>
         </div>
       </div>
     </div>

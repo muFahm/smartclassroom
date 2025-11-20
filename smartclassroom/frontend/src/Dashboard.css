@@ -1,3 +1,7 @@
+/* ====================================================== */
+/*                   DASHBOARD CONTAINER                   */
+/* ====================================================== */
+
 .dashboard-container {
   margin: 0;
   margin-top: 56px;
@@ -5,7 +9,7 @@
   padding: 20px;
   background-color: #f3f4f6;
   height: calc(100vh - 104px);
-  overflow: hidden; /* Prevent scroll */
+  overflow: auto;
 }
 
 .dashboard-grid {
@@ -14,6 +18,10 @@
   gap: 20px;
   height: 100%;
 }
+
+/* ====================================================== */
+/*                  LEFT COLUMN (SIDEBAR)                  */
+/* ====================================================== */
 
 .dashboard-left-column {
   display: flex;
@@ -24,84 +32,117 @@
   padding-right: 8px;
 }
 
-/* Scroll style */
-.dashboard-left-column::-webkit-scrollbar {
-  width: 6px;
-}
-.dashboard-left-column::-webkit-scrollbar-track {
-  background: #f3f4f6;
-  border-radius: 10px;
-}
-.dashboard-left-column::-webkit-scrollbar-thumb {
-  background: #d1d5db;
-  border-radius: 10px;
-}
-.dashboard-left-column::-webkit-scrollbar-thumb:hover {
-  background: #9ca3af;
-}
+/* Scrollbar */
+.dashboard-left-column::-webkit-scrollbar { width: 6px; }
+.dashboard-left-column::-webkit-scrollbar-track { background: #f3f4f6; border-radius: 10px; }
+.dashboard-left-column::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 10px; }
+.dashboard-left-column::-webkit-scrollbar-thumb:hover { background: #9ca3af; }
+
+/* ====================================================== */
+/*                  RIGHT COLUMN (MAIN AREA)               */
+/* ====================================================== */
 
 .dashboard-right-column {
   width: 100%;
   height: 100%;
-  overflow: hidden; /* No scroll */
   display: flex;
   flex-direction: column;
   gap: 8px;
-  max-width: 650px;
+  overflow: hidden !important;
+  max-width: none;
   padding-right: 8px;
 }
 
-/* ====================== */
-/*     BAGIAN GRID ATAS   */
-/* ====================== */
+/* ====================================================== */
+/*                      TOP ROW GRID                      */
+/* ====================================================== */
 
 .dashboard-top-row {
   display: grid;
-  grid-template-columns: 150px 180px 180px;
-  grid-template-rows: 70px 70px;
-  grid-template-areas:
-    "suhu posisi ekspresi"
-    "cahaya posisi ekspresi";
+  grid-template-columns: 150px 180px auto;
+  grid-auto-rows: auto;
+  align-items: start;
   column-gap: 6px;
   row-gap: 6px;
   margin-bottom: 8px;
   flex-shrink: 0;
 }
 
-/* Suhu card (baris 1 kiri) */
-.suhu-slot {
-  grid-area: suhu;
+/* Suhu + Cahaya (Column 1) */
+.left-cards-container {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  grid-column: 1;
+  grid-row: 1;
 }
 
-/* Cahaya card (baris 2 kiri) */
+.suhu-slot,
 .cahaya-slot {
-  grid-area: cahaya;
+  height: 70px;
 }
 
-/* Posisi Kursi: membentang dari baris 1 ke baris 2 di kolom 2 */
+/* Posisi Kursi (Column 2) */
 .posisi-slot {
-  grid-area: posisi;
+  grid-column: 2;
+  grid-row: 1;
+  height: 146px;
 }
 
-/* Ekspresi Suara: membentang dari baris 1 ke baris 2 di kolom 3 */
-.ekspresi-slot {
-  grid-area: ekspresi;
+/* ====================================================== */
+/*                      CHARTS GRID                        */
+/* ====================================================== */
+
+.charts-grid-slot {
+  grid-column: 3;
+  grid-row: 1;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  grid-auto-rows: minmax(260px, auto);
+  gap: 6px;
+
+  /* Fixed width agar tidak overflow */
+  width: 420px !important;
+  max-width: 420px;
+  margin-bottom: 0;
+  padding-bottom: 0;
 }
 
-/* Ukuran card posisi kursi sudah disesuaikan */
-.right-seat-card {
+.chart-card-wrapper {
   width: 100%;
   height: 100%;
-  display: flex;
-  align-items: stretch;
+  min-height: 0;
 }
 
-/* Hasil Polling - compact version */
+/* ====================================================== */
+/*                       MIDDLE ROW                       */
+/* ====================================================== */
+
 .dashboard-middle-row {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+
+  /* Karena layout butuh diposisikan naik */
   flex-shrink: 0;
+  margin-top: -385px;
 }
 
-/* Tombol generik */
+/* ====================================================== */
+/*                      BOTTOM ROW                         */
+/* ====================================================== */
+
+.dashboard-bottom-row {
+  width: 100%;
+  flex-shrink: 0;
+  margin-top: 12px;
+}
+
+/* ====================================================== */
+/*                   GENERIC BUTTONS                       */
+/* ====================================================== */
+
 .card-action-button {
   padding: 6px 12px;
   font-size: 14px;
@@ -111,6 +152,7 @@
   cursor: pointer;
   transition: all 0.2s;
 }
+
 .card-action-button:hover {
   background-color: #f9fafb;
   border-color: #9ca3af;

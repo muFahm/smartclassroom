@@ -1,3 +1,7 @@
+/* ========================= */
+/*       CARD WRAPPER        */
+/* ========================= */
+
 .hasil-polling-card {
   background: #ffffff;
   border-radius: 8px;
@@ -8,6 +12,10 @@
   display: flex;
   flex-direction: column;
 }
+
+/* ========================= */
+/*        HEADER AREA        */
+/* ========================= */
 
 .hasil-polling-header {
   display: flex;
@@ -23,6 +31,7 @@
   margin: 0;
 }
 
+/* Toggle Button (Top-right icon) */
 .toggle-button {
   background: transparent;
   border: none;
@@ -41,16 +50,22 @@
   color: #1f2937;
 }
 
+/* ========================= */
+/*      TABLE CONTAINER      */
+/* ========================= */
+
 .polling-table-container {
   overflow-x: auto;
 }
 
+/* Table layout */
 .polling-table {
   width: 100%;
   border-collapse: collapse;
   font-size: 12px;
 }
 
+/* Table header */
 .polling-table thead {
   background: #f9fafb;
 }
@@ -63,19 +78,26 @@
   border-bottom: 2px solid #e5e7eb;
 }
 
+/* Table body */
 .polling-table td {
   padding: 5px 8px;
   color: #1f2937;
   border-bottom: 1px solid #f3f4f6;
 }
 
+/* Remove last row border */
 .polling-table tbody tr:last-child td {
   border-bottom: none;
 }
 
+/* Hover effect */
 .polling-table tbody tr:hover {
   background: #f9fafb;
 }
+
+/* ========================= */
+/*        BADGE STYLE        */
+/* ========================= */
 
 .jawaban-badge {
   display: inline-block;
@@ -85,11 +107,13 @@
   font-weight: 500;
 }
 
+/* Correct answer */
 .jawaban-badge.benar {
   background: #dcfce7;
   color: #166534;
 }
 
+/* Wrong answer */
 .jawaban-badge.salah {
   background: #fee2e2;
   color: #991b1b;

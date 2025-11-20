@@ -1,4 +1,4 @@
-.ekspresi-suara-card {
+.ekspresi-wajah-card {
   background: #ffffff;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -11,14 +11,14 @@
   flex-direction: column;
 }
 
-.ekspresi-suara-header {
+.ekspresi-wajah-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 8px;
 }
 
-.ekspresi-suara-title {
+.ekspresi-wajah-title {
   font-size: 13px;
   font-weight: 600;
   color: #1f2937;
