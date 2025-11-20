@@ -1,16 +1,16 @@
-import React from 'react';
-import { Pie } from 'react-chartjs-2';
-import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
-import ChartDataLabels from 'chartjs-plugin-datalabels';
-import './AktivitasMahasiswa.css';
-import { ACTIVITY_SUMMARY } from '../utils/mockData';
+import React from "react";
+import { Pie } from "react-chartjs-2";
+import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
+import ChartDataLabels from "chartjs-plugin-datalabels";
+import "./AktivitasMahasiswa.css";
+import { ACTIVITY_SUMMARY } from "../utils/mockData";
 
 // Register Chart.js components
 ChartJS.register(ArcElement, Tooltip, Legend, ChartDataLabels);
 
 export default function AktivitasMahasiswa() {
   const chartData = {
-    labels: ['Duduk', 'Berdiri', 'Berjalan', 'Tidur', 'Main Hp'],
+    labels: ["Duduk", "Berdiri", "Berjalan", "Tidur", "Main Hp"],
     datasets: [
       {
         data: [
@@ -18,14 +18,14 @@ export default function AktivitasMahasiswa() {
           ACTIVITY_SUMMARY.berdiri,
           ACTIVITY_SUMMARY.berjalan,
           ACTIVITY_SUMMARY.tidur,
-          ACTIVITY_SUMMARY.mainHp
+          ACTIVITY_SUMMARY.mainHp,
         ],
         backgroundColor: [
-          '#10b981', // green - Duduk
-          '#ef4444', // red - Berdiri
-          '#f59e0b', // orange - Berjalan
-          '#6b7280', // gray - Tidur
-          '#eab308', // yellow - Main Hp
+          "#10b981", // green - Duduk
+          "#ef4444", // red - Berdiri
+          "#f59e0b", // orange - Berjalan
+          "#6b7280", // gray - Tidur
+          "#eab308", // yellow - Main Hp
         ],
         borderWidth: 0,
       },
@@ -39,8 +39,8 @@ export default function AktivitasMahasiswa() {
     plugins: {
       legend: {
         display: true,
-        position: 'right',
-        align: 'center',
+        position: "right",
+        align: "center",
         labels: {
           boxWidth: 8,
           boxHeight: 8,
@@ -49,27 +49,27 @@ export default function AktivitasMahasiswa() {
             size: 9,
           },
           usePointStyle: true,
-          pointStyle: 'circle',
+          pointStyle: "circle",
         },
       },
       tooltip: {
         enabled: true,
         callbacks: {
-          label: function(context) {
-            return context.label + ': ' + context.parsed + '%';
-          }
-        }
+          label: function (context) {
+            return context.label + ": " + context.parsed + "%";
+          },
+        },
       },
       datalabels: {
-        color: '#fff',
+        color: "#fff",
         font: {
-          weight: 'bold',
+          weight: "bold",
           size: 10,
         },
         formatter: (value) => {
-          return value + '%';
-        }
-      }
+          return value + "%";
+        },
+      },
     },
     layout: {
       padding: {
@@ -87,8 +87,13 @@ export default function AktivitasMahasiswa() {
         <h3 className="aktivitas-mahasiswa-title">Aktivitas Mahasiswa</h3>
         <button className="toggle-button">
           <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-            <path d="M10 4C10 4 4 8.5 4 12C4 14.2091 5.79086 16 8 16H12C14.2091 16 16 14.2091 16 12C16 8.5 10 4 10 4Z" 
-                  stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            <path
+              d="M10 4C10 4 4 8.5 4 12C4 14.2091 5.79086 16 8 16H12C14.2091 16 16 14.2091 16 12C16 8.5 10 4 10 4Z"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
           </svg>
         </button>
       </div>

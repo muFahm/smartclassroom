@@ -22,7 +22,6 @@ export default function Dashboard() {
 
       <div className="dashboard-container">
         <div className="dashboard-grid">
-
           {/* ====================================== */}
           {/* KOLOM KIRI (Kelas, Jam, Widget)        */}
           {/* ====================================== */}
@@ -36,7 +35,6 @@ export default function Dashboard() {
           {/* KOLOM KANAN (Konten Utama)             */}
           {/* ====================================== */}
           <div className="dashboard-right-column">
-
             {/* -------------------------------------- */}
             {/* TOP ROW: Suhu, Cahaya, Posisi Kursi + 4 Chart */}
             {/* -------------------------------------- */}
@@ -80,7 +78,6 @@ export default function Dashboard() {
               <HasilPolling />
               <TranskripSuara />
             </div>
-
           </div>
         </div>
       </div>
