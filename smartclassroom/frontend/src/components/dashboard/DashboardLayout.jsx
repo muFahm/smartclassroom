@@ -1,0 +1,38 @@
+import React from "react";
+import { Link, NavLink, Outlet } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
+
+const navItems = [
+  { label: "Paket Kuis", path: "quizzes" },
+  { label: "Sesi Kuis", path: "sessions" },
+];
+
+export default function DashboardLayout() {
+  const { user, logout } = useAuth();
+
+  return (
+    <div className="dashboard">
+      <aside className="sidebar">
+        <div className="sidebar__brand">
+          <Link to="/dashboard">SmartClassroom</Link>
+        </div>
+        <nav>
+          {navItems.map((item) => (
+            <NavLink key={item.path} to={item.path} className={({ isActive }) => (isActive ? "nav-link active" : "nav-link")}>
+              {item.label}
+            </NavLink>
+          ))}
+        </nav>
+        <div className="sidebar__footer">
+          <p>{user?.email}</p>
+          <button onClick={logout} className="secondary">
+            Keluar
+          </button>
+        </div>
+      </aside>
+      <main className="content">
+        <Outlet />
+      </main>
+    </div>
+  );
+}

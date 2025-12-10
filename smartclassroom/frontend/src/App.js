@@ -1,17 +1,40 @@
 import React from "react";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Login from "./Login";
-import Register from "./Register";
-import Dashboard from "./Dashboard";
+import "./App.css";
+import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
+import { AuthProvider } from "./context/AuthContext";
+import ProtectedRoute from "./components/ProtectedRoute";
+import DashboardLayout from "./components/dashboard/DashboardLayout";
+import LoginPage from "./pages/auth/LoginPage";
+import QuizPackagesPage from "./pages/dashboard/QuizPackagesPage";
+import PackageDetailPage from "./pages/dashboard/PackageDetailPage";
+import SessionsPage from "./pages/dashboard/SessionsPage";
+import SessionDetailPage from "./pages/dashboard/SessionDetailPage";
+import SessionReportPage from "./pages/dashboard/SessionReportPage";
 
 export default function App() {
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-        <Route path="/dashboard" element={<Dashboard />} />
-      </Routes>
-    </BrowserRouter>
+    <AuthProvider>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/login" element={<LoginPage />} />
+          <Route
+            path="/dashboard"
+            element={
+              <ProtectedRoute>
+                <DashboardLayout />
+              </ProtectedRoute>
+            }
+          >
+            <Route index element={<Navigate to="quizzes" replace />} />
+            <Route path="quizzes" element={<QuizPackagesPage />} />
+            <Route path="quizzes/:packageId" element={<PackageDetailPage />} />
+            <Route path="sessions" element={<SessionsPage />} />
+            <Route path="sessions/:sessionId" element={<SessionDetailPage />} />
+            <Route path="sessions/:sessionId/report" element={<SessionReportPage />} />
+          </Route>
+          <Route path="*" element={<Navigate to="/dashboard" replace />} />
+        </Routes>
+      </BrowserRouter>
+    </AuthProvider>
   );
 }
