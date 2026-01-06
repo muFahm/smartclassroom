@@ -3,8 +3,8 @@ import "./TranskripSuara.css";
 import { TRANSCRIPT_DATA } from "../utils/mockData";
 
 export default function TranskripSuara() {
-  // Ambil 4 data pertama untuk tampilan
-  const displayData = TRANSCRIPT_DATA.slice(0, 4);
+  // Tampilkan semua data
+  const displayData = TRANSCRIPT_DATA;
 
   return (
     <div className="transkrip-suara-card">

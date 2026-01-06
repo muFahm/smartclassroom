@@ -33,24 +33,25 @@ export default function EkspresiSuara() {
   const chartOptions = {
     responsive: true,
     maintainAspectRatio: true,
-    aspectRatio: 1.5,
+    aspectRatio: 1.8,
     plugins: {
       legend: {
         display: true,
         position: "right",
         align: "center",
         labels: {
-          boxWidth: 10,
-          boxHeight: 10,
-          padding: 8,
+          boxWidth: 8,
+          boxHeight: 8,
+          padding: 6,
           font: {
-            size: 10,
+            size: 9,
           },
           usePointStyle: true,
-          pointStyle: 'circle',
+          pointStyle: "circle",
         },
       },
       tooltip: {
+        enabled: true,
         callbacks: {
           label: function (context) {
             return context.label + ": " + context.parsed + "%";
@@ -61,7 +62,7 @@ export default function EkspresiSuara() {
         color: "#fff",
         font: {
           weight: "bold",
-          size: 12,
+          size: 10,
         },
         formatter: (value) => {
           return value + "%";
@@ -70,10 +71,10 @@ export default function EkspresiSuara() {
     },
     layout: {
       padding: {
-        left: 5,
-        right: 5,
-        top: 5,
-        bottom: 5,
+        left: 0,
+        right: 0,
+        top: 0,
+        bottom: 0,
       },
     },
   };

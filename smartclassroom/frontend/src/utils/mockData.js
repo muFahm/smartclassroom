@@ -19,20 +19,21 @@ export const SENSOR_DATA = {
 
 // ==================== CHAIR DATA ====================
 export const CHAIR_DATA = {
-  total: 30,
-  occupied: 14,
-  available: 16,
-  percentage: 47, // 14/30 * 100
+  total: 36,
+  occupied: 18,
+  available: 18,
+  percentage: 50, // 18/36 * 100
   // Layout: 1 = Terisi (Blue), 0 = Kosong (Gray)
-  // Format: Array of rows, each row has 6 seats
+  // Format: Array of rows, each row has 9 seats (4 rows)
   layout: [
-    // Row 1 - Dosen area (3 seats)
-    [1, 1, 1, 0, 0, 0],
-    // Row 2-5 - Students (27 seats)
-    [0, 0, 0, 1, 0, 1],
-    [1, 0, 0, 1, 1, 0],
-    [1, 0, 0, 1, 1, 0],
-    [1, 1, 0, 0, 1, 1],
+    // Row 1
+    [1, 1, 1, 0, 0, 0, 1, 1, 0],
+    // Row 2
+    [0, 1, 0, 1, 1, 0, 1, 0, 0],
+    // Row 3
+    [1, 0, 1, 1, 0, 1, 1, 0, 1],
+    // Row 4
+    [1, 1, 0, 0, 1, 1, 0, 1, 1],
   ],
 };
 

@@ -8,9 +8,12 @@
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   border: 1px solid #e5e7eb;
   padding: 8px;
-  width: 336px;
+  width: 100%;      /* ✅ PERBAIKAN */
+  height: 100%;     /* ✅ TAMBAHKAN */
   display: flex;
   flex-direction: column;
+  overflow: hidden; /* ✅ TAMBAHKAN */
+  min-height: 0;    /* ✅ TAMBAHKAN */
 }
 
 /* ========================= */
@@ -25,9 +28,9 @@
 }
 
 .hasil-polling-title {
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 600;
-  color: #1f2937;
+  color: #1e40af;
   margin: 0;
 }
 
@@ -55,14 +58,17 @@
 /* ========================= */
 
 .polling-table-container {
-  overflow-x: auto;
+  overflow-y: auto;
+  overflow-x: hidden;
+  flex: 1;          /* ✅ TAMBAHKAN */
+  min-height: 0;    /* ✅ TAMBAHKAN */
 }
 
 /* Table layout */
 .polling-table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 12px;
+  font-size: 11px;
 }
 
 /* Table header */
@@ -71,7 +77,7 @@
 }
 
 .polling-table th {
-  padding: 6px 8px;
+  padding: 5px 6px;
   text-align: left;
   font-weight: 600;
   color: #374151;
@@ -80,7 +86,7 @@
 
 /* Table body */
 .polling-table td {
-  padding: 5px 8px;
+  padding: 4px 6px;
   color: #1f2937;
   border-bottom: 1px solid #f3f4f6;
 }

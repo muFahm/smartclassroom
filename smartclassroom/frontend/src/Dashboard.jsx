@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import Navbar from "./components/Navbar";
 import PilihanKelas from "./components/PilihanKelas";
 import DateTimeCard from "./components/DateTimeCard";
@@ -12,72 +12,126 @@ import EkspresiSuara from "./components/EkspresiSuara";
 import EkspresiWajah from "./components/EkspresiWajah";
 import KlasifikasiGerakan from "./components/KlasifikasiGerakan";
 import AktivitasMahasiswa from "./components/AktivitasMahasiswa";
+import StatistikPengenalan from "./components/StatistikPengenalan";
 import Footer from "./components/Footer";
 import "./Dashboard.css";
 
 export default function Dashboard() {
+  // ========================================
+  // STATE MANAGEMENT
+  // ========================================
+  
+  // Mode aktif dashboard (default, kuis, diskusi, kolaborasi, presentasi, brainstorming, belajar, praktikum)
+  const [activeMode, setActiveMode] = useState('default');
+  
+  // Visibility widgets (dipindahkan dari Widget.jsx untuk centralized control)
+  const [widgets, setWidgets] = useState({
+    statistikPengenalan: true,
+    aktivitasMahasiswa: true,
+    klasifikasiGerakan: true,
+    ekspresiSuara: true,
+    ekspresiWajah: true,
+    hasilPolling: true,
+    transkripSuara: true,
+    posisiKursi: true,
+  });
+
+  // ========================================
+  // HELPER FUNCTIONS
+  // ========================================
+  
+  // Mengembalikan class CSS berdasarkan mode aktif
+  const getModeClass = () => {
+    return `mode-${activeMode}`;
+  };
+
   return (
     <>
-      <Navbar />
+      <Navbar activeMode={activeMode} setActiveMode={setActiveMode} />
 
       <div className="dashboard-container">
         <div className="dashboard-grid">
-          {/* ====================================== */}
-          {/* KOLOM KIRI (Kelas, Jam, Widget)        */}
-          {/* ====================================== */}
+          {/* ========================================== */}
+          {/* SIDEBAR (STATIS - Tidak berubah di semua mode) */}
+          {/* ========================================== */}
           <div className="dashboard-left-column">
             <PilihanKelas />
             <DateTimeCard />
-            <Widget />
+            
+            {/* Suhu & Cahaya - Side by Side */}
+            <div className="sidebar-sensor-row">
+              <Suhu />
+              <Cahaya />
+            </div>
+            
+            <PosisiKursi mode="sidebar" />
+            <Widget widgets={widgets} setWidgets={setWidgets} />
           </div>
 
-          {/* ====================================== */}
-          {/* KOLOM KANAN (Konten Utama)             */}
-          {/* ====================================== */}
-          <div className="dashboard-right-column">
-            {/* -------------------------------------- */}
-            {/* TOP ROW: Suhu, Cahaya, Posisi Kursi + 4 Chart */}
-            {/* -------------------------------------- */}
-            <div className="dashboard-top-row">
-              {/* Suhu & Cahaya (kolom kecil kiri) */}
-              <div className="left-cards-container">
-                <div className="suhu-slot">
-                  <Suhu />
-                </div>
-                <div className="cahaya-slot">
-                  <Cahaya />
-                </div>
+          {/* ========================================== */}
+          {/* MAIN AREA (DINAMIS - Berubah sesuai mode) */}
+          {/* ========================================== */}
+          <div className={`dashboard-right-column ${getModeClass()}`}>
+            
+            {/* Posisi Kursi (Visual Denah) - Muncul di mode default & kolaborasi */}
+            {widgets.posisiKursi && (
+              <div className="widget-wrapper grid-posisi-denah">
+                <PosisiKursi mode="denah" />
               </div>
+            )}
 
-              {/* Posisi Kursi */}
-              <div className="posisi-slot">
-                <PosisiKursi />
+            {/* Hasil Polling */}
+            {widgets.hasilPolling && (
+              <div className="widget-wrapper grid-polling">
+                <HasilPolling />
               </div>
+            )}
 
-              {/* Grid 4 Chart */}
-              <div className="charts-grid-slot">
-                <div className="chart-card-wrapper">
+            {/* Transkrip Suara */}
+            {widgets.transkripSuara && (
+              <div className="widget-wrapper grid-transkrip">
+                <TranskripSuara />
+              </div>
+            )}
+
+            {/* Charts Grid Container - 4 chart dalam 1 grid */}
+            <div className="charts-container">
+              {/* Ekspresi Suara */}
+              {widgets.ekspresiSuara && (
+                <div className="widget-wrapper grid-ekspresi-suara">
                   <EkspresiSuara />
                 </div>
-                <div className="chart-card-wrapper">
+              )}
+
+              {/* Ekspresi Wajah */}
+              {widgets.ekspresiWajah && (
+                <div className="widget-wrapper grid-ekspresi-wajah">
                   <EkspresiWajah />
                 </div>
-                <div className="chart-card-wrapper">
+              )}
+
+              {/* Klasifikasi Gerakan */}
+              {widgets.klasifikasiGerakan && (
+                <div className="widget-wrapper grid-gerakan">
                   <KlasifikasiGerakan />
                 </div>
-                <div className="chart-card-wrapper">
+              )}
+
+              {/* Aktivitas Mahasiswa */}
+              {widgets.aktivitasMahasiswa && (
+                <div className="widget-wrapper grid-aktivitas">
                   <AktivitasMahasiswa />
                 </div>
-              </div>
+              )}
             </div>
 
-            {/* -------------------------------------- */}
-            {/* MID ROW: Hasil Polling + Transkrip Suara */}
-            {/* -------------------------------------- */}
-            <div className="dashboard-middle-row">
-              <HasilPolling />
-              <TranskripSuara />
-            </div>
+            {/* Statistik Pengenalan (Suara & Wajah) */}
+            {widgets.statistikPengenalan && (
+              <div className="widget-wrapper grid-statistik">
+                <StatistikPengenalan />
+              </div>
+            )}
+
           </div>
         </div>
       </div>

@@ -3,11 +3,11 @@
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   border: 1px solid #e5e7eb;
-  padding: 12px;
+  padding: 8px;
   width: 100%;
   height: 100%;
   display: flex;
-  min-height: 260px;
+  min-height: 0;
   flex-direction: column;
 }
 
@@ -21,7 +21,7 @@
 .ekspresi-wajah-title {
   font-size: 13px;
   font-weight: 600;
-  color: #1f2937;
+  color: #1e40af;
   margin: 0;
 }
 
