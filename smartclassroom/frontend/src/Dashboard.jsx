@@ -23,10 +23,10 @@ export default function Dashboard() {
   // STATE MANAGEMENT
   // ========================================
 
-  // Mode aktif dashboard (default, kuis, diskusi, kolaborasi, presentasi, brainstorming, belajar, praktikum)
+  // Mode aktif dashboard
   const [activeMode, setActiveMode] = useState("default");
 
-  // Visibility widgets (dipindahkan dari Widget.jsx untuk centralized control)
+  // Visibility widgets - DEFAULT SEMUA TRUE untuk testing
   const [widgets, setWidgets] = useState({
     statistikPengenalan: true,
     aktivitasMahasiswa: true,
@@ -37,6 +37,12 @@ export default function Dashboard() {
     transkripSuara: true,
     posisiKursi: true,
   });
+
+  // ========================================
+  // DEBUG - Bisa dihapus nanti
+  // ========================================
+  console.log('🎯 Dashboard - Active Mode:', activeMode);
+  console.log('📊 Dashboard - Widgets:', widgets);
 
   // ========================================
   // HELPER FUNCTIONS
@@ -67,11 +73,11 @@ export default function Dashboard() {
             </div>
 
             <PosisiKursi mode="sidebar" />
-
-            {/* ✅ PASS activeMode ke Widget untuk context-aware filtering */}
-            <Widget
+            
+            {/* ✅ Widget dengan activeMode prop */}
+            <Widget 
               key={activeMode}
-              widgets={widgets}
+              widgets={widgets} 
               setWidgets={setWidgets}
               activeMode={activeMode}
             />
@@ -200,6 +206,63 @@ export default function Dashboard() {
                   {widgets.statistikPengenalan && (
                     <div className="widget-wrapper grid-statistik">
                       <StatistikPengenalan />
+                    </div>
+                  )}
+                </div>
+              </>
+            )}
+
+            {/* ==================== MODE DISKUSI ==================== */}
+            {activeMode === "diskusi" && (
+              <>
+                {/* Statistik Pengenalan - Top Left */}
+                {widgets.statistikPengenalan && (
+                  <div className="widget-wrapper grid-statistik">
+                    <StatistikPengenalan />
+                  </div>
+                )}
+
+                {/* Ekspresi Suara - Top Right */}
+                {widgets.ekspresiSuara && (
+                  <div className="widget-wrapper grid-ekspresi-suara">
+                    <EkspresiSuara />
+                  </div>
+                )}
+
+                {/* Transkrip Suara - Middle Left */}
+                {widgets.transkripSuara && (
+                  <div className="widget-wrapper grid-transkrip">
+                    <TranskripSuara />
+                  </div>
+                )}
+
+                {/* Ekspresi Wajah - Middle Right */}
+                {widgets.ekspresiWajah && (
+                  <div className="widget-wrapper grid-ekspresi-wajah">
+                    <EkspresiWajah />
+                  </div>
+                )}
+
+                {/* Bottom Row - 3 columns */}
+                <div className="grid-bottom-row">
+                  {/* Klasifikasi Gerakan */}
+                  {widgets.klasifikasiGerakan && (
+                    <div className="widget-wrapper grid-klasifikasi">
+                      <KlasifikasiGerakan />
+                    </div>
+                  )}
+
+                  {/* Posisi Kursi Denah */}
+                  {widgets.posisiKursi && (
+                    <div className="widget-wrapper grid-posisi">
+                      <PosisiKursi mode="denah" />
+                    </div>
+                  )}
+
+                  {/* Aktivitas Mahasiswa */}
+                  {widgets.aktivitasMahasiswa && (
+                    <div className="widget-wrapper grid-aktivitas">
+                      <AktivitasMahasiswa />
                     </div>
                   )}
                 </div>

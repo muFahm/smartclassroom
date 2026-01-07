@@ -10,7 +10,6 @@ export default function Navbar({ activeMode, setActiveMode }) {
     { id: "presentasi", label: "Presentasi" },
     { id: "brainstorming", label: "Brainstorming" },
     { id: "belajar", label: "Belajar" },
-    { id: "praktikum", label: "Praktikum" },
   ];
 
   return (

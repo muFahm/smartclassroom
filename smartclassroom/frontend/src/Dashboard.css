@@ -248,6 +248,99 @@
   min-height: 0;
 }
 
+
+/* ====================================================== */
+/*             MODE DISKUSI - Discussion Layout           */
+/* ====================================================== */
+
+.dashboard-right-column.mode-diskusi {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  grid-template-rows: auto 1fr auto;
+  gap: 12px;
+  grid-template-areas:
+    "statistik ekspresi-suara"
+    "transkrip ekspresi-wajah"
+    "bottom-row bottom-row";
+}
+
+.mode-diskusi .grid-statistik {
+  grid-area: statistik;
+  overflow: hidden;
+  min-height: 130px;
+  max-height: 150px;
+}
+
+.mode-diskusi .grid-ekspresi-suara {
+  grid-area: ekspresi-suara;
+  overflow: hidden;
+  min-height: 130px;
+  max-height: 150px;
+}
+
+.mode-diskusi .grid-transkrip {
+  grid-area: transkrip;
+  overflow: hidden;
+  min-height: 0;
+}
+
+/* Highlight Transkrip Suara - sama seperti Soal Kuis */
+.mode-diskusi .grid-transkrip .transkrip-suara-card {
+  border: 2px solid #3b82f6 !important;
+  background: linear-gradient(to bottom, #eff6ff 0%, #ffffff 100%) !important;
+}
+
+.mode-diskusi .grid-ekspresi-wajah {
+  grid-area: ekspresi-wajah;
+  overflow: hidden;
+}
+
+/* Bottom row - 3 columns */
+.mode-diskusi .grid-bottom-row {
+  grid-area: bottom-row;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 12px;
+  min-height: 180px;
+  max-height: 220px;
+}
+
+.mode-diskusi .grid-klasifikasi,
+.mode-diskusi .grid-posisi,
+.mode-diskusi .grid-aktivitas {
+  overflow: hidden;
+  min-height: 0;
+}
+
+/* CSS Override - Transkrip lebih prominent di mode diskusi */
+.mode-diskusi .transkrip-suara-title {
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.mode-diskusi .transkrip-item {
+  padding: 10px 12px;
+}
+
+.mode-diskusi .transkrip-speaker {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.mode-diskusi .transkrip-message {
+  font-size: 13px;
+}
+
+/* Komponen lainnya */
+.mode-diskusi .statistik-pengenalan-title,
+.mode-diskusi .ekspresi-suara-title,
+.mode-diskusi .ekspresi-wajah-title,
+.mode-diskusi .klasifikasi-gerakan-title,
+.mode-diskusi .posisi-kursi-title,
+.mode-diskusi .aktivitas-mahasiswa-title {
+  font-size: 13px;
+}
+
 /* ============================================ */
 /* RIGHT SIDEBAR - PRIORITAS MENENGAH */
 /*    3 Widgets: Klasifikasi, Transkrip, Statistik    */
