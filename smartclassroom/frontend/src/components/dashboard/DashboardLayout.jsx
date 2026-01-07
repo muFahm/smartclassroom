@@ -5,6 +5,7 @@ import { useAuth } from "../../context/AuthContext";
 const navItems = [
   { label: "Paket Kuis", path: "quizzes" },
   { label: "Sesi Kuis", path: "sessions" },
+  { label: "Registrasi Wajah", path: "biometrics/face" },
 ];
 
 export default function DashboardLayout() {
