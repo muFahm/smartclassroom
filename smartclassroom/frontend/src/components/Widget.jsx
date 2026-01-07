@@ -1,159 +1,127 @@
-import React, { useState } from 'react';
-import './Widget.css';
+import React from "react";
+import "./Widget.css";
 
-export default function Widget() {
-  const [widgets, setWidgets] = useState({
-    tampilkanSemua: false,
-    suhu: false,
-    cahaya: false,
-    posisiKursi: false,
-    hasilPolling: false,
-    transkripSuara: false,
-    ekspresiSuara: false,
-    ekspresiWajah: false,
-    klasifikasiGerakan: false,
-    aktivitasMahasiswa: false,
-    statistikSuara: false,
-    statistikWajah: false,
-  });
+export default function Widget({ widgets, setWidgets, activeMode }) {
+  // ========================================
+  // KONFIGURASI WIDGET PER MODE
+  // ========================================
+
+  const getAvailableWidgets = () => {
+    const widgetConfigs = {
+      default: [
+        { key: "posisiKursi", label: "Posisi Kursi" },
+        { key: "hasilPolling", label: "Hasil Polling" },
+        { key: "transkripSuara", label: "Transkrip Suara" },
+        { key: "ekspresiSuara", label: "Ekspresi Suara" },
+        { key: "ekspresiWajah", label: "Ekspresi Wajah" },
+        { key: "klasifikasiGerakan", label: "Klasifikasi Gerakan" },
+        { key: "aktivitasMahasiswa", label: "Aktivitas Mahasiswa" },
+        { key: "statistikPengenalan", label: "Statistik Pengenalan" },
+      ],
+      kuis: [
+        { key: "hasilPolling", label: "Hasil Polling" },
+        { key: "klasifikasiGerakan", label: "Klasifikasi Gerakan" },
+        { key: "transkripSuara", label: "Transkrip Suara" },
+        { key: "statistikPengenalan", label: "Statistik Pengenalan" },
+        { key: "ekspresiWajah", label: "Ekspresi Wajah" },
+        { key: "ekspresiSuara", label: "Ekspresi Suara" },
+      ],
+    };
+
+    return widgetConfigs[activeMode] || widgetConfigs.default;
+  };
+
+  // ========================================
+  // GET MODE LABEL FOR BADGE
+  // ========================================
+
+  const getModeLabel = () => {
+    const labels = {
+      default: "Dashboard Utama",
+      kuis: "Mode Kuis",
+      diskusi: "Mode Diskusi",
+      kolaborasi: "Mode Kolaborasi",
+      presentasi: "Mode Presentasi",
+      brainstorming: "Mode Brainstorming",
+      belajar: "Mode Belajar",
+      praktikum: "Mode Praktikum",
+    };
+    return labels[activeMode] || "Dashboard";
+  };
+
+  // ========================================
+  // HANDLERS
+  // ========================================
 
   const handleCheckboxChange = (name) => {
-    setWidgets(prev => ({
+    setWidgets((prev) => ({
       ...prev,
-      [name]: !prev[name]
+      [name]: !prev[name],
     }));
   };
 
+  const availableWidgets = getAvailableWidgets();
+
   const handleTampilkanSemua = () => {
-    const newValue = !widgets.tampilkanSemua;
-    setWidgets({
-      tampilkanSemua: newValue,
-      suhu: newValue,
-      cahaya: newValue,
-      posisiKursi: newValue,
-      hasilPolling: newValue,
-      transkripSuara: newValue,
-      ekspresiSuara: newValue,
-      ekspresiWajah: newValue,
-      klasifikasiGerakan: newValue,
-      aktivitasMahasiswa: newValue,
-      statistikSuara: newValue,
-      statistikWajah: newValue,
+    // Check hanya widget yang available di mode ini
+    const availableKeys = availableWidgets.map((w) => w.key);
+    const allAvailableChecked = availableKeys.every(
+      (key) => widgets[key] === true
+    );
+    const newValue = !allAvailableChecked;
+
+    // Update hanya widget yang available di mode aktif
+    const updates = {};
+    availableKeys.forEach((key) => {
+      updates[key] = newValue;
     });
+
+    setWidgets((prev) => ({
+      ...prev,
+      ...updates,
+    }));
   };
+
+  // Check apakah semua widget yang available sudah checked
+  const availableKeys = availableWidgets.map((w) => w.key);
+  const allAvailableChecked = availableKeys.every(
+    (key) => widgets[key] === true
+  );
+
+  // ========================================
+  // RENDER
+  // ========================================
 
   return (
     <div className="widget-card">
-      <h3 className="widget-title">Widget</h3>
-      
+      {/* Header with Mode Badge */}
+      <div className="widget-header">
+        <h3 className="widget-title">Widget</h3>
+        <span className="widget-mode-badge">{getModeLabel()}</span>
+      </div>
+
       <div className="widget-list">
+        {/* Tampilkan Semua - Toggle All Available Widgets */}
         <label className="widget-item">
           <input
             type="checkbox"
-            checked={widgets.tampilkanSemua}
+            checked={allAvailableChecked}
             onChange={handleTampilkanSemua}
           />
           <span>Tampilkan Semua</span>
         </label>
 
-        <label className="widget-item">
-          <input
-            type="checkbox"
-            checked={widgets.suhu}
-            onChange={() => handleCheckboxChange('suhu')}
-          />
-          <span>Suhu</span>
-        </label>
-
-        <label className="widget-item">
-          <input
-            type="checkbox"
-            checked={widgets.cahaya}
-            onChange={() => handleCheckboxChange('cahaya')}
-          />
-          <span>Cahaya</span>
-        </label>
-
-        <label className="widget-item">
-          <input
-            type="checkbox"
-            checked={widgets.posisiKursi}
-            onChange={() => handleCheckboxChange('posisiKursi')}
-          />
-          <span>Posisi Kursi</span>
-        </label>
-
-        <label className="widget-item">
-          <input
-            type="checkbox"
-            checked={widgets.hasilPolling}
-            onChange={() => handleCheckboxChange('hasilPolling')}
-          />
-          <span>Hasil Polling</span>
-        </label>
-
-        <label className="widget-item">
-          <input
-            type="checkbox"
-            checked={widgets.transkripSuara}
-            onChange={() => handleCheckboxChange('transkripSuara')}
-          />
-          <span>Transkrip Suara</span>
-        </label>
-
-        <label className="widget-item">
-          <input
-            type="checkbox"
-            checked={widgets.ekspresiSuara}
-            onChange={() => handleCheckboxChange('ekspresiSuara')}
-          />
-          <span>Ekspresi Suara</span>
-        </label>
-
-        <label className="widget-item">
-          <input
-            type="checkbox"
-            checked={widgets.ekspresiWajah}
-            onChange={() => handleCheckboxChange('ekspresiWajah')}
-          />
-          <span>Ekspresi Wajah</span>
-        </label>
-
-        <label className="widget-item">
-          <input
-            type="checkbox"
-            checked={widgets.klasifikasiGerakan}
-            onChange={() => handleCheckboxChange('klasifikasiGerakan')}
-          />
-          <span>Klasifikasi Gerakan</span>
-        </label>
-
-        <label className="widget-item">
-          <input
-            type="checkbox"
-            checked={widgets.aktivitasMahasiswa}
-            onChange={() => handleCheckboxChange('aktivitasMahasiswa')}
-          />
-          <span>Aktivitas Mahasiswa</span>
-        </label>
-
-        <label className="widget-item">
-          <input
-            type="checkbox"
-            checked={widgets.statistikSuara}
-            onChange={() => handleCheckboxChange('statistikSuara')}
-          />
-          <span>Statistik Pengenalan Suara</span>
-        </label>
-
-        <label className="widget-item">
-          <input
-            type="checkbox"
-            checked={widgets.statistikWajah}
-            onChange={() => handleCheckboxChange('statistikWajah')}
-          />
-          <span>Statistik Pengenalan Wajah</span>
-        </label>
+        {/* Render HANYA widget yang available di mode ini */}
+        {availableWidgets.map(({ key, label }) => (
+          <label key={key} className="widget-item">
+            <input
+              type="checkbox"
+              checked={widgets[key]}
+              onChange={() => handleCheckboxChange(key)}
+            />
+            <span>{label}</span>
+          </label>
+        ))}
       </div>
     </div>
   );

@@ -1,24 +1,54 @@
 .widget-card {
   background: #ffffff;
   border-radius: 8px;
-  padding: 14px 16px;
+  padding: 10px 12px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   border: 1px solid #e5e7eb;
   width: 100%;
 }
 
+/* ========================================== */
+/*              WIDGET HEADER                 */
+/* ========================================== */
+
+.widget-header {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+
 .widget-title {
-  font-size: 15px;
+  font-size: 13px;
   font-weight: 600;
   color: #1e40af;
-  margin: 0 0 12px 0;
+  margin: 0;
   padding: 0;
 }
+
+/* Mode Badge - Shows current active mode */
+.widget-mode-badge {
+  font-size: 9px;
+  font-weight: 600;
+  color: #1e40af;
+  background: #eff6ff;
+  padding: 3px 8px;
+  border-radius: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+  align-self: flex-start;
+  border: 1px solid #dbeafe;
+}
+
+/* ========================================== */
+/*              WIDGET LIST                   */
+/* ========================================== */
 
 .widget-list {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 6px;
 }
 
 .widget-item {
@@ -35,15 +65,15 @@
 }
 
 .widget-item input[type="checkbox"] {
-  width: 16px;
-  height: 16px;
+  width: 14px;
+  height: 14px;
   cursor: pointer;
   accent-color: #1e40af;
   flex-shrink: 0;
 }
 
 .widget-item span {
-  font-size: 14px;
+  font-size: 12px;
   color: #374151;
   font-weight: 400;
   line-height: 1.3;
@@ -52,4 +82,24 @@
 .widget-item input[type="checkbox"]:checked + span {
   color: #1e40af;
   font-weight: 500;
+}
+
+/* ========================================== */
+/*         FIRST ITEM (Tampilkan Semua)      */
+/* ========================================== */
+
+.widget-item:first-of-type {
+  padding-bottom: 6px;
+  border-bottom: 1px solid #e5e7eb;
+  margin-bottom: 2px;
+}
+
+.widget-item:first-of-type span {
+  font-weight: 500;
+  color: #1f2937;
+}
+
+.widget-item:first-of-type input[type="checkbox"]:checked + span {
+  color: #1e40af;
+  font-weight: 600;
 }

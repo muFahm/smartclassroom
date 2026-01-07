@@ -70,11 +70,11 @@ export default function StatistikPengenalan() {
         position: "top",
         align: "end",
         labels: {
-          boxWidth: 15,
-          boxHeight: 15,
-          padding: 15,
+          boxWidth: 10,
+          boxHeight: 10,
+          padding: 8,
           font: {
-            size: 12,
+            size: 10,
             weight: "500",
           },
           usePointStyle: false,
@@ -136,17 +136,6 @@ export default function StatistikPengenalan() {
         <h3 className="statistik-pengenalan-title">
           Statistik Pengenalan Wajah dan Suara
         </h3>
-        <button className="toggle-button">
-          <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-            <path
-              d="M10 4C10 4 4 8.5 4 12C4 14.2091 5.79086 16 8 16H12C14.2091 16 16 14.2091 16 12C16 8.5 10 4 10 4Z"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
-        </button>
       </div>
 
       <div className="chart-container">

@@ -57,11 +57,44 @@ export const POLLING_DATA = [
   { id: "06411002", nama: "Maulana", jawaban: "Benar" },
 ];
 
+// Polling data untuk mode kuis (jawaban a/b/c/d)
+export const POLLING_DATA_KUIS = [
+  { id: "06422025", nama: "Hany", jawaban: "a" },
+  { id: "06422058", nama: "Raja", jawaban: "b" },
+  { id: "06422014", nama: "Ratu", jawaban: "b" },
+  { id: "06422025", nama: "Chaesa", jawaban: "a" },
+  { id: "06422523", nama: "Sonya", jawaban: "c" },
+  { id: "06400225", nama: "Mandari", jawaban: "a" },
+  { id: "06422104", nama: "Kharisma", jawaban: "a" },
+  { id: "06422100", nama: "Ziddan", jawaban: "d" },
+  { id: "06422111", nama: "Josua", jawaban: "b" },
+  { id: "06422510", nama: "Fahmi", jawaban: "a" },
+  { id: "06411200", nama: "Dimas", jawaban: "a" },
+  { id: "06422115", nama: "Bintang", jawaban: "a" },
+  { id: "06422336", nama: "Rodrick", jawaban: "c" },
+  { id: "06422551", nama: "Ridho", jawaban: "b" },
+  { id: "06411222", nama: "Aldi", jawaban: "a" },
+  { id: "06411002", nama: "Maulana", jawaban: "a" },
+];
+
 export const POLLING_SUMMARY = {
   correct: 8,
   wrong: 6,
   total: 14,
   accuracy: 57, // percentage
+};
+
+// ==================== KUIS DATA ====================
+export const KUIS_ACTIVE = {
+  nomor: 1,
+  pertanyaan: "Manakah yang merupakan tipe data string di JavaScript ?",
+  pilihan: [
+    { label: "a", text: '"Hello World"' },
+    { label: "b", text: "123" },
+    { label: "c", text: "true" },
+    { label: "d", text: "null" },
+  ],
+  jawaban_benar: "a",
 };
 
 // ==================== STUDENT ACTIVITY DATA ====================

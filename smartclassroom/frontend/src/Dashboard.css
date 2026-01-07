@@ -187,6 +187,226 @@
 }
 
 /* ====================================================== */
+/*               MODE KUIS - Quiz Layout                  */
+/*            NO SCROLL - Everything Fits in View         */
+/* ====================================================== */
+
+.dashboard-right-column.mode-kuis {
+  display: grid;
+  grid-template-columns: 2fr 1fr; /* Left: 66%, Right: 33% */
+  grid-template-rows: 1fr;
+  gap: 12px;
+  grid-template-areas: "left-main right-sidebar";
+  overflow: hidden;
+  min-height: 0;
+}
+
+/* ============================================ */
+/* LEFT MAIN - PRIORITAS UTAMA */
+/* Soal + Polling + Mini Realtime (Ekspresi) */
+/* ============================================ */
+
+.mode-kuis .grid-left-main {
+  grid-area: left-main;
+  display: grid;
+  grid-template-rows: auto 1fr auto; /* Soal - Polling - Realtime */
+  gap: 12px;
+  overflow: hidden;
+  min-height: 0;
+  height: 100%;
+}
+
+/* Soal Kuis - Fixed height di atas */
+.mode-kuis .grid-soal {
+  grid-row: 1;
+  height: auto;
+  min-height: 140px;
+  max-height: 180px;
+  overflow: hidden;
+}
+
+/* Hasil Polling - Flex grow (PRIORITAS UTAMA) */
+.mode-kuis .grid-polling {
+  grid-row: 2;
+  overflow: hidden;
+  min-height: 0;
+}
+
+/* Mini Realtime Bar - Ekspresi Wajah + Suara */
+.mode-kuis .grid-mini-realtime {
+  grid-row: 3;
+  display: grid;
+  grid-template-columns: 1fr 1fr; /* Side by side */
+  gap: 10px;
+  height: 140px; /* Fixed compact height */
+  overflow: hidden;
+}
+
+.mode-kuis .grid-ekspresi-wajah-mini,
+.mode-kuis .grid-ekspresi-suara-mini {
+  overflow: hidden;
+  min-height: 0;
+}
+
+/* ============================================ */
+/* RIGHT SIDEBAR - PRIORITAS MENENGAH */
+/*    3 Widgets: Klasifikasi, Transkrip, Statistik    */
+/* ============================================ */
+
+.mode-kuis .grid-right-sidebar {
+  grid-area: right-sidebar;
+  display: grid;
+  grid-template-rows: 1fr 1fr 1fr; /* 33% each */
+  gap: 12px;
+  overflow: hidden;
+  min-height: 0;
+  height: 100%;
+}
+
+/* PRIORITAS MENENGAH - Equal size */
+.mode-kuis .grid-klasifikasi,
+.mode-kuis .grid-transkrip,
+.mode-kuis .grid-statistik {
+  overflow: hidden;
+  min-height: 0;
+}
+
+/* ============================================ */
+/* STYLING ENHANCEMENT untuk Mode Kuis */
+/* ============================================ */
+
+/* Polling - Highlight Border */
+.mode-kuis .hasil-polling-card {
+  border: 2px solid #3b82f6;
+  box-shadow: 0 4px 6px rgba(59, 130, 246, 0.1);
+}
+
+.mode-kuis .hasil-polling-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: #1e40af;
+}
+
+.mode-kuis .polling-table {
+  font-size: 13px;
+}
+
+.mode-kuis .polling-table th {
+  font-size: 13px;
+  padding: 8px 10px;
+  background: #eff6ff;
+}
+
+.mode-kuis .polling-table td {
+  font-size: 13px;
+  padding: 8px 10px;
+}
+
+/* Soal - Highlight Border */
+.mode-kuis .soal-kuis-card {
+  border: 2px solid #3b82f6;
+  background: linear-gradient(to bottom, #eff6ff 0%, #ffffff 100%);
+}
+
+.mode-kuis .soal-title {
+  font-size: 14px;
+  color: #1e40af;
+  font-weight: 700;
+}
+
+.mode-kuis .soal-pertanyaan {
+  font-size: 13px;
+  font-weight: 600;
+  color: #1f2937;
+  line-height: 1.4;
+}
+
+.mode-kuis .pilihan-item {
+  font-size: 11px;
+  gap: 4px;
+}
+
+.mode-kuis .pilihan-label {
+  font-size: 11px;
+}
+
+.mode-kuis .pilihan-text {
+  font-size: 11px;
+}
+
+/* Komponen Prioritas Menengah - Sidebar Kanan */
+.mode-kuis .klasifikasi-gerakan-card,
+.mode-kuis .transkrip-suara-card,
+.mode-kuis .statistik-pengenalan-card {
+  padding: 8px;
+}
+
+.mode-kuis .klasifikasi-gerakan-title,
+.mode-kuis .transkrip-suara-title,
+.mode-kuis .statistik-pengenalan-title {
+  font-size: 12px;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.mode-kuis .klasifikasi-gerakan-header,
+.mode-kuis .transkrip-suara-header,
+.mode-kuis .statistik-pengenalan-header {
+  margin-bottom: 4px;
+}
+
+/* Transkrip - Compact Items */
+.mode-kuis .transkrip-item {
+  padding: 2px 0;
+  gap: 4px;
+}
+
+.mode-kuis .transkrip-time {
+  font-size: 9px;
+  min-width: 32px;
+}
+
+.mode-kuis .transkrip-text {
+  font-size: 10px;
+  line-height: 1.3;
+}
+
+/* Mini Realtime - Ekspresi Wajah & Suara (Compact) */
+.mode-kuis .grid-mini-realtime .ekspresi-wajah-card,
+.mode-kuis .grid-mini-realtime .ekspresi-suara-card {
+  padding: 6px;
+  border: 1px solid #e5e7eb;
+}
+
+.mode-kuis .grid-mini-realtime .ekspresi-wajah-title,
+.mode-kuis .grid-mini-realtime .ekspresi-suara-title {
+  font-size: 10px;
+  font-weight: 600;
+  margin-bottom: 3px;
+}
+
+.mode-kuis .grid-mini-realtime .ekspresi-wajah-header,
+.mode-kuis .grid-mini-realtime .ekspresi-suara-header {
+  margin-bottom: 3px;
+}
+
+.mode-kuis .grid-mini-realtime .chart-container {
+  padding: 2px;
+}
+
+/* Toggle buttons di mode kuis - lebih kecil */
+.mode-kuis .toggle-button {
+  padding: 2px;
+  width: 20px;
+  height: 20px;
+}
+
+.mode-kuis .toggle-button svg {
+  width: 14px;
+  height: 14px;
+}
+
+/* ====================================================== */
 /*                  WIDGET WRAPPER                         */
 /* ====================================================== */
 
@@ -223,24 +443,42 @@
 /* ====================================================== */
 
 /* Untuk layar 1366x768 */
-@media (max-width: 1440px) {
+@media (max-width: 1440px) and (max-height: 800px) {
   .dashboard-container {
     padding: 12px;
   }
-  
+
   .dashboard-grid {
     grid-template-columns: 260px 1fr;
     gap: 12px;
   }
-  
+
   .dashboard-right-column.mode-default {
     grid-template-columns: 300px 1fr;
     grid-template-rows: minmax(160px, 180px) minmax(140px, 160px) 1fr;
     gap: 10px;
   }
-  
+
   .mode-default .charts-container {
     gap: 10px;
+  }
+
+  /* Mode Kuis Responsive */
+  .mode-kuis .grid-soal {
+    min-height: 120px;
+    max-height: 150px;
+  }
+
+  .mode-kuis .grid-mini-realtime {
+    height: 120px;
+  }
+
+  .mode-kuis .soal-pertanyaan {
+    font-size: 12px;
+  }
+
+  .mode-kuis .pilihan-item {
+    font-size: 10px;
   }
 }
 
@@ -250,14 +488,29 @@
     grid-template-columns: 300px 1fr;
     gap: 18px;
   }
-  
+
   .dashboard-right-column.mode-default {
     grid-template-columns: 340px 1fr;
     grid-template-rows: minmax(200px, 220px) minmax(180px, 200px) 1fr;
     gap: 14px;
   }
-  
+
   .mode-default .charts-container {
+    gap: 14px;
+  }
+
+  /* Mode Kuis Responsive */
+  .mode-kuis .grid-soal {
+    min-height: 160px;
+    max-height: 200px;
+  }
+
+  .mode-kuis .grid-mini-realtime {
+    height: 160px;
+    gap: 12px;
+  }
+
+  .mode-kuis .grid-right-sidebar {
     gap: 14px;
   }
 }

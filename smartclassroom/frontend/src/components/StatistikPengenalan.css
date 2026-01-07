@@ -6,22 +6,22 @@
   display: flex;
   flex-direction: column;
   width: 100%;
-  height: 100%;     /* ✅ PENTING */
+  height: 100%; /* ✅ PENTING */
   overflow: hidden; /* ✅ PENTING */
-  min-height: 0;    /* ✅ TAMBAHKAN JIKA BELUM ADA */
+  min-height: 0; /* ✅ TAMBAHKAN JIKA BELUM ADA */
 }
 
 .statistik-pengenalan-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 6px;
+  margin-bottom: 4px;
 }
 
 .statistik-pengenalan-title {
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 600;
-  color: #1e40af;
+  color: #1f2937;
   margin: 0;
 }
 
@@ -45,6 +45,6 @@
   width: 100%;
   position: relative;
   flex: 1;
-  min-height: 0;    /* ✅ PENTING */
+  min-height: 0; /* ✅ PENTING */
   overflow: hidden; /* ✅ TAMBAHKAN JIKA BELUM ADA */
 }

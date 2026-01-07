@@ -1,26 +1,16 @@
 import React from "react";
 import "./HasilPolling.css";
-import { POLLING_DATA } from "../utils/mockData";
+import { POLLING_DATA, POLLING_DATA_KUIS } from "../utils/mockData";
 
-export default function HasilPolling() {
-  // Ambil 3 data pertama untuk tampilan
-  const displayData = POLLING_DATA.slice(0, 3);
+export default function HasilPolling({ mode = "default" }) {
+  // Gunakan data berbeda untuk mode kuis
+  const sourceData = mode === "kuis" ? POLLING_DATA_KUIS : POLLING_DATA;
+  const displayData = mode === "kuis" ? sourceData : sourceData.slice(0, 3);
 
   return (
     <div className="hasil-polling-card">
       <div className="hasil-polling-header">
         <h3 className="hasil-polling-title">Hasil Polling</h3>
-        <button className="toggle-button">
-          <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-            <path
-              d="M10 4C10 4 4 8.5 4 12C4 14.2091 5.79086 16 8 16H12C14.2091 16 16 14.2091 16 12C16 8.5 10 4 10 4Z"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
-        </button>
       </div>
 
       <div className="polling-table-container">

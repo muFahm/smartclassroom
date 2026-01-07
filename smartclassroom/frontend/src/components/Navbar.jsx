@@ -1,7 +1,18 @@
 import React from "react";
 import "./Navbar.css";
 
-export default function Navbar() {
+export default function Navbar({ activeMode, setActiveMode }) {
+  const modes = [
+    { id: "default", label: "Dashboard Utama" },
+    { id: "kuis", label: "Kuis" },
+    { id: "diskusi", label: "Diskusi" },
+    { id: "kolaborasi", label: "Kolaborasi" },
+    { id: "presentasi", label: "Presentasi" },
+    { id: "brainstorming", label: "Brainstorming" },
+    { id: "belajar", label: "Belajar" },
+    { id: "praktikum", label: "Praktikum" },
+  ];
+
   return (
     <nav className="navbar">
       <div className="navbar-left">
@@ -9,21 +20,15 @@ export default function Navbar() {
       </div>
 
       <div className="navbar-center">
-        <a href="#dashboard" className="navbar-link">
-          Dashboard Utama
-        </a>
-        <a href="#kursi" className="navbar-link">
-          Kursi & Polling
-        </a>
-        <a href="#mahasiswa" className="navbar-link">
-          Aktivitas Mahasiswa
-        </a>
-        <a href="#suara" className="navbar-link">
-          Aktivitas Suara
-        </a>
-        <a href="#wajah" className="navbar-link">
-          Aktivitas Wajah
-        </a>
+        {modes.map((mode) => (
+          <button
+            key={mode.id}
+            className={`navbar-link ${activeMode === mode.id ? "active" : ""}`}
+            onClick={() => setActiveMode(mode.id)}
+          >
+            {mode.label}
+          </button>
+        ))}
       </div>
 
       <div className="navbar-right">

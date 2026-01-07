@@ -4,12 +4,12 @@
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   border: 1px solid #e5e7eb;
   padding: 8px;
-  width: 100%;      /* ✅ PERBAIKAN */
-  height: 100%;     /* ✅ TAMBAHKAN */
+  width: 100%; /* ✅ PERBAIKAN */
+  height: 100%; /* ✅ TAMBAHKAN */
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  min-height: 0;    /* ✅ TAMBAHKAN */
+  min-height: 0; /* ✅ TAMBAHKAN */
 }
 
 .transkrip-suara-header {
@@ -22,7 +22,7 @@
 .transkrip-suara-title {
   font-size: 13px;
   font-weight: 600;
-  color: #1e40af;
+  color: #1f2937;
   margin: 0;
 }
 
@@ -51,7 +51,7 @@
   overflow-y: auto;
   overflow-x: hidden;
   flex: 1;
-  min-height: 0;  /* ✅ PENTING */
+  min-height: 0; /* ✅ PENTING */
 }
 
 .transkrip-item {
