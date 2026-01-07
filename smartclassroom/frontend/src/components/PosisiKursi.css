@@ -46,20 +46,20 @@
 .kursi-content {
   flex: 1;
   display: flex;
-  align-items: center;
-  justify-content: center;
+  align-items: flex-start;
+  justify-content: flex-start;
   padding: 4px;
 }
 
 .kursi-display-box {
   background: #f3f4f6;
-  border-radius: 8px;
-  padding: 12px;
+  border-radius: 6px;
+  padding: 10px;
   width: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 50px;
+  min-height: 45px;
 }
 
 .kursi-count {
@@ -73,23 +73,34 @@
 /* ====================================================== */
 
 .posisi-kursi-card.compact {
-  padding: 8px;
+  padding: 6px 8px;
+  height: auto;
+  min-height: auto;
+}
+
+.posisi-kursi-card.compact .posisi-kursi-header {
+  margin-bottom: 4px;
 }
 
 .posisi-kursi-card.compact .posisi-kursi-title {
   font-size: 12px;
   color: #1e40af;
-  margin-bottom: 6px;
+  margin-bottom: 4px;
+}
+
+.posisi-kursi-card.compact .kursi-content {
+  flex: none;
+  padding: 0;
 }
 
 .posisi-kursi-card.compact .kursi-display-box {
   padding: 8px;
-  min-height: 40px;
+  min-height: 36px;
   border-radius: 6px;
 }
 
 .posisi-kursi-card.compact .kursi-count {
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 600;
 }
 
@@ -102,14 +113,14 @@
 }
 
 .posisi-kursi-card.denah {
-  height: 100%;     /* ✅ PASTIKAN ADA */
+  height: 100%; /* ✅ PASTIKAN ADA */
   overflow: hidden; /* ✅ PASTIKAN ADA */
-  min-height: 0;    /* ✅ TAMBAHKAN */
+  min-height: 0; /* ✅ TAMBAHKAN */
 }
 
 .posisi-kursi-card.denah .kursi-content {
   flex: 1;
-  min-height: 0;    /* ✅ TAMBAHKAN */
+  min-height: 0; /* ✅ TAMBAHKAN */
   overflow: hidden; /* ✅ PASTIKAN ADA */
   flex-direction: column;
   gap: 2px;
@@ -192,7 +203,8 @@
 
 /* Animasi Pulse untuk Bangku Terisi */
 @keyframes pulse-blue {
-  0%, 100% {
+  0%,
+  100% {
     opacity: 1;
     transform: scale(1);
   }
