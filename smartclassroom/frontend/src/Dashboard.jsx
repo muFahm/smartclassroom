@@ -41,8 +41,8 @@ export default function Dashboard() {
   // ========================================
   // DEBUG - Bisa dihapus nanti
   // ========================================
-  console.log('🎯 Dashboard - Active Mode:', activeMode);
-  console.log('📊 Dashboard - Widgets:', widgets);
+  console.log("🎯 Dashboard - Active Mode:", activeMode);
+  console.log("📊 Dashboard - Widgets:", widgets);
 
   // ========================================
   // HELPER FUNCTIONS
@@ -73,11 +73,11 @@ export default function Dashboard() {
             </div>
 
             <PosisiKursi mode="sidebar" />
-            
+
             {/* ✅ Widget dengan activeMode prop */}
-            <Widget 
+            <Widget
               key={activeMode}
-              widgets={widgets} 
+              widgets={widgets}
               setWidgets={setWidgets}
               activeMode={activeMode}
             />
@@ -206,6 +206,69 @@ export default function Dashboard() {
                   {widgets.statistikPengenalan && (
                     <div className="widget-wrapper grid-statistik">
                       <StatistikPengenalan />
+                    </div>
+                  )}
+                </div>
+              </>
+            )}
+
+            {/* ==================== MODE KOLABORASI ==================== */}
+            {activeMode === "kolaborasi" && (
+              <>
+                {/* Column 1 - Posisi Kursi (Full Height) */}
+                {widgets.posisiKursi && (
+                  <div className="widget-wrapper grid-col1">
+                    <PosisiKursi mode="denah" />
+                  </div>
+                )}
+
+                {/* Column 2 - Ekspresi Suara + Klasifikasi */}
+                <div className="grid-col2">
+                  {/* Ekspresi Suara */}
+                  {widgets.ekspresiSuara && (
+                    <div className="widget-wrapper grid-ekspresi-suara-col2">
+                      <EkspresiSuara />
+                    </div>
+                  )}
+
+                  {/* Klasifikasi Gerakan */}
+                  {widgets.klasifikasiGerakan && (
+                    <div className="widget-wrapper grid-klasifikasi-col2">
+                      <KlasifikasiGerakan />
+                    </div>
+                  )}
+                </div>
+
+                {/* Column 3 - Ekspresi Wajah + Aktivitas */}
+                <div className="grid-col3">
+                  {/* Ekspresi Wajah */}
+                  {widgets.ekspresiWajah && (
+                    <div className="widget-wrapper grid-ekspresi-wajah-col3">
+                      <EkspresiWajah />
+                    </div>
+                  )}
+
+                  {/* Aktivitas Mahasiswa */}
+                  {widgets.aktivitasMahasiswa && (
+                    <div className="widget-wrapper grid-aktivitas-col3">
+                      <AktivitasMahasiswa />
+                    </div>
+                  )}
+                </div>
+
+                {/* Bottom Row - Mini */}
+                <div className="grid-bottom-row">
+                  {/* Statistik Pengenalan */}
+                  {widgets.statistikPengenalan && (
+                    <div className="widget-wrapper grid-statistik-bottom">
+                      <StatistikPengenalan />
+                    </div>
+                  )}
+
+                  {/* Transkrip Suara */}
+                  {widgets.transkripSuara && (
+                    <div className="widget-wrapper grid-transkrip-bottom">
+                      <TranskripSuara />
                     </div>
                   )}
                 </div>

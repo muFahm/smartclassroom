@@ -248,7 +248,6 @@
   min-height: 0;
 }
 
-
 /* ====================================================== */
 /*             MODE DISKUSI - Discussion Layout           */
 /* ====================================================== */
@@ -339,6 +338,164 @@
 .mode-diskusi .posisi-kursi-title,
 .mode-diskusi .aktivitas-mahasiswa-title {
   font-size: 13px;
+}
+
+
+/* ====================================================== */
+/*         MODE KOLABORASI - Collaboration Layout        */
+/*     Focus: Posisi Kursi Denah (Object Detection)      */
+/* ====================================================== */
+
+.dashboard-right-column.mode-kolaborasi {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-rows: 1fr auto;
+  gap: 12px;
+  grid-template-areas:
+    "col1 col2 col3"
+    "bottom-row bottom-row bottom-row";
+}
+
+/* Column 1 - Posisi Kursi (Full Height) */
+.mode-kolaborasi .grid-col1 {
+  grid-area: col1;
+  overflow: hidden;
+  min-height: 0;
+}
+
+/* Highlight Posisi Kursi Denah */
+.mode-kolaborasi .grid-col1 .posisi-kursi-card {
+  border: 2px solid #3b82f6 !important;
+  background: linear-gradient(to bottom, #eff6ff 0%, #ffffff 100%) !important;
+}
+
+.mode-kolaborasi .posisi-kursi-title {
+  font-size: 15px !important;
+  font-weight: 600 !important;
+  color: #1e40af !important;
+}
+
+/* Column 2 - Ekspresi Suara + Klasifikasi */
+.mode-kolaborasi .grid-col2 {
+  grid-area: col2;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  overflow: hidden;
+}
+
+.mode-kolaborasi .grid-ekspresi-suara-col2,
+.mode-kolaborasi .grid-klasifikasi-col2 {
+  flex: 1;
+  overflow: hidden;
+  min-height: 0;
+}
+
+/* Column 3 - Ekspresi Wajah + Aktivitas */
+.mode-kolaborasi .grid-col3 {
+  grid-area: col3;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  overflow: hidden;
+}
+
+.mode-kolaborasi .grid-ekspresi-wajah-col3,
+.mode-kolaborasi .grid-aktivitas-col3 {
+  flex: 1;
+  overflow: hidden;
+  min-height: 0;
+}
+
+/* Bottom Row - Statistik + Transkrip (MINI) */
+.mode-kolaborasi .grid-bottom-row {
+  grid-area: bottom-row;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  min-height: 130px;
+  max-height: 150px;
+  overflow: hidden;
+}
+
+.mode-kolaborasi .grid-statistik-bottom,
+.mode-kolaborasi .grid-transkrip-bottom {
+  overflow: hidden;
+  min-height: 0;
+}
+
+/* CSS Override - Komponen bottom row lebih compact */
+.mode-kolaborasi .transkrip-suara-title,
+.mode-kolaborasi .statistik-pengenalan-title {
+  font-size: 12px;
+}
+
+.mode-kolaborasi .transkrip-item {
+  padding: 8px 10px;
+}
+
+.mode-kolaborasi .transkrip-speaker {
+  font-size: 11px;
+}
+
+.mode-kolaborasi .transkrip-message {
+  font-size: 11px;
+}
+
+/* Komponen sidebar */
+.mode-kolaborasi .aktivitas-mahasiswa-title,
+.mode-kolaborasi .klasifikasi-gerakan-title,
+.mode-kolaborasi .ekspresi-suara-title,
+.mode-kolaborasi .ekspresi-wajah-title {
+  font-size: 13px;
+}
+
+/* CSS Override - Posisi Kursi Denah lebih besar untuk prioritas */
+.mode-kolaborasi .kursi-grid .kursi-seat {
+  width: 32px !important;
+  height: 32px !important;
+}
+
+.mode-kolaborasi .kursi-grid .seat-dot {
+  width: 18px !important;
+  height: 18px !important;
+}
+
+.mode-kolaborasi .kursi-grid {
+  gap: 8px !important;
+  padding: 12px !important;
+}
+
+.mode-kolaborasi .kursi-row {
+  gap: 8px !important;
+}
+
+/* Tampilkan jumlah kursi di mode kolaborasi */
+.mode-kolaborasi .kursi-legend {
+  font-size: 14px !important;
+  font-weight: 600 !important;
+}
+
+.mode-kolaborasi .kursi-stats {
+  display: flex !important;
+  gap: 16px;
+  margin-top: 12px;
+  padding: 8px 12px;
+  background: #f9fafb;
+  border-radius: 6px;
+}
+
+.mode-kolaborasi .kursi-stat-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+}
+
+.mode-kolaborasi .kursi-stat-count {
+  font-weight: 700;
+  font-size: 15px;
+  color: #1f2937;
 }
 
 /* ============================================ */
