@@ -218,7 +218,7 @@ export default function Dashboard() {
                 {/* Column 1 - Posisi Kursi (Full Height) */}
                 {widgets.posisiKursi && (
                   <div className="widget-wrapper grid-col1">
-                    <PosisiKursi mode="denah" />
+                    <PosisiKursi mode="denah" showStats={true} />
                   </div>
                 )}
 

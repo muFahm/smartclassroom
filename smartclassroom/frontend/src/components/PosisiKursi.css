@@ -63,8 +63,8 @@
 }
 
 .kursi-count {
-  font-size: 16px;
-  font-weight: 600;
+  font-size: 10px;
+  font-weight: 800;
   color: #1f2937;
 }
 
@@ -96,7 +96,7 @@
 }
 
 .posisi-kursi-card.compact .kursi-count {
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 700;
 }
 

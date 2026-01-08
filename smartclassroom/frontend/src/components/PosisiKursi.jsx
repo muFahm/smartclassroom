@@ -2,7 +2,7 @@ import React from "react";
 import "./PosisiKursi.css";
 import { CHAIR_DATA } from "../utils/mockData";
 
-export default function PosisiKursi({ mode = "sidebar" }) {
+export default function PosisiKursi({ mode = "sidebar", showStats = false }) {
   const { occupied, total, layout } = CHAIR_DATA;
 
   // Mode Sidebar: Tampilan compact
@@ -16,7 +16,7 @@ export default function PosisiKursi({ mode = "sidebar" }) {
         <div className="kursi-content">
           <div className="kursi-display-box">
             <span className="kursi-count">
-              Kursi : {occupied} / {total}
+              Kursi Terisi : {occupied} / {total}
             </span>
           </div>
         </div>
@@ -49,17 +49,37 @@ export default function PosisiKursi({ mode = "sidebar" }) {
           ))}
         </div>
 
-        {/* Legend */}
-        <div className="kursi-legend">
-          <div className="legend-item">
-            <div className="legend-dot occupied"></div>
-            <span>Terisi</span>
+        {/* Legend / Count Statistics */}
+        {showStats ? (
+          // Mode Kolaborasi: Count Statistics dengan angka
+          <div className="kursi-stats">
+            <div className="kursi-stat-item">
+              <div className="legend-dot occupied"></div>
+              <span>
+                Terisi: <span className="kursi-stat-count">{occupied}</span>
+              </span>
+            </div>
+            <div className="kursi-stat-item">
+              <div className="legend-dot empty"></div>
+              <span>
+                Kosong:{" "}
+                <span className="kursi-stat-count">{total - occupied}</span>
+              </span>
+            </div>
           </div>
-          <div className="legend-item">
-            <div className="legend-dot empty"></div>
-            <span>Kosong</span>
+        ) : (
+          // Mode Lain: Legend Traditional tanpa angka
+          <div className="kursi-legend">
+            <div className="legend-item">
+              <div className="legend-dot occupied"></div>
+              <span>Terisi</span>
+            </div>
+            <div className="legend-item">
+              <div className="legend-dot empty"></div>
+              <span>Kosong</span>
+            </div>
           </div>
-        </div>
+        )}
       </div>
     </div>
   );

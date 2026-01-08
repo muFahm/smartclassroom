@@ -340,7 +340,6 @@
   font-size: 13px;
 }
 
-
 /* ====================================================== */
 /*         MODE KOLABORASI - Collaboration Layout        */
 /*     Focus: Posisi Kursi Denah (Object Detection)      */
@@ -361,6 +360,12 @@
   grid-area: col1;
   overflow: hidden;
   min-height: 0;
+}
+
+/* Vertical centering untuk denah */
+.mode-kolaborasi .kursi-content {
+  justify-content: center;
+  align-items: center;
 }
 
 /* Highlight Posisi Kursi Denah */
@@ -478,11 +483,15 @@
 
 .mode-kolaborasi .kursi-stats {
   display: flex !important;
-  gap: 16px;
-  margin-top: 12px;
-  padding: 8px 12px;
+  justify-content: center !important;
+  align-items: center !important;
+  gap: 24px;
+  margin: 12px auto 0 auto;
+  padding: 10px 20px;
   background: #f9fafb;
-  border-radius: 6px;
+  border-radius: 8px;
+  width: fit-content;
+  max-width: 90%;
 }
 
 .mode-kolaborasi .kursi-stat-item {
