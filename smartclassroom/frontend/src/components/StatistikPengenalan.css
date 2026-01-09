@@ -1,8 +1,9 @@
 .statistik-pengenalan-card {
   background: white;
   border-radius: 8px;
-  padding: 8px;
+  padding: 12px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e5e7eb;
   display: flex;
   flex-direction: column;
   width: 100%;
@@ -15,7 +16,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 4px;
+  margin-bottom: 8px;
 }
 
 .statistik-pengenalan-title {

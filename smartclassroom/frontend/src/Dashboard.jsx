@@ -278,10 +278,10 @@ export default function Dashboard() {
             {/* ==================== MODE DISKUSI ==================== */}
             {activeMode === "diskusi" && (
               <>
-                {/* Statistik Pengenalan - Top Left */}
-                {widgets.statistikPengenalan && (
-                  <div className="widget-wrapper grid-statistik">
-                    <StatistikPengenalan />
+                {/* Transkrip Suara - Top Left (PRIORITY) */}
+                {widgets.transkripSuara && (
+                  <div className="widget-wrapper grid-transkrip">
+                    <TranskripSuara />
                   </div>
                 )}
 
@@ -292,10 +292,10 @@ export default function Dashboard() {
                   </div>
                 )}
 
-                {/* Transkrip Suara - Middle Left */}
-                {widgets.transkripSuara && (
-                  <div className="widget-wrapper grid-transkrip">
-                    <TranskripSuara />
+                {/* Statistik Pengenalan - Middle Left */}
+                {widgets.statistikPengenalan && (
+                  <div className="widget-wrapper grid-statistik">
+                    <StatistikPengenalan />
                   </div>
                 )}
 
@@ -326,6 +326,194 @@ export default function Dashboard() {
                   {widgets.aktivitasMahasiswa && (
                     <div className="widget-wrapper grid-aktivitas">
                       <AktivitasMahasiswa />
+                    </div>
+                  )}
+                </div>
+              </>
+            )}
+
+            {/* ==================== MODE PRESENTASI ==================== */}
+            {activeMode === "presentasi" && (
+              <>
+                {/* Left Main - Transkrip + Statistik */}
+                <div className="grid-left-main">
+                  {/* Transkrip Suara (PRIORITY) */}
+                  {widgets.transkripSuara && (
+                    <div className="widget-wrapper grid-transkrip">
+                      <TranskripSuara />
+                    </div>
+                  )}
+
+                  {/* Statistik Pengenalan - Below Transkrip */}
+                  {widgets.statistikPengenalan && (
+                    <div className="widget-wrapper grid-statistik">
+                      <StatistikPengenalan />
+                    </div>
+                  )}
+                </div>
+
+                {/* Right Sidebar */}
+                <div className="grid-right-sidebar">
+                  {/* Klasifikasi Gerakan - Presenter Gesture */}
+                  {widgets.klasifikasiGerakan && (
+                    <div className="widget-wrapper grid-klasifikasi">
+                      <KlasifikasiGerakan />
+                    </div>
+                  )}
+
+                  {/* Ekspresi Suara - Di bawah Klasifikasi */}
+                  {widgets.ekspresiSuara && (
+                    <div className="widget-wrapper grid-ekspresi-suara">
+                      <EkspresiSuara />
+                    </div>
+                  )}
+
+                  {/* Mini Row - Aktivitas + Ekspresi Wajah (Compact) */}
+                  <div className="grid-mini-row">
+                    {widgets.aktivitasMahasiswa && (
+                      <div className="widget-wrapper grid-aktivitas-mini">
+                        <AktivitasMahasiswa />
+                      </div>
+                    )}
+
+                    {widgets.ekspresiWajah && (
+                      <div className="widget-wrapper grid-ekspresi-wajah-mini">
+                        <EkspresiWajah />
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </>
+            )}
+
+            {/* ==================== MODE BRAINSTORMING ==================== */}
+            {activeMode === "brainstorming" && (
+              <>
+                {/* Left Column - Transkrip + Bottom Row */}
+                <div className="grid-left-column">
+                  {/* Transkrip Suara (PRIORITY) */}
+                  {widgets.transkripSuara && (
+                    <div className="widget-wrapper grid-transkrip">
+                      <TranskripSuara />
+                    </div>
+                  )}
+
+                  {/* Bottom Row - Posisi Kursi + Ekspresi Suara */}
+                  <div className="grid-left-bottom-row">
+                    {/* Posisi Kursi - Denah (PRIORITY) */}
+                    {widgets.posisiKursi && (
+                      <div className="widget-wrapper grid-posisi">
+                        <PosisiKursi mode="denah" />
+                      </div>
+                    )}
+
+                    {/* Ekspresi Suara - Antusiasme (PRIORITY) */}
+                    {widgets.ekspresiSuara && (
+                      <div className="widget-wrapper grid-ekspresi-suara-left">
+                        <EkspresiSuara />
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Right Sidebar */}
+                <div className="grid-right-sidebar">
+                  {/* Statistik Pengenalan (PRIORITY) */}
+                  {widgets.statistikPengenalan && (
+                    <div className="widget-wrapper grid-statistik">
+                      <StatistikPengenalan />
+                    </div>
+                  )}
+
+                  {/* Klasifikasi Gerakan */}
+                  {widgets.klasifikasiGerakan && (
+                    <div className="widget-wrapper grid-klasifikasi">
+                      <KlasifikasiGerakan />
+                    </div>
+                  )}
+
+                  {/* Bottom Row - 2 Visual Widgets (Larger) */}
+                  <div className="grid-right-bottom-row">
+                    {widgets.ekspresiWajah && (
+                      <div className="widget-wrapper grid-ekspresi-wajah">
+                        <EkspresiWajah />
+                      </div>
+                    )}
+
+                    {widgets.aktivitasMahasiswa && (
+                      <div className="widget-wrapper grid-aktivitas">
+                        <AktivitasMahasiswa />
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </>
+            )}
+
+            {/* ==================== MODE BELAJAR ==================== */}
+            {activeMode === "belajar" && (
+              <>
+                {/* Left Column - 2 Rows */}
+                <div className="belajar-left-column">
+                  {/* Top Row - Aktivitas + Ekspresi Wajah (PRIORITY) */}
+                  <div className="belajar-top-row">
+                    {widgets.aktivitasMahasiswa && (
+                      <div className="widget-wrapper belajar-grid-aktivitas">
+                        <AktivitasMahasiswa />
+                      </div>
+                    )}
+
+                    {widgets.ekspresiWajah && (
+                      <div className="widget-wrapper belajar-grid-wajah">
+                        <EkspresiWajah />
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Bottom Row - Polling + Posisi Denah */}
+                  <div className="belajar-left-bottom-row">
+                    {widgets.hasilPolling && (
+                      <div className="widget-wrapper belajar-grid-polling-left">
+                        <HasilPolling />
+                      </div>
+                    )}
+
+                    {widgets.posisiKursi && (
+                      <div className="widget-wrapper belajar-grid-posisi-denah">
+                        <PosisiKursi mode="denah" />
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Right Column */}
+                <div className="belajar-right-column">
+                  {/* Transkrip Suara (MENENGAH) */}
+                  {widgets.transkripSuara && (
+                    <div className="widget-wrapper belajar-grid-transkrip">
+                      <TranskripSuara />
+                    </div>
+                  )}
+
+                  {/* Middle Row - Ekspresi Suara + Klasifikasi Gerakan (MENENGAH) */}
+                  <div className="belajar-middle-row">
+                    {widgets.ekspresiSuara && (
+                      <div className="widget-wrapper belajar-grid-ekspresi">
+                        <EkspresiSuara />
+                      </div>
+                    )}
+
+                    {widgets.klasifikasiGerakan && (
+                      <div className="widget-wrapper belajar-grid-klasifikasi">
+                        <KlasifikasiGerakan />
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Statistik Pengenalan (RENDAH) */}
+                  {widgets.statistikPengenalan && (
+                    <div className="widget-wrapper belajar-grid-statistik">
+                      <StatistikPengenalan />
                     </div>
                   )}
                 </div>

@@ -54,6 +54,33 @@ export default function Widget({
         { key: "transkripSuara", label: "Transkrip Suara" },
         { key: "ekspresiSuara", label: "Ekspresi Suara" },
       ],
+      presentasi: [
+        { key: "transkripSuara", label: "Transkrip Suara" },
+        { key: "klasifikasiGerakan", label: "Klasifikasi Gerakan" },
+        { key: "statistikPengenalan", label: "Statistik Pengenalan" },
+        { key: "ekspresiWajah", label: "Ekspresi Wajah" },
+        { key: "aktivitasMahasiswa", label: "Aktivitas Mahasiswa" },
+        { key: "ekspresiSuara", label: "Ekspresi Suara" },
+      ],
+      brainstorming: [
+        { key: "transkripSuara", label: "Transkrip Suara" },
+        { key: "statistikPengenalan", label: "Statistik Pengenalan" },
+        { key: "posisiKursi", label: "Posisi Kursi" },
+        { key: "ekspresiSuara", label: "Ekspresi Suara" },
+        { key: "ekspresiWajah", label: "Ekspresi Wajah" },
+        { key: "aktivitasMahasiswa", label: "Aktivitas Mahasiswa" },
+        { key: "klasifikasiGerakan", label: "Klasifikasi Gerakan" },
+      ],
+      belajar: [
+        { key: "aktivitasMahasiswa", label: "Aktivitas Mahasiswa" },
+        { key: "ekspresiWajah", label: "Ekspresi Wajah" },
+        { key: "statistikPengenalan", label: "Statistik Pengenalan" },
+        { key: "posisiKursi", label: "Posisi Kursi" },
+        { key: "transkripSuara", label: "Transkrip Suara" },
+        { key: "ekspresiSuara", label: "Ekspresi Suara" },
+        { key: "klasifikasiGerakan", label: "Klasifikasi Gerakan" },
+        { key: "hasilPolling", label: "Hasil Polling" },
+      ],
     };
 
     return widgetConfigs[activeMode] || widgetConfigs.default;

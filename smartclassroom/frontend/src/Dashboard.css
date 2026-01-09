@@ -258,13 +258,13 @@
   grid-template-rows: auto 1fr auto;
   gap: 12px;
   grid-template-areas:
-    "statistik ekspresi-suara"
-    "transkrip ekspresi-wajah"
+    "transkrip ekspresi-suara"
+    "statistik ekspresi-wajah"
     "bottom-row bottom-row";
 }
 
-.mode-diskusi .grid-statistik {
-  grid-area: statistik;
+.mode-diskusi .grid-transkrip {
+  grid-area: transkrip;
   overflow: hidden;
   min-height: 130px;
   max-height: 150px;
@@ -277,8 +277,8 @@
   max-height: 150px;
 }
 
-.mode-diskusi .grid-transkrip {
-  grid-area: transkrip;
+.mode-diskusi .grid-statistik {
+  grid-area: statistik;
   overflow: hidden;
   min-height: 0;
 }
@@ -507,6 +507,500 @@
   color: #1f2937;
 }
 
+/* ====================================================== */
+/*         MODE PRESENTASI - Presentation Layout          */
+/*      Focus: Transkrip Suara (Speech-to-Text)          */
+/* ====================================================== */
+
+.dashboard-right-column.mode-presentasi {
+  display: grid;
+  grid-template-columns: 2fr 1fr; /* Left: 66%, Right: 33% */
+  grid-template-rows: 1fr;
+  gap: 12px;
+  grid-template-areas: "left-main right-sidebar";
+  overflow: hidden;
+  min-height: 0;
+}
+
+/* Left Main - Transkrip + Statistik */
+.mode-presentasi .grid-left-main {
+  grid-area: left-main;
+  display: grid;
+  grid-template-rows: 1fr auto; /* Transkrip flex, Statistik compact */
+  gap: 12px;
+  overflow: hidden;
+  min-height: 0;
+}
+
+.mode-presentasi .grid-transkrip {
+  overflow: hidden;
+  min-height: 0;
+}
+
+.mode-presentasi .grid-statistik {
+  min-height: 180px;
+  max-height: 220px;
+  overflow: hidden;
+}
+
+/* Highlight Transkrip Suara - Extra Wide dengan Auto-Scroll */
+.mode-presentasi .grid-transkrip .transkrip-suara-card {
+  border: 2px solid #3b82f6 !important;
+  background: linear-gradient(to bottom, #eff6ff 0%, #ffffff 100%) !important;
+  height: 100%;
+}
+
+.mode-presentasi .transkrip-suara-title {
+  font-size: 16px !important;
+  font-weight: 700 !important;
+  color: #1e40af !important;
+}
+
+.mode-presentasi .transkrip-content {
+  max-height: calc(100% - 40px) !important;
+  overflow-y: auto !important;
+}
+
+.mode-presentasi .transkrip-item {
+  padding: 12px 14px !important;
+  margin-bottom: 8px !important;
+}
+
+.mode-presentasi .transkrip-speaker {
+  font-size: 14px !important;
+  font-weight: 700 !important;
+}
+
+.mode-presentasi .transkrip-message {
+  font-size: 14px !important;
+  line-height: 1.6 !important;
+}
+
+/* Right Sidebar - Supporting Widgets */
+.mode-presentasi .grid-right-sidebar {
+  grid-area: right-sidebar;
+  display: grid;
+  grid-template-rows: 1fr 1fr auto; /* Klasifikasi - Ekspresi Suara - Mini Row */
+  gap: 12px;
+  overflow: hidden;
+  min-height: 0;
+}
+
+.mode-presentasi .grid-klasifikasi,
+.mode-presentasi .grid-ekspresi-suara {
+  overflow: hidden;
+  min-height: 0;
+}
+
+/* Highlight Priority Widgets - Klasifikasi Gerakan & Ekspresi Suara */
+.mode-presentasi .klasifikasi-gerakan-card {
+  border: 2px solid #3b82f6 !important;
+  background: linear-gradient(to bottom, #eff6ff 0%, #ffffff 100%) !important;
+}
+
+.mode-presentasi .ekspresi-suara-card {
+  border: 2px solid #3b82f6 !important;
+  background: linear-gradient(to bottom, #eff6ff 0%, #ffffff 100%) !important;
+}
+
+/* Mini Row - Aktivitas + Ekspresi Wajah (Compact Side by Side) */
+.mode-presentasi .grid-mini-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  height: 140px; /* Fixed compact height */
+  overflow: hidden;
+}
+
+.mode-presentasi .grid-aktivitas-mini,
+.mode-presentasi .grid-ekspresi-wajah-mini {
+  overflow: hidden;
+  min-height: 0;
+}
+
+/* CSS Override - Klasifikasi Gerakan Prominent untuk Presenter */
+.mode-presentasi .klasifikasi-gerakan-title {
+  font-size: 14px !important;
+  font-weight: 700 !important;
+  color: #1e40af !important;
+}
+
+/* CSS Override - Mini widgets lebih compact */
+.mode-presentasi .grid-mini-row .aktivitas-mahasiswa-card,
+.mode-presentasi .grid-mini-row .ekspresi-wajah-card {
+  padding: 6px !important;
+}
+
+.mode-presentasi .grid-mini-row .aktivitas-mahasiswa-title,
+.mode-presentasi .grid-mini-row .ekspresi-wajah-title {
+  font-size: 11px !important;
+  font-weight: 600 !important;
+  margin-bottom: 3px !important;
+}
+
+.mode-presentasi .statistik-pengenalan-title,
+.mode-presentasi .ekspresi-suara-title {
+  font-size: 14px !important;
+  font-weight: 700 !important;
+  color: #1e40af !important;
+}
+
+/* ====================================================== */
+/*       MODE BRAINSTORMING - Ideation Layout             */
+/*    Focus: Transkrip + Statistik + Posisi Duduk        */
+/* ====================================================== */
+
+.dashboard-right-column.mode-brainstorming {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr; /* Left: 55%, Right: 45% */
+  grid-template-rows: 1fr;
+  gap: 16px;
+  grid-template-areas: "left-column right-sidebar";
+  overflow: hidden;
+  min-height: 0;
+  padding: 4px;
+}
+
+/* Left Column - Transkrip + Posisi Kursi */
+.mode-brainstorming .grid-left-column {
+  grid-area: left-column;
+  display: grid;
+  grid-template-rows: 1fr auto; /* Transkrip flex, Bottom row compact */
+  gap: 12px;
+  overflow: hidden;
+  min-height: 0;
+}
+
+/* Left Bottom Row - Posisi Kursi + Klasifikasi Gerakan */
+.mode-brainstorming .grid-left-bottom-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr; /* 2 equal columns */
+  gap: 12px;
+  min-height: 180px;
+  max-height: 200px;
+  overflow: hidden;
+}
+
+/* Transkrip Suara in Left Column */
+.mode-brainstorming .grid-transkrip {
+  overflow: hidden;
+  min-height: 0;
+}
+
+/* Highlight Transkrip - Extra Large untuk Brainstorming */
+.mode-brainstorming .grid-transkrip .transkrip-suara-card {
+  border: 2px solid #3b82f6 !important;
+  background: linear-gradient(to bottom, #eff6ff 0%, #ffffff 100%) !important;
+  height: 100%;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15) !important;
+  border-radius: 12px !important;
+  transition: all 0.3s ease;
+}
+
+.mode-brainstorming .grid-left-main .transkrip-suara-card:hover {
+  box-shadow: 0 6px 20px rgba(59, 130, 246, 0.25) !important;
+  transform: translateY(-2px);
+}
+
+.mode-brainstorming .transkrip-suara-title {
+  font-size: 16px !important;
+  font-weight: 700 !important;
+  color: #1e40af !important;
+}
+
+.mode-brainstorming .transkrip-content {
+  max-height: calc(100% - 40px) !important;
+  overflow-y: auto !important;
+}
+
+.mode-brainstorming .transkrip-item {
+  padding: 12px 14px !important;
+  margin-bottom: 8px !important;
+}
+
+.mode-brainstorming .transkrip-speaker {
+  font-size: 14px !important;
+  font-weight: 700 !important;
+}
+
+.mode-brainstorming .transkrip-message {
+  font-size: 14px !important;
+  line-height: 1.6 !important;
+}
+
+/* Right Sidebar - Supporting Widgets */
+.mode-brainstorming .grid-right-sidebar {
+  grid-area: right-sidebar;
+  display: grid;
+  grid-template-rows: 1fr 1fr auto; /* Statistik - Ekspresi - Bottom Row */
+  gap: 12px;
+  overflow: hidden;
+  min-height: 0;
+  padding: 4px;
+  border-radius: 8px;
+}
+
+/* Right Bottom Row - Ekspresi Wajah + Aktivitas (Larger) */
+.mode-brainstorming .grid-right-bottom-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr; /* 2 equal columns */
+  gap: 12px;
+  min-height: 180px;
+  max-height: 200px;
+  overflow: hidden;
+}
+
+/* Statistik Pengenalan - Priority dengan Outline */
+.mode-brainstorming .grid-statistik {
+  overflow: hidden;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.mode-brainstorming .statistik-pengenalan-card {
+  border: 2px solid #3b82f6 !important;
+  background: linear-gradient(to bottom, #eff6ff 0%, #ffffff 100%) !important;
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.12) !important;
+  border-radius: 10px !important;
+  transition: all 0.3s ease;
+}
+
+.mode-brainstorming .statistik-pengenalan-card:hover {
+  box-shadow: 0 4px 16px rgba(59, 130, 246, 0.2) !important;
+  transform: translateY(-1px);
+}
+
+.mode-brainstorming .statistik-pengenalan-title {
+  font-size: 14px !important;
+  font-weight: 700 !important;
+  color: #1e40af !important;
+}
+
+/* Posisi Kursi - Priority dalam Left Bottom Row */
+.mode-brainstorming .grid-posisi {
+  overflow: hidden;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Klasifikasi Gerakan in Left Bottom Row */
+.mode-brainstorming .grid-klasifikasi {
+  overflow: hidden;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.mode-brainstorming .klasifikasi-gerakan-card {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
+  border-radius: 10px !important;
+  transition: all 0.3s ease;
+  height: 100% !important;
+}
+
+.mode-brainstorming .klasifikasi-gerakan-card:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15) !important;
+  transform: translateY(-1px);
+}
+
+/* Ekspresi Suara in Left Bottom Row - Priority */
+.mode-brainstorming .grid-ekspresi-suara-left {
+  overflow: hidden;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.mode-brainstorming .grid-ekspresi-suara-left .ekspresi-suara-card {
+  border: 2px solid #3b82f6 !important;
+  background: linear-gradient(to bottom, #eff6ff 0%, #ffffff 100%) !important;
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.12) !important;
+  border-radius: 10px !important;
+  transition: all 0.3s ease;
+  height: 100% !important;
+}
+
+.mode-brainstorming .grid-ekspresi-suara-left .ekspresi-suara-card:hover {
+  box-shadow: 0 4px 16px rgba(59, 130, 246, 0.2) !important;
+  transform: translateY(-1px);
+}
+
+.mode-brainstorming .grid-ekspresi-suara-left .ekspresi-suara-title {
+  font-size: 14px !important;
+  font-weight: 700 !important;
+  color: #1e40af !important;
+}
+
+.mode-brainstorming .posisi-kursi-card {
+  border: 2px solid #3b82f6 !important;
+  background: linear-gradient(to bottom, #eff6ff 0%, #ffffff 100%) !important;
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.12) !important;
+  border-radius: 10px !important;
+  transition: all 0.3s ease;
+  height: 100% !important;
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+.mode-brainstorming .posisi-kursi-card:hover {
+  box-shadow: 0 4px 16px rgba(59, 130, 246, 0.2) !important;
+  transform: translateY(-1px);
+}
+
+.mode-brainstorming .posisi-kursi-title {
+  font-size: 14px !important;
+  font-weight: 700 !important;
+  color: #1e40af !important;
+}
+
+/* Klasifikasi Gerakan in Left Bottom Row */
+.mode-brainstorming .grid-klasifikasi {
+  overflow: hidden;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.mode-brainstorming .klasifikasi-gerakan-card {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
+  border-radius: 10px !important;
+  transition: all 0.3s ease;
+  height: 100% !important;
+}
+
+.mode-brainstorming .klasifikasi-gerakan-card:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15) !important;
+  transform: translateY(-1px);
+}
+
+/* Posisi Kursi - Denah Content Styling for Brainstorming */
+.mode-brainstorming .kursi-content {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 8px !important;
+  flex: 1 !important;
+}
+
+.mode-brainstorming .kursi-grid {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 6px !important;
+  padding: 8px !important;
+  background: #f9fafb !important;
+  border-radius: 8px !important;
+  margin-bottom: 8px !important;
+}
+
+.mode-brainstorming .kursi-row {
+  display: flex !important;
+  gap: 6px !important;
+  justify-content: center !important;
+}
+
+.mode-brainstorming .kursi-seat {
+  width: 20px !important;
+  height: 20px !important;
+  border-radius: 4px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  transition: all 0.2s ease !important;
+}
+
+.mode-brainstorming .kursi-seat.occupied {
+  background: #3b82f6 !important;
+}
+
+.mode-brainstorming .kursi-seat.empty {
+  background: #e5e7eb !important;
+}
+
+.mode-brainstorming .kursi-seat .seat-dot {
+  width: 10px !important;
+  height: 10px !important;
+  border-radius: 50% !important;
+  background: white !important;
+  opacity: 0.8 !important;
+}
+
+.mode-brainstorming .kursi-legend {
+  display: flex !important;
+  gap: 16px !important;
+  justify-content: center !important;
+  padding: 6px !important;
+  background: #f9fafb !important;
+  border-radius: 6px !important;
+  font-size: 11px !important;
+}
+
+/* Ekspresi Suara - Menengah dengan Outline */
+.mode-brainstorming .grid-ekspresi-suara {
+  overflow: hidden;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.mode-brainstorming .ekspresi-suara-card {
+  border: 2px solid #3b82f6 !important;
+  background: linear-gradient(to bottom, #eff6ff 0%, #ffffff 100%) !important;
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.12) !important;
+  border-radius: 10px !important;
+  transition: all 0.3s ease;
+}
+
+.mode-brainstorming .ekspresi-suara-card:hover {
+  box-shadow: 0 4px 16px rgba(59, 130, 246, 0.2) !important;
+  transform: translateY(-1px);
+}
+
+.mode-brainstorming .ekspresi-suara-title {
+  font-size: 14px !important;
+  font-weight: 700 !important;
+  color: #1e40af !important;
+}
+
+/* Ekspresi Wajah & Aktivitas in Right Bottom Row (Larger) */
+.mode-brainstorming .grid-ekspresi-wajah,
+.mode-brainstorming .grid-aktivitas {
+  overflow: hidden;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.mode-brainstorming .grid-right-bottom-row .ekspresi-wajah-card,
+.mode-brainstorming .grid-right-bottom-row .aktivitas-mahasiswa-card {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
+  border-radius: 10px !important;
+  transition: all 0.3s ease;
+  height: 100% !important;
+  padding: 10px !important;
+}
+
+.mode-brainstorming .grid-right-bottom-row .ekspresi-wajah-card:hover,
+.mode-brainstorming .grid-right-bottom-row .aktivitas-mahasiswa-card:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15) !important;
+  transform: translateY(-1px);
+}
+
+.mode-brainstorming .grid-right-bottom-row .ekspresi-wajah-title,
+.mode-brainstorming .grid-right-bottom-row .aktivitas-mahasiswa-title {
+  font-size: 13px !important;
+  font-weight: 600 !important;
+}
+
+
+.mode-brainstorming .grid-mini-row .klasifikasi-gerakan-title {
+  font-size: 10px !important;
+  font-weight: 600 !important;
+  margin-bottom: 2px !important;
+}
+
 /* ============================================ */
 /* RIGHT SIDEBAR - PRIORITAS MENENGAH */
 /*    3 Widgets: Klasifikasi, Transkrip, Statistik    */
@@ -597,7 +1091,7 @@
 .mode-kuis .klasifikasi-gerakan-card,
 .mode-kuis .transkrip-suara-card,
 .mode-kuis .statistik-pengenalan-card {
-  padding: 8px;
+  padding: 12px;
 }
 
 .mode-kuis .klasifikasi-gerakan-title,
@@ -605,13 +1099,13 @@
 .mode-kuis .statistik-pengenalan-title {
   font-size: 12px;
   font-weight: 600;
-  margin-bottom: 4px;
+  margin-bottom: 8px;
 }
 
 .mode-kuis .klasifikasi-gerakan-header,
 .mode-kuis .transkrip-suara-header,
 .mode-kuis .statistik-pengenalan-header {
-  margin-bottom: 4px;
+  margin-bottom: 8px;
 }
 
 /* Transkrip - Compact Items */
@@ -802,3 +1296,346 @@
 .scrollable-content::-webkit-scrollbar-thumb:hover {
   background: #9ca3af;
 }
+
+/* ====================================================== */
+/*       MODE BELAJAR - Learning & Study Layout          */
+/*   Focus: Aktivitas + Ekspresi Wajah (Student Monitoring) */
+/* ====================================================== */
+
+/* ====================================================== */
+/*       MODE BELAJAR - Learning & Study Layout          */
+/*   Focus: Aktivitas + Ekspresi Wajah (Student Monitoring) */
+/* ====================================================== */
+
+.dashboard-right-column.mode-belajar {
+  display: grid !important;
+  grid-template-columns: 1fr 1fr !important; /* Equal split: 50% + 50% */
+  grid-template-rows: 1fr !important;
+  gap: 16px !important;
+  overflow: hidden;
+  min-height: 0;
+  padding: 4px;
+}
+
+/* Left Column - Aktivitas + Ekspresi Wajah (LARGE PRIORITY) */
+.mode-belajar .belajar-left-column {
+  display: grid;
+  grid-template-rows: 1fr auto; /* Top row (priority widgets) + bottom row (compact) */
+  gap: 14px;
+  overflow: hidden;
+  min-height: 0;
+}
+
+/* Top Row - Aktivitas + Ekspresi Wajah (2 cols, PRIORITY) */
+.mode-belajar .belajar-top-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr; /* 2 equal columns */
+  gap: 12px;
+  overflow: hidden;
+  min-height: 0;
+}
+
+/* Left Bottom Row - Polling + Posisi Denah */
+.mode-belajar .belajar-left-bottom-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr; /* 2 equal columns */
+  gap: 12px;
+  min-height: 190px;
+  max-height: 210px;
+  overflow: hidden;
+}
+
+/* Right Column - Transkrip + 2 Rows */
+.mode-belajar .belajar-right-column {
+  display: grid;
+  grid-template-rows: 1fr auto auto; /* Transkrip flex, Middle, Polling */
+  gap: 14px;
+  overflow: hidden;
+  min-height: 0;
+  padding: 4px;
+}
+
+/* Aktivitas Mahasiswa & Ekspresi Wajah - Priority Widgets */
+.mode-belajar .belajar-grid-aktivitas,
+.mode-belajar .belajar-grid-wajah {
+  overflow: hidden;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.mode-belajar .belajar-grid-aktivitas .aktivitas-mahasiswa-card,
+.mode-belajar .belajar-grid-wajah .ekspresi-wajah-card {
+  border: 2px solid #3b82f6 !important;
+  background: linear-gradient(to bottom, #eff6ff 0%, #ffffff 100%) !important;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15) !important;
+  border-radius: 12px !important;
+  transition: all 0.3s ease;
+  height: 100% !important;
+  padding: 14px !important;
+}
+
+.mode-belajar .belajar-grid-aktivitas .aktivitas-mahasiswa-card:hover,
+.mode-belajar .belajar-grid-wajah .ekspresi-wajah-card:hover {
+  box-shadow: 0 6px 20px rgba(59, 130, 246, 0.25) !important;
+  transform: translateY(-2px);
+}
+
+.mode-belajar .belajar-grid-aktivitas .aktivitas-mahasiswa-title,
+.mode-belajar .belajar-grid-wajah .ekspresi-wajah-title {
+  font-size: 16px !important;
+  font-weight: 700 !important;
+  color: #1e40af !important;
+}
+
+/* Transkrip Suara */
+.mode-belajar .belajar-grid-transkrip {
+  overflow: hidden;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.mode-belajar .belajar-grid-transkrip .transkrip-suara-card {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
+  border-radius: 10px !important;
+  transition: all 0.3s ease;
+  height: 100% !important;
+}
+
+.mode-belajar .belajar-grid-transkrip .transkrip-suara-title {
+  font-size: 14px !important;
+  font-weight: 600 !important;
+}
+
+/* Middle Row */
+.mode-belajar .belajar-middle-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  min-height: 160px;
+  max-height: 180px;
+  overflow: hidden;
+}
+
+.mode-belajar .belajar-middle-row .ekspresi-suara-card,
+.mode-belajar .belajar-middle-row .klasifikasi-gerakan-card {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
+  border-radius: 10px !important;
+  height: 100% !important;
+  padding: 10px !important;
+}
+
+/* Statistik + Posisi Denah in Left Bottom Row */
+.mode-belajar .belajar-grid-polling-left,
+.mode-belajar .belajar-grid-posisi-denah {
+  overflow: hidden;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.mode-belajar .belajar-left-bottom-row .polling-card,
+.mode-belajar .belajar-left-bottom-row .posisi-kursi-card {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
+  border-radius: 10px !important;
+  transition: all 0.3s ease;
+  height: 100% !important;
+  padding: 8px !important;
+  overflow: auto !important;
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+.mode-belajar .belajar-left-bottom-row .polling-card:hover,
+.mode-belajar .belajar-left-bottom-row .posisi-kursi-card:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15) !important;
+  transform: translateY(-1px);
+}
+
+.mode-belajar .belajar-left-bottom-row .polling-title,
+.mode-belajar .belajar-left-bottom-row .posisi-kursi-title {
+  font-size: 12px !important;
+  font-weight: 600 !important;
+}
+
+/* Kursi Grid Adjustments for Belajar Mode */
+.mode-belajar .belajar-left-bottom-row .kursi-grid {
+  gap: 6px !important;
+  margin-top: 6px !important;
+}
+
+.mode-belajar .belajar-left-bottom-row .kursi-row {
+  gap: 6px !important;
+  justify-content: center !important;
+}
+
+.mode-belajar .belajar-left-bottom-row .kursi-seat {
+  width: 20px !important;
+  height: 20px !important;
+  font-size: 9px !important;
+  border-radius: 4px !important;
+}
+
+.mode-belajar .belajar-left-bottom-row .kursi-legend {
+  margin-top: 8px !important;
+  gap: 10px !important;
+  font-size: 10px !important;
+}
+
+.mode-belajar .belajar-left-bottom-row .legend-item {
+  gap: 4px !important;
+}
+
+.mode-belajar .belajar-left-bottom-row .legend-color {
+  width: 14px !important;
+  height: 14px !important;
+  border-radius: 3px !important;
+}
+
+/* Statistik Single Row (Right Bottom) */
+.mode-belajar .belajar-grid-statistik {
+  overflow: hidden;
+  min-height: 150px;
+  max-height: 170px;
+  display: flex;
+  flex-direction: column;
+}
+
+.mode-belajar .belajar-grid-statistik .statistik-pengenalan-card {
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08) !important;
+  border-radius: 8px !important;
+  transition: all 0.3s ease;
+  height: 100% !important;
+  padding: 12px !important;
+}
+
+.mode-belajar .belajar-grid-statistik .statistik-pengenalan-card:hover {
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.12) !important;
+  transform: translateY(-1px);
+}
+
+.mode-belajar .belajar-grid-statistik .statistik-pengenalan-title {
+  font-size: 11px !important;
+  font-weight: 600 !important;
+}
+
+/* Remove old bottom-row styling */
+/* Bottom Row */
+.mode-belajar .belajar-bottom-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  min-height: 120px;
+  max-height: 140px;
+  overflow: hidden;
+}
+
+.mode-belajar .belajar-bottom-row .polling-card,
+.mode-belajar .belajar-bottom-row .posisi-kursi-card {
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08) !important;
+  border-radius: 8px !important;
+  height: 100% !important;
+  padding: 8px !important;
+}
+
+.mode-belajar .belajar-bottom-row .polling-title,
+.mode-belajar .belajar-bottom-row .posisi-kursi-title {
+  font-size: 11px !important;
+  font-weight: 600 !important;
+}
+
+/* Right Sidebar - 3 Rows (Transkrip + Middle + Bottom) */
+.mode-belajar .grid-right-sidebar {
+  grid-area: right-sidebar;
+  display: grid;
+  grid-template-rows: 1fr auto auto; /* Transkrip flex, Middle compact, Bottom compact */
+  gap: 14px;
+  overflow: hidden;
+  min-height: 0;
+  padding: 4px;
+  border-radius: 8px;
+}
+
+/* Middle Row - Ekspresi Suara + Klasifikasi Gerakan (Menengah) */
+.mode-belajar .grid-middle-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr; /* 2 equal columns */
+  gap: 12px;
+  min-height: 160px;
+  max-height: 180px;
+  overflow: hidden;
+}
+
+.mode-belajar .grid-ekspresi-suara,
+.mode-belajar .grid-klasifikasi {
+  overflow: hidden;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.mode-belajar .grid-middle-row .ekspresi-suara-card,
+.mode-belajar .grid-middle-row .klasifikasi-gerakan-card {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
+  border-radius: 10px !important;
+  transition: all 0.3s ease;
+  height: 100% !important;
+  padding: 10px !important;
+}
+
+.mode-belajar .grid-middle-row .ekspresi-suara-card:hover,
+.mode-belajar .grid-middle-row .klasifikasi-gerakan-card:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15) !important;
+  transform: translateY(-1px);
+}
+
+.mode-belajar .grid-middle-row .ekspresi-suara-title,
+.mode-belajar .grid-middle-row .klasifikasi-gerakan-title {
+  font-size: 13px !important;
+  font-weight: 600 !important;
+}
+
+/* Bottom Row - Polling + Posisi Kursi (Rendah/Small) */
+.mode-belajar .grid-bottom-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr; /* 2 equal columns */
+  gap: 12px;
+  min-height: 120px;
+  max-height: 140px;
+  overflow: hidden;
+}
+
+.mode-belajar .grid-polling,
+.mode-belajar .grid-posisi {
+  overflow: hidden;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.mode-belajar .grid-bottom-row .polling-card,
+.mode-belajar .grid-bottom-row .posisi-kursi-card {
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08) !important;
+  border-radius: 8px !important;
+  transition: all 0.3s ease;
+  height: 100% !important;
+  padding: 8px !important;
+}
+
+.mode-belajar .grid-bottom-row .polling-card:hover,
+.mode-belajar .grid-bottom-row .posisi-kursi-card:hover {
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.12) !important;
+  transform: translateY(-1px);
+}
+
+.mode-belajar .grid-bottom-row .polling-title,
+.mode-belajar .grid-bottom-row .posisi-kursi-title {
+  font-size: 11px !important;
+  font-weight: 600 !important;
+}
+
+/* ====================================================== */
+/*       END OF MODE BELAJAR                              */
+/* ====================================================== */
+
