@@ -11,6 +11,7 @@ import SessionsPage from "./pages/dashboard/SessionsPage";
 import SessionDetailPage from "./pages/dashboard/SessionDetailPage";
 import SessionReportPage from "./pages/dashboard/SessionReportPage";
 import FaceEnrollmentPage from "./pages/dashboard/FaceEnrollmentPage";
+import VoiceEnrollmentPage from "./pages/dashboard/VoiceEnrollmentPage";
 
 export default function App() {
   return (
@@ -33,6 +34,7 @@ export default function App() {
             <Route path="sessions/:sessionId" element={<SessionDetailPage />} />
             <Route path="sessions/:sessionId/report" element={<SessionReportPage />} />
 			<Route path="biometrics/face" element={<FaceEnrollmentPage />} />
+      			<Route path="biometrics/voice" element={<VoiceEnrollmentPage />} />
           </Route>
           <Route path="*" element={<Navigate to="/dashboard" replace />} />
         </Routes>

@@ -7,6 +7,9 @@ from .views import (
     FaceEnrollmentSampleUploadView,
     FaceEnrollmentStartView,
     ProfileView,
+    VoiceEnrollmentCompleteView,
+    VoiceEnrollmentSampleUploadView,
+    VoiceEnrollmentStartView,
     login_view,
     logout_view,
     register_view,
@@ -29,5 +32,16 @@ urlpatterns = [
         "biometrics/face/enrollments/<int:enrollment_id>/complete/",
         FaceEnrollmentCompleteView.as_view(),
         name="face_enrollment_complete",
+    ),
+    path("biometrics/voice/enrollments/start/", VoiceEnrollmentStartView.as_view(), name="voice_enrollment_start"),
+    path(
+        "biometrics/voice/enrollments/<int:enrollment_id>/samples/",
+        VoiceEnrollmentSampleUploadView.as_view(),
+        name="voice_enrollment_upload_sample",
+    ),
+    path(
+        "biometrics/voice/enrollments/<int:enrollment_id>/complete/",
+        VoiceEnrollmentCompleteView.as_view(),
+        name="voice_enrollment_complete",
     ),
 ]

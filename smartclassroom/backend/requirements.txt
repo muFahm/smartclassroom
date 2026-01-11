@@ -13,3 +13,10 @@ python-dotenv==1.1.1
 sqlparse==0.5.3
 typing_extensions==4.15.0
 tzdata==2025.2
+
+# Voice biometrics (VAD + optional speaker embedding)
+# - VAD uses numpy
+# - Embedding uses SpeechBrain + Torch (optional; if missing, enrollment still completes but embedding stays empty)
+numpy
+speechbrain
+torch

@@ -6,6 +6,7 @@ const navItems = [
   { label: "Paket Kuis", path: "quizzes" },
   { label: "Sesi Kuis", path: "sessions" },
   { label: "Registrasi Wajah", path: "biometrics/face" },
+  { label: "Registrasi Suara", path: "biometrics/voice" },
 ];
 
 export default function DashboardLayout() {

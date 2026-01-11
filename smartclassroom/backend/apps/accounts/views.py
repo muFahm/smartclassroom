@@ -11,13 +11,18 @@ from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework_simplejwt.views import TokenObtainPairView
 
 from .biometrics.face_processing import process_face_image
-from .models import CustomUser, FaceEnrollment, FaceSample
+from .biometrics.voice_processing import analyze_voice_sample, compute_enrollment_embedding
+from .models import CustomUser, FaceEnrollment, FaceSample, VoiceEnrollment, VoiceSample
 from .serializers import (
     FaceEnrollmentSerializer,
     FaceEnrollmentStartResponseSerializer,
     FaceSampleSerializer,
     FaceSampleUploadSerializer,
     RegisterSerializer,
+    VoiceEnrollmentSerializer,
+    VoiceEnrollmentStartResponseSerializer,
+    VoiceSampleSerializer,
+    VoiceSampleUploadSerializer,
 )
 
 
@@ -177,3 +182,103 @@ class FaceEnrollmentCompleteView(APIView):
         enrollment.save(update_fields=["is_active", "updated_at"])
 
         return Response(FaceEnrollmentSerializer(enrollment).data)
+
+
+class VoiceEnrollmentStartView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        VoiceEnrollment.objects.filter(user=request.user, is_active=True).update(is_active=False)
+        enrollment = VoiceEnrollment.objects.create(user=request.user, is_active=False)
+        payload = {"enrollment_id": enrollment.id, "min_voice_active_ms": 30000}
+        return Response(VoiceEnrollmentStartResponseSerializer(payload).data)
+
+
+class VoiceEnrollmentSampleUploadView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, enrollment_id: int):
+        serializer = VoiceSampleUploadSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        audio = serializer.validated_data["audio"]
+
+        enrollment = VoiceEnrollment.objects.filter(id=enrollment_id, user=request.user).first()
+        if not enrollment:
+            return Response({"detail": "Enrollment tidak ditemukan."}, status=404)
+
+        exists = VoiceSample.objects.filter(user=request.user, enrollment=enrollment).exists()
+        if exists:
+            return Response({"detail": "Sample suara untuk enrollment ini sudah ada."}, status=400)
+
+        sample = VoiceSample.objects.create(user=request.user, enrollment=enrollment)
+        sample.audio.save(audio.name, audio, save=True)
+
+        try:
+            metrics, _ = analyze_voice_sample(sample.audio.path)
+        except Exception as e:
+            sample.delete()
+            return Response({"detail": f"Gagal memproses audio: {e}"}, status=400)
+
+        sample.duration_ms = metrics.duration_ms
+        sample.voice_active_ms = metrics.voice_active_ms
+        sample.voice_ratio = metrics.voice_ratio
+        sample.vad_threshold = metrics.vad_threshold
+        sample.rms_in = metrics.rms_in
+        sample.save(update_fields=["duration_ms", "voice_active_ms", "voice_ratio", "vad_threshold", "rms_in"])
+
+        if metrics.voice_active_ms < 30000:
+            return Response(
+                {
+                    "detail": "Suara efektif kurang dari 30 detik. Silakan rekam ulang.",
+                    "voice_active_ms": metrics.voice_active_ms,
+                    "duration_ms": metrics.duration_ms,
+                    "voice_ratio": metrics.voice_ratio,
+                    "vad_threshold": metrics.vad_threshold,
+                    "rms_in": metrics.rms_in,
+                },
+                status=400,
+            )
+
+        return Response(VoiceSampleSerializer(sample).data, status=201)
+
+
+class VoiceEnrollmentCompleteView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, enrollment_id: int):
+        enrollment = VoiceEnrollment.objects.filter(id=enrollment_id, user=request.user).first()
+        if not enrollment:
+            return Response({"detail": "Enrollment tidak ditemukan."}, status=404)
+
+        sample = VoiceSample.objects.filter(user=request.user, enrollment=enrollment).first()
+        if not sample:
+            return Response({"detail": "Sample suara belum diupload."}, status=400)
+
+        if (sample.voice_active_ms or 0) < 30000:
+            return Response(
+                {
+                    "detail": "Suara efektif kurang dari 30 detik.",
+                    "voice_active_ms": sample.voice_active_ms,
+                },
+                status=400,
+            )
+
+        embedding = []
+        quality_score = sample.voice_ratio
+        try:
+            embedding, _ = compute_enrollment_embedding(sample.audio.path)
+        except Exception:
+            # Model may not be installed yet; keep embedding empty like face enrollment MVP.
+            embedding = []
+
+        enrollment.embedding = embedding
+        enrollment.quality_score = quality_score
+
+        VoiceEnrollment.objects.filter(user=request.user).exclude(id=enrollment.id).update(is_active=False)
+        enrollment.is_active = True
+        enrollment.save(update_fields=["embedding", "quality_score", "is_active", "updated_at"])
+
+        data = VoiceEnrollmentSerializer(enrollment).data
+        if not embedding:
+            data["detail"] = "Voice enrollment selesai (aktif). Embedding akan diisi saat model tersedia."
+        return Response(data)

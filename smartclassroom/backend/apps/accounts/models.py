@@ -9,6 +9,11 @@ def _face_sample_upload_to(instance, filename: str) -> str:
     return f"biometrics/faces/user_{instance.user_id}/{prompt}/{ts}_{filename}"
 
 
+def _voice_sample_upload_to(instance, filename: str) -> str:
+    ts = timezone.now().strftime("%Y%m%d%H%M%S")
+    return f"biometrics/voices/user_{instance.user_id}/{ts}_{filename}"
+
+
 class CustomUser(AbstractUser):
     email = models.EmailField(unique=True)
     ROLE_CHOICES = (
@@ -69,6 +74,50 @@ class FaceSample(models.Model):
     embedding = models.JSONField(default=list, blank=True)
     detector_confidence = models.FloatField(null=True, blank=True)
     blur_score = models.FloatField(null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-created_at"]
+
+
+class VoiceEnrollment(models.Model):
+    user = models.ForeignKey(
+        "accounts.CustomUser",
+        on_delete=models.CASCADE,
+        related_name="voice_enrollments",
+    )
+    model_name = models.CharField(max_length=100, default="ecapa-tdnn")
+    model_version = models.CharField(max_length=200, default="speechbrain/spkrec-ecapa-voxceleb")
+    embedding = models.JSONField(default=list, blank=True)
+    quality_score = models.FloatField(null=True, blank=True)
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        indexes = [models.Index(fields=["user", "is_active"])]
+
+
+class VoiceSample(models.Model):
+    user = models.ForeignKey(
+        "accounts.CustomUser",
+        on_delete=models.CASCADE,
+        related_name="voice_samples",
+    )
+    enrollment = models.ForeignKey(
+        "accounts.VoiceEnrollment",
+        on_delete=models.CASCADE,
+        related_name="samples",
+        null=True,
+        blank=True,
+    )
+    audio = models.FileField(upload_to=_voice_sample_upload_to)
+
+    duration_ms = models.PositiveIntegerField(null=True, blank=True)
+    voice_active_ms = models.PositiveIntegerField(null=True, blank=True)
+    voice_ratio = models.FloatField(null=True, blank=True)
+    vad_threshold = models.FloatField(null=True, blank=True)
+    rms_in = models.FloatField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
