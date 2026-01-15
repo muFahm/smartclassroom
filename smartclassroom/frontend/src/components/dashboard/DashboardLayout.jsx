@@ -7,6 +7,7 @@ const navItems = [
   { label: "Sesi Kuis", path: "sessions" },
   { label: "Registrasi Wajah", path: "biometrics/face" },
   { label: "Registrasi Suara", path: "biometrics/voice" },
+  { label: "Absensi", path: "attendance" },
 ];
 
 export default function DashboardLayout() {

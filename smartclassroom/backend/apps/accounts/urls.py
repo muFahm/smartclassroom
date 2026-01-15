@@ -13,6 +13,11 @@ from .views import (
     login_view,
     logout_view,
     register_view,
+    AttendanceSessionStartView,
+    AttendanceRecognizeView,
+    AttendanceSessionStopView,
+    AttendanceSessionRecordsView,
+    FaceEncodingsReloadView,
 )
 
 urlpatterns = [
@@ -44,4 +49,22 @@ urlpatterns = [
         VoiceEnrollmentCompleteView.as_view(),
         name="voice_enrollment_complete",
     ),
+    # Attendance
+    path("attendance/sessions/start/", AttendanceSessionStartView.as_view(), name="attendance_session_start"),
+    path(
+        "attendance/sessions/<int:session_id>/recognize/",
+        AttendanceRecognizeView.as_view(),
+        name="attendance_session_recognize",
+    ),
+    path(
+        "attendance/sessions/<int:session_id>/stop/",
+        AttendanceSessionStopView.as_view(),
+        name="attendance_session_stop",
+    ),
+    path(
+        "attendance/sessions/<int:session_id>/records/",
+        AttendanceSessionRecordsView.as_view(),
+        name="attendance_session_records",
+    ),
+    path("biometrics/face/reload/", FaceEncodingsReloadView.as_view(), name="face_encodings_reload"),
 ]

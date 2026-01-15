@@ -122,3 +122,55 @@ class VoiceSample(models.Model):
 
     class Meta:
         ordering = ["-created_at"]
+
+
+class AttendanceSession(models.Model):
+    host = models.ForeignKey(
+        "accounts.CustomUser",
+        on_delete=models.CASCADE,
+        related_name="attendance_sessions",
+    )
+    name = models.CharField(max_length=200, blank=True, default="")
+    is_active = models.BooleanField(default=False)
+    started_at = models.DateTimeField(null=True, blank=True)
+    ended_at = models.DateTimeField(null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-created_at"]
+
+    def __str__(self):
+        return f"Session {self.id} by {self.host.email}"
+
+
+class AttendanceRecord(models.Model):
+    session = models.ForeignKey(
+        "accounts.AttendanceSession",
+        on_delete=models.CASCADE,
+        related_name="records",
+    )
+    student = models.ForeignKey(
+        "accounts.CustomUser",
+        on_delete=models.CASCADE,
+        related_name="attendance_records",
+    )
+    recognized_label = models.CharField(max_length=200, blank=True)
+    recognized_name = models.CharField(max_length=200, blank=True)
+    recognized_nim = models.CharField(max_length=50, blank=True)
+    timestamp = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ("session", "student")
+        ordering = ["timestamp"]
+
+
+class FaceLabelMapping(models.Model):
+    label = models.CharField(max_length=200, unique=True)
+    user = models.ForeignKey(
+        "accounts.CustomUser",
+        on_delete=models.CASCADE,
+        related_name="face_label_mappings",
+    )
+
+    def __str__(self):
+        return f"{self.label} -> {self.user.email}"

@@ -282,3 +282,118 @@ class VoiceEnrollmentCompleteView(APIView):
         if not embedding:
             data["detail"] = "Voice enrollment selesai (aktif). Embedding akan diisi saat model tersedia."
         return Response(data)
+
+
+# -------------------
+# Attendance API
+# -------------------
+from .biometrics.face_service import get_face_service
+from .models import AttendanceSession, AttendanceRecord
+from .serializers import AttendanceSessionStartResponseSerializer, AttendanceRecordSerializer, AttendanceSessionSerializer
+from django.utils import timezone
+
+
+class FaceEncodingsReloadView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        # Only allow lecturers/staff to trigger reload
+        if request.user.role != "lecturer":
+            return Response({"detail": "Forbidden"}, status=403)
+        fs = get_face_service()
+        try:
+            fs.reload()
+            return Response({"detail": "Reloaded encodings", "path": fs._loaded_path})
+        except Exception as e:
+            return Response({"detail": f"Reload failed: {e}"}, status=500)
+
+
+class AttendanceSessionStartView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        # only lecturers can start sessions
+        if request.user.role != "lecturer":
+            return Response({"detail": "Forbidden"}, status=403)
+
+        session = AttendanceSession.objects.create(host=request.user, is_active=True, started_at=timezone.now())
+        payload = {"session_id": session.id}
+        return Response(AttendanceSessionStartResponseSerializer(payload).data)
+
+
+class AttendanceRecognizeView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, session_id: int):
+        session = AttendanceSession.objects.filter(id=session_id).first()
+        if not session or not session.is_active:
+            return Response({"detail": "Session not found or not active."}, status=404)
+
+        if request.user != session.host:
+            return Response({"detail": "Forbidden"}, status=403)
+
+        image = request.FILES.get("image")
+        if not image:
+            return Response({"detail": "No image provided."}, status=400)
+
+        fs = get_face_service()
+        if not fs.available():
+            return Response(
+                {
+                    "detail": "Face recognition service unavailable. Ensure 'face-recognition' is installed and encodings.pickle path is configured.",
+                    "loaded_path": getattr(fs, "_loaded_path", None),
+                },
+                status=500,
+            )
+        results = fs.identify(image.read())
+
+        out = []
+        for r in results:
+            entry = {"label": r.label, "distance": r.distance, "student": None, "already_recorded": False}
+            user = fs.map_label_to_user(r.label)
+            if user and user.role == "student":
+                extracted_nim = ""
+                if r.label and "_" in r.label:
+                    extracted_nim = r.label.split("_", 1)[1]
+                obj, created = AttendanceRecord.objects.get_or_create(
+                    session=session,
+                    student=user,
+                    defaults={
+                        "recognized_label": r.label,
+                        "recognized_name": user.username,
+                        "recognized_nim": extracted_nim,
+                    },
+                )
+                entry["student"] = {"id": user.id, "username": user.username, "email": user.email}
+                entry["already_recorded"] = not created
+            out.append(entry)
+
+        return Response({"results": out, "loaded_path": getattr(fs, "_loaded_path", None)})
+
+
+class AttendanceSessionStopView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, session_id: int):
+        session = AttendanceSession.objects.filter(id=session_id).first()
+        if not session or not session.is_active:
+            return Response({"detail": "Session not found or not active."}, status=404)
+        if request.user != session.host:
+            return Response({"detail": "Forbidden"}, status=403)
+        session.is_active = False
+        session.ended_at = timezone.now()
+        session.save(update_fields=["is_active", "ended_at"])
+        return Response(AttendanceSessionSerializer(session).data)
+
+
+class AttendanceSessionRecordsView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, session_id: int):
+        session = AttendanceSession.objects.filter(id=session_id).first()
+        if not session:
+            return Response({"detail": "Session not found."}, status=404)
+        if request.user != session.host:
+            return Response({"detail": "Forbidden"}, status=403)
+        records = AttendanceRecord.objects.filter(session=session).select_related("student")
+        return Response(AttendanceRecordSerializer(records, many=True).data)

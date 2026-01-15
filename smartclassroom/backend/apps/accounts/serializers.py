@@ -99,3 +99,33 @@ class VoiceSampleSerializer(serializers.ModelSerializer):
 
 class VoiceSampleUploadSerializer(serializers.Serializer):
     audio = serializers.FileField()
+
+
+class AttendanceSessionStartResponseSerializer(serializers.Serializer):
+    session_id = serializers.IntegerField()
+
+
+class AttendanceRecordSerializer(serializers.ModelSerializer):
+    student = serializers.SerializerMethodField()
+
+    class Meta:
+        model = None  # set at import time
+        fields = ["id", "student", "recognized_label", "recognized_name", "recognized_nim", "timestamp"]
+        read_only_fields = fields
+
+    def get_student(self, obj):
+        user = obj.student
+        return {"id": user.id, "username": user.username, "email": user.email}
+
+
+class AttendanceSessionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = None  # set at import time
+        fields = ["id", "host", "name", "is_active", "started_at", "ended_at", "created_at"]
+        read_only_fields = fields
+
+
+# Set model references (avoids circular import problems)
+from .models import AttendanceSession, AttendanceRecord  # noqa: E402
+AttendanceRecordSerializer.Meta.model = AttendanceRecord
+AttendanceSessionSerializer.Meta.model = AttendanceSession
