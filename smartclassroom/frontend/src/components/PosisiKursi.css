@@ -121,7 +121,7 @@
 .posisi-kursi-card.denah .kursi-content {
   flex: 1;
   min-height: 0; /* ✅ TAMBAHKAN */
-  overflow: hidden; /* ✅ PASTIKAN ADA */
+  overflow: auto; /* ✅ ENABLE SCROLL */
   flex-direction: column;
   gap: 4px;
   padding: 4px;
@@ -167,10 +167,27 @@
   cursor: pointer;
   transition: all 0.3s ease;
   position: relative;
+  font-size: 9px;
+  font-weight: 700;
+  color: #fff;
 }
 
 .kursi-seat:hover {
   transform: scale(1.1);
+}
+
+/* Empty space (null in layout array) */
+.kursi-empty-space {
+  width: 24px;
+  height: 24px;
+  visibility: hidden;
+}
+
+.seat-number {
+  font-size: 9px;
+  font-weight: 700;
+  color: #fff;
+  z-index: 1;
 }
 
 .seat-dot {
@@ -186,6 +203,10 @@
   border: 2px solid #3b82f6;
 }
 
+.kursi-seat.occupied .seat-number {
+  color: #1e40af;
+}
+
 .kursi-seat.occupied .seat-dot {
   background: #3b82f6;
   animation: pulse-blue 2s infinite;
@@ -195,6 +216,10 @@
 .kursi-seat.empty {
   background: #f3f4f6;
   border: 2px solid #d1d5db;
+}
+
+.kursi-seat.empty .seat-number {
+  color: #6b7280;
 }
 
 .kursi-seat.empty .seat-dot {
@@ -254,4 +279,49 @@
   font-size: 12px;
   color: #6b7280;
   font-weight: 500;
+}
+
+/* ====================================================== */
+/*         X-SHAPE LAYOUT (Kelas 703)                    */
+/* ====================================================== */
+
+.posisi-kursi-card.layout-x-shape .kursi-grid {
+  gap: 6px;
+  padding: 8px;
+}
+
+.posisi-kursi-card.layout-x-shape .kursi-row {
+  gap: 6px;
+}
+
+.posisi-kursi-card.layout-x-shape .kursi-seat {
+  width: 22px;
+  height: 22px;
+}
+
+/* Stats - Mode Kolaborasi dengan Count */
+.kursi-stats {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+  padding: 8px 0 4px 0;
+  border-top: 1px solid #e5e7eb;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.kursi-stat-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  color: #374151;
+}
+
+.kursi-stat-count {
+  font-weight: 700;
+  color: #1f2937;
+  font-size: 14px;
 }

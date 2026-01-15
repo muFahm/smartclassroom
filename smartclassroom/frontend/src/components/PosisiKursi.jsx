@@ -1,9 +1,24 @@
 import React from "react";
 import "./PosisiKursi.css";
 import { CHAIR_DATA } from "../utils/mockData";
+import { getClassroomConfig } from "../utils/classroomLayouts";
 
-export default function PosisiKursi({ mode = "sidebar", showStats = false }) {
-  const { occupied, total, layout } = CHAIR_DATA;
+export default function PosisiKursi({ mode = "sidebar", showStats = false, classroomId = "701" }) {
+  // Get classroom configuration and occupancy data
+  const classroomConfig = getClassroomConfig(classroomId);
+  const chairData = CHAIR_DATA[classroomId];
+
+  // Fallback if classroom not found
+  if (!classroomConfig || !chairData) {
+    return (
+      <div className="posisi-kursi-card error">
+        <p>Classroom {classroomId} not found</p>
+      </div>
+    );
+  }
+
+  const { layout, type } = classroomConfig;
+  const { occupied, total, occupancy } = chairData;
 
   // Mode Sidebar: Tampilan compact
   if (mode === "sidebar") {
@@ -26,7 +41,7 @@ export default function PosisiKursi({ mode = "sidebar", showStats = false }) {
 
   // Mode Denah: Tampilan visual grid bangku
   return (
-    <div className="posisi-kursi-card denah">
+    <div className={`posisi-kursi-card denah layout-${type}`}>
       <div className="posisi-kursi-header">
         <h3 className="posisi-kursi-title">Posisi Kursi</h3>
       </div>
@@ -36,15 +51,25 @@ export default function PosisiKursi({ mode = "sidebar", showStats = false }) {
         <div className="kursi-grid">
           {layout.map((row, rowIndex) => (
             <div key={rowIndex} className="kursi-row">
-              {row.map((seat, seatIndex) => (
-                <div
-                  key={`${rowIndex}-${seatIndex}`}
-                  className={`kursi-seat ${seat === 1 ? "occupied" : "empty"}`}
-                  title={seat === 1 ? "Terisi" : "Kosong"}
-                >
-                  <div className="seat-dot"></div>
-                </div>
-              ))}
+              {row.map((seatNumber, seatIndex) => {
+                // null = empty space (no seat)
+                if (seatNumber === null) {
+                  return <div key={`${rowIndex}-${seatIndex}`} className="kursi-empty-space"></div>;
+                }
+
+                // Get occupancy status (1 = occupied, 0 = empty)
+                const isOccupied = occupancy[seatNumber] === 1;
+
+                return (
+                  <div
+                    key={`${rowIndex}-${seatIndex}`}
+                    className={`kursi-seat ${isOccupied ? "occupied" : "empty"}`}
+                    title={`Kursi ${seatNumber}: ${isOccupied ? "Terisi" : "Kosong"}`}
+                  >
+                    <div className="seat-number">{seatNumber}</div>
+                  </div>
+                );
+              })}
             </div>
           ))}
         </div>
