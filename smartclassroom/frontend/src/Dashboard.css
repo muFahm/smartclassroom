@@ -372,12 +372,23 @@
 .mode-kolaborasi .grid-col1 .posisi-kursi-card {
   border: 2px solid #3b82f6 !important;
   background: linear-gradient(to bottom, #eff6ff 0%, #ffffff 100%) !important;
+  padding: 6px !important;
+}
+
+.mode-kolaborasi .posisi-kursi-header {
+  margin-bottom: 4px !important;
 }
 
 .mode-kolaborasi .posisi-kursi-title {
-  font-size: 15px !important;
+  font-size: 13px !important;
   font-weight: 600 !important;
   color: #1e40af !important;
+}
+
+.mode-kolaborasi .kursi-content {
+  padding: 10px 6px 6px 6px !important;
+  gap: 3px !important;
+  overflow: auto !important;
 }
 
 /* Column 2 - Ekspresi Suara + Klasifikasi */
@@ -455,24 +466,30 @@
   font-size: 13px;
 }
 
-/* CSS Override - Posisi Kursi Denah lebih besar untuk prioritas */
+/* CSS Override - Posisi Kursi Denah - Normal size dengan scroll internal */
 .mode-kolaborasi .kursi-grid .kursi-seat {
-  width: 32px !important;
-  height: 32px !important;
+  width: 26px !important;
+  height: 26px !important;
+  font-size: 10px !important;
 }
 
 .mode-kolaborasi .kursi-grid .seat-dot {
-  width: 18px !important;
-  height: 18px !important;
+  width: 15px !important;
+  height: 15px !important;
 }
 
 .mode-kolaborasi .kursi-grid {
-  gap: 8px !important;
-  padding: 12px !important;
+  gap: 4px !important;
+  padding: 10px 6px 6px 6px !important;
+  margin-top: 0 !important;
 }
 
 .mode-kolaborasi .kursi-row {
-  gap: 8px !important;
+  gap: 4px !important;
+}
+
+.mode-kolaborasi .kursi-row:first-child {
+  margin-top: 0 !important;
 }
 
 /* Tampilkan jumlah kursi di mode kolaborasi */
@@ -676,8 +693,8 @@
   display: grid;
   grid-template-columns: 1fr 1fr; /* 2 equal columns */
   gap: 12px;
-  min-height: 180px;
-  max-height: 200px;
+  min-height: 250px;
+  max-height: 320px;
   overflow: hidden;
 }
 
@@ -783,6 +800,38 @@
   min-height: 0;
   display: flex;
   flex-direction: column;
+  height: 100%;
+}
+
+.mode-brainstorming .grid-posisi .posisi-kursi-card {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: 10px !important;
+}
+
+.mode-brainstorming .posisi-kursi-header {
+  margin-bottom: 4px !important;
+}
+
+.mode-brainstorming .posisi-kursi-title {
+  font-size: 13px !important;
+}
+
+.mode-brainstorming .kursi-content {
+  padding: 18px 6px 6px 6px !important;
+  gap: 3px !important;
+  overflow: auto !important;
+}
+
+.mode-brainstorming .kursi-grid {
+  width: 100%;
+  padding: 16px 6px 6px 6px !important;
+  margin-top: 0 !important;
+}
+
+.mode-brainstorming .kursi-row:first-child {
+  margin-top: 8px !important;
 }
 
 /* Klasifikasi Gerakan in Left Bottom Row */
@@ -912,7 +961,8 @@
 }
 
 .mode-brainstorming .kursi-seat.occupied {
-  background: #3b82f6 !important;
+  background: #dbeafe !important;
+  border: 2px solid #3b82f6 !important;
 }
 
 .mode-brainstorming .kursi-seat.empty {
@@ -993,7 +1043,6 @@
   font-size: 13px !important;
   font-weight: 600 !important;
 }
-
 
 .mode-brainstorming .grid-mini-row .klasifikasi-gerakan-title {
   font-size: 10px !important;
@@ -1341,7 +1390,7 @@
   grid-template-columns: 1fr 1fr; /* 2 equal columns */
   gap: 12px;
   min-height: 190px;
-  max-height: 210px;
+  max-height: 280px;
   overflow: hidden;
 }
 
@@ -1441,7 +1490,7 @@
   border-radius: 10px !important;
   transition: all 0.3s ease;
   height: 100% !important;
-  padding: 8px !important;
+  padding: 10px !important;
   overflow: auto !important;
   display: flex !important;
   flex-direction: column !important;
@@ -1460,14 +1509,35 @@
 }
 
 /* Kursi Grid Adjustments for Belajar Mode */
+.mode-belajar .belajar-left-bottom-row .kursi-content {
+  padding: 24px 8px 8px 12px !important;
+  overflow: auto !important;
+}
+
 .mode-belajar .belajar-left-bottom-row .kursi-grid {
   gap: 6px !important;
   margin-top: 6px !important;
+  padding: 20px 8px 8px 12px !important;
 }
 
 .mode-belajar .belajar-left-bottom-row .kursi-row {
   gap: 6px !important;
-  justify-content: center !important;
+  justify-content: flex-start !important;
+  padding-left: 4px !important;
+}
+
+.mode-belajar .belajar-left-bottom-row .kursi-row:first-child {
+  margin-top: 10px !important;
+}
+
+/* Override untuk X-shape layout (Kelas 703) */
+.mode-belajar .belajar-left-bottom-row .layout-x-shape .kursi-grid {
+  padding: 20px 8px 8px 12px !important;
+}
+
+.mode-belajar .belajar-left-bottom-row .layout-x-shape .kursi-row {
+  padding-left: 4px !important;
+  justify-content: flex-start !important;
 }
 
 .mode-belajar .belajar-left-bottom-row .kursi-seat {
@@ -1638,4 +1708,3 @@
 /* ====================================================== */
 /*       END OF MODE BELAJAR                              */
 /* ====================================================== */
-

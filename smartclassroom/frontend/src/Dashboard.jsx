@@ -26,6 +26,9 @@ export default function Dashboard() {
   // Mode aktif dashboard
   const [activeMode, setActiveMode] = useState("default");
 
+  // Selected classroom
+  const [selectedClass, setSelectedClass] = useState("701");
+
   // Visibility widgets - DEFAULT SEMUA TRUE untuk testing
   const [widgets, setWidgets] = useState({
     statistikPengenalan: true,
@@ -63,7 +66,10 @@ export default function Dashboard() {
           {/* SIDEBAR (STATIS - Tidak berubah di semua mode) */}
           {/* ========================================== */}
           <div className="dashboard-left-column">
-            <PilihanKelas />
+            <PilihanKelas 
+              selectedClass={selectedClass}
+              setSelectedClass={setSelectedClass}
+            />
             <DateTimeCard />
 
             {/* Suhu & Cahaya - Side by Side */}
@@ -72,7 +78,7 @@ export default function Dashboard() {
               <Cahaya />
             </div>
 
-            <PosisiKursi mode="sidebar" />
+            <PosisiKursi mode="sidebar" classroomId={selectedClass} />
 
             {/* ✅ Widget dengan activeMode prop */}
             <Widget
@@ -93,7 +99,7 @@ export default function Dashboard() {
                 {/* Posisi Kursi (Visual Denah) */}
                 {widgets.posisiKursi && (
                   <div className="widget-wrapper grid-posisi-denah">
-                    <PosisiKursi mode="denah" />
+                    <PosisiKursi mode="denah" classroomId={selectedClass} />
                   </div>
                 )}
 
@@ -218,7 +224,7 @@ export default function Dashboard() {
                 {/* Column 1 - Posisi Kursi (Full Height) */}
                 {widgets.posisiKursi && (
                   <div className="widget-wrapper grid-col1">
-                    <PosisiKursi mode="denah" showStats={true} />
+                    <PosisiKursi mode="denah" showStats={true} classroomId={selectedClass} />
                   </div>
                 )}
 
@@ -318,7 +324,7 @@ export default function Dashboard() {
                   {/* Posisi Kursi Denah */}
                   {widgets.posisiKursi && (
                     <div className="widget-wrapper grid-posisi">
-                      <PosisiKursi mode="denah" />
+                      <PosisiKursi mode="denah" classroomId={selectedClass} />
                     </div>
                   )}
 
@@ -403,7 +409,7 @@ export default function Dashboard() {
                     {/* Posisi Kursi - Denah (PRIORITY) */}
                     {widgets.posisiKursi && (
                       <div className="widget-wrapper grid-posisi">
-                        <PosisiKursi mode="denah" />
+                        <PosisiKursi mode="denah" classroomId={selectedClass} />
                       </div>
                     )}
 
@@ -480,7 +486,7 @@ export default function Dashboard() {
 
                     {widgets.posisiKursi && (
                       <div className="widget-wrapper belajar-grid-posisi-denah">
-                        <PosisiKursi mode="denah" />
+                        <PosisiKursi mode="denah" classroomId={selectedClass} />
                       </div>
                     )}
                   </div>

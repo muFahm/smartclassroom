@@ -120,11 +120,16 @@
 
 .posisi-kursi-card.denah .kursi-content {
   flex: 1;
-  min-height: 0; /* ✅ TAMBAHKAN */
-  overflow: auto; /* ✅ ENABLE SCROLL */
+  min-height: 0;
+  overflow: auto;
   flex-direction: column;
-  gap: 4px;
-  padding: 4px;
+  gap: 2px;
+  padding: 2px;
+}
+
+/* Scale khusus untuk layout dengan banyak kursi (702) */
+.posisi-kursi-card.denah .kursi-grid {
+  width: 100%;
 }
 
 .kursi-count-display {
@@ -145,15 +150,16 @@
 .kursi-grid {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 3px;
   width: 100%;
-  padding: 4px;
+  padding: 2px;
+  align-items: center;
 }
 
 .kursi-row {
   display: flex;
   justify-content: center;
-  gap: 4px;
+  gap: 3px;
 }
 
 /* Individual Seat/Bangku */

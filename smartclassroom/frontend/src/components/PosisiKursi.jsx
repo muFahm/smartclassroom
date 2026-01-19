@@ -3,7 +3,11 @@ import "./PosisiKursi.css";
 import { CHAIR_DATA } from "../utils/mockData";
 import { getClassroomConfig } from "../utils/classroomLayouts";
 
-export default function PosisiKursi({ mode = "sidebar", showStats = false, classroomId = "701" }) {
+export default function PosisiKursi({
+  mode = "sidebar",
+  showStats = false,
+  classroomId = "701",
+}) {
   // Get classroom configuration and occupancy data
   const classroomConfig = getClassroomConfig(classroomId);
   const chairData = CHAIR_DATA[classroomId];
@@ -54,7 +58,12 @@ export default function PosisiKursi({ mode = "sidebar", showStats = false, class
               {row.map((seatNumber, seatIndex) => {
                 // null = empty space (no seat)
                 if (seatNumber === null) {
-                  return <div key={`${rowIndex}-${seatIndex}`} className="kursi-empty-space"></div>;
+                  return (
+                    <div
+                      key={`${rowIndex}-${seatIndex}`}
+                      className="kursi-empty-space"
+                    ></div>
+                  );
                 }
 
                 // Get occupancy status (1 = occupied, 0 = empty)
@@ -63,8 +72,12 @@ export default function PosisiKursi({ mode = "sidebar", showStats = false, class
                 return (
                   <div
                     key={`${rowIndex}-${seatIndex}`}
-                    className={`kursi-seat ${isOccupied ? "occupied" : "empty"}`}
-                    title={`Kursi ${seatNumber}: ${isOccupied ? "Terisi" : "Kosong"}`}
+                    className={`kursi-seat ${
+                      isOccupied ? "occupied" : "empty"
+                    }`}
+                    title={`Kursi ${seatNumber}: ${
+                      isOccupied ? "Terisi" : "Kosong"
+                    }`}
                   >
                     <div className="seat-number">{seatNumber}</div>
                   </div>
