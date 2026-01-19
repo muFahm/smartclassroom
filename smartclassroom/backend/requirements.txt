@@ -14,6 +14,8 @@ sqlparse==0.5.3
 typing_extensions==4.15.0
 tzdata==2025.2
 
+opencv-python-headless==4.9.0.80
+
 # Face recognition attendance (encodings.pickle)
 # NOTE: On Windows, installing `face-recognition` may require build tools and/or a prebuilt `dlib` wheel.
 face-recognition
@@ -21,6 +23,6 @@ face-recognition
 # Voice biometrics (VAD + optional speaker embedding)
 # - VAD uses numpy
 # - Embedding uses SpeechBrain + Torch (optional; if missing, enrollment still completes but embedding stays empty)
-numpy
+numpy==1.26.4
 speechbrain
 torch

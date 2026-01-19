@@ -13,8 +13,7 @@ services:
     ports:
       - "8000:8000"
     volumes:
-      - ./smartclassroom/backend/db.sqlite3:/app/db.sqlite3
-      - ./smartclassroom/backend/media:/app/media
+      - ./smartclassroom/backend:/app
     restart: unless-stopped
 
   frontend:
