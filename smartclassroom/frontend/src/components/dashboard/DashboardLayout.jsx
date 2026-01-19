@@ -3,6 +3,7 @@ import { Link, NavLink, Outlet } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 
 const navItems = [
+  { label: "Ruang Kelas", path: "classrooms" },
   { label: "Paket Kuis", path: "quizzes" },
   { label: "Sesi Kuis", path: "sessions" },
   { label: "Registrasi Wajah", path: "biometrics/face" },
