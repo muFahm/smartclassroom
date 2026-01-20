@@ -1,6 +1,23 @@
 from rest_framework import serializers
 
-from .models import CustomUser, FaceEnrollment, FaceSample, VoiceEnrollment, VoiceSample
+from .models import CustomUser, FaceEnrollment, FaceSample, VoiceEnrollment, VoiceSample, UserActivityLog
+
+
+class ProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CustomUser
+        fields = [
+            "id",
+            "email",
+            "username",
+            "role",
+            "full_name",
+            "nim",
+            "major",
+            "enrollment_year",
+            "avatar_url",
+        ]
+        read_only_fields = ["email", "role"]
 
 
 class RegisterSerializer(serializers.ModelSerializer):
@@ -17,6 +34,13 @@ class RegisterSerializer(serializers.ModelSerializer):
             password=validated_data["password"],
             role=validated_data.get("role", "student"),
         )
+
+
+class ActivityLogSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserActivityLog
+        fields = ["id", "activity_type", "message", "metadata", "created_at"]
+        read_only_fields = fields
 
 
 class FaceEnrollmentSerializer(serializers.ModelSerializer):

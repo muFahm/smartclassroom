@@ -5,6 +5,7 @@ import { AuthProvider } from "./context/AuthContext";
 import ProtectedRoute from "./components/ProtectedRoute";
 import DashboardLayout from "./components/dashboard/DashboardLayout";
 import LoginPage from "./pages/auth/LoginPage";
+import RegisterPage from "./pages/auth/RegisterPage";
 import QuizPackagesPage from "./pages/dashboard/QuizPackagesPage";
 import PackageDetailPage from "./pages/dashboard/PackageDetailPage";
 import SessionsPage from "./pages/dashboard/SessionsPage";
@@ -16,6 +17,9 @@ import ClassroomsPage from "./pages/dashboard/ClassroomsPage";
 import ClassroomDetailPage from "./pages/dashboard/ClassroomDetailPage";
 import ClassSessionDetailPage from "./pages/dashboard/ClassSessionDetailPage";
 import AttendanceSessionPage from "./pages/dashboard/AttendanceSessionPage";
+import DevicesPage from "./pages/dashboard/DevicesPage";
+import ProfilePage from "./pages/dashboard/ProfilePage";
+import ActivityPage from "./pages/dashboard/ActivityPage";
 
 export default function App() {
   return (
@@ -23,6 +27,7 @@ export default function App() {
       <BrowserRouter>
         <Routes>
           <Route path="/login" element={<LoginPage />} />
+          <Route path="/register" element={<RegisterPage />} />
           <Route
             path="/dashboard"
             element={
@@ -43,6 +48,9 @@ export default function App() {
 			<Route path="biometrics/face" element={<FaceEnrollmentPage />} />
             <Route path="biometrics/voice" element={<VoiceEnrollmentPage />} />
             <Route path="attendance" element={<AttendanceSessionPage />} />
+            <Route path="devices" element={<DevicesPage />} />
+            <Route path="profile" element={<ProfilePage />} />
+            <Route path="activity" element={<ActivityPage />} />
           </Route>
           <Route path="*" element={<Navigate to="/dashboard" replace />} />
         </Routes>

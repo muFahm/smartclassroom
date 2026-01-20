@@ -28,10 +28,41 @@ class PollingDeviceViewSet(viewsets.ModelViewSet):
 	permission_classes = [IsLecturer]
 
 	@action(detail=False, methods=["get"], permission_classes=[permissions.IsAuthenticated])
-	def my_device(self, request):
-		device = PollingDevice.objects.filter(assigned_to=request.user).first()
+	def my_devices(self, request):
+		devices = PollingDevice.objects.filter(assigned_to=request.user).order_by("code")
+		serializer = self.get_serializer(devices, many=True)
+		return Response(serializer.data)
+
+	@action(detail=False, methods=["post"], permission_classes=[permissions.IsAuthenticated], url_path="claim")
+	def claim(self, request):
+		code = request.data.get("code")
+		if not code:
+			return Response({"detail": "Kode perangkat wajib diisi."}, status=status.HTTP_400_BAD_REQUEST)
+		device = PollingDevice.objects.filter(code__iexact=code).first()
 		if not device:
-			return Response({}, status=status.HTTP_204_NO_CONTENT)
+			return Response({"detail": "Perangkat tidak ditemukan."}, status=status.HTTP_404_NOT_FOUND)
+		if device.assigned_to_id and device.assigned_to_id != request.user.id:
+			return Response({"detail": "Perangkat sudah dipakai pengguna lain."}, status=status.HTTP_400_BAD_REQUEST)
+		if device.status == PollingDevice.STATUS_MAINTENANCE:
+			return Response({"detail": "Perangkat sedang perawatan."}, status=status.HTTP_400_BAD_REQUEST)
+		device.assigned_to = request.user
+		device.status = PollingDevice.STATUS_ASSIGNED
+		device.refresh_token()
+		device.save(update_fields=["assigned_to", "status", "device_token", "updated_at"])
+		serializer = self.get_serializer(device)
+		return Response(serializer.data, status=status.HTTP_200_OK)
+
+	@action(detail=True, methods=["post"], permission_classes=[permissions.IsAuthenticated], url_path="reset")
+	def reset_device(self, request, pk=None):
+		device = self.get_object()
+		if not (request.user.role == "lecturer" or device.assigned_to_id == request.user.id):
+			return Response({"detail": "Tidak memiliki akses reset perangkat ini."}, status=status.HTTP_403_FORBIDDEN)
+		device.assigned_to = None
+		device.status = PollingDevice.STATUS_AVAILABLE
+		device.refresh_token()
+		device.last_payload = {}
+		device.save(update_fields=["assigned_to", "status", "device_token", "last_payload", "updated_at"])
+		# TODO: publish MQTT reset command here (bridge or async task)
 		serializer = self.get_serializer(device)
 		return Response(serializer.data)
 

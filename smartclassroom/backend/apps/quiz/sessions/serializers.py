@@ -16,6 +16,7 @@ from .models import (
 
 class PollingDeviceSerializer(serializers.ModelSerializer):
 	assigned_to_email = serializers.CharField(source="assigned_to.email", read_only=True)
+	is_online = serializers.SerializerMethodField()
 
 	class Meta:
 		model = PollingDevice
@@ -29,9 +30,16 @@ class PollingDeviceSerializer(serializers.ModelSerializer):
 			"firmware_version",
 			"battery_level",
 			"last_seen",
+			"last_rssi",
+			"last_payload",
 			"device_token",
+			"claim_code",
+			"is_online",
 		]
-		read_only_fields = ["device_token", "last_seen"]
+		read_only_fields = ["device_token", "last_seen", "last_rssi", "last_payload", "is_online", "claim_code"]
+
+	def get_is_online(self, obj):
+		return obj.is_online
 
 
 class SessionQuestionSerializer(serializers.ModelSerializer):

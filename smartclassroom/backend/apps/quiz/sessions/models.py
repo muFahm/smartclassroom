@@ -1,6 +1,7 @@
 import secrets
 from django.conf import settings
 from django.db import models
+from django.utils import timezone
 
 from apps.quiz.quizzes.models import QuizOption, QuizPackage, QuizQuestion
 
@@ -36,7 +37,17 @@ class PollingDevice(TimeStampedModel):
 	firmware_version = models.CharField(max_length=20, blank=True)
 	battery_level = models.PositiveIntegerField(default=0)
 	last_seen = models.DateTimeField(null=True, blank=True)
+	last_rssi = models.IntegerField(null=True, blank=True)
+	last_payload = models.JSONField(default=dict, blank=True)
 	device_token = models.CharField(max_length=64, default="", blank=True)
+	claim_code = models.CharField(max_length=12, default="", blank=True)
+
+	@property
+	def is_online(self) -> bool:
+		if not self.last_seen:
+			return False
+		delta = timezone.now() - self.last_seen
+		return delta.total_seconds() <= 60
 
 	class Meta:
 		ordering = ["code"]

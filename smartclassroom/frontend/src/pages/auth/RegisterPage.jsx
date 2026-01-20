@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Navigate, useNavigate } from "react-router-dom";
+import { Navigate, useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 
 export default function RegisterPage() {
@@ -30,7 +30,7 @@ export default function RegisterPage() {
     setLoading(true);
 
     try {
-      const res = await fetch("http://localhost:8000/api/accounts/register/", {
+      const res = await fetch(`${process.env.REACT_APP_API_BASE_URL || "http://localhost:8000"}/api/accounts/register/`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(form),
@@ -124,10 +124,7 @@ export default function RegisterPage() {
         </button>
       </form>
       <p style={{ marginTop: "15px", textAlign: "center" }}>
-        Sudah punya akun?{" "}
-        <a href="/login" style={{ color: "#007bff", textDecoration: "none" }}>
-          Masuk di sini
-        </a>
+        Sudah punya akun? <Link to="/login">Masuk di sini</Link>
       </p>
     </div>
   );

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Navigate, useLocation, useNavigate } from "react-router-dom";
+import { Link, Navigate, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 
 export default function LoginPage() {
@@ -50,6 +50,9 @@ export default function LoginPage() {
           {loading ? "Memuat..." : "Masuk"}
         </button>
       </form>
+      <p style={{ marginTop: "12px", textAlign: "center" }}>
+        Belum punya akun? <Link to="/register">Daftar akun mahasiswa/dosen</Link>
+      </p>
     </div>
   );
 }

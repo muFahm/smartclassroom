@@ -16,6 +16,11 @@ class CustomUser(AbstractUser):
         ("lecturer", "Dosen/Admin"),
     )
     role = models.CharField(max_length=20, choices=ROLE_CHOICES, default="student")
+    full_name = models.CharField(max_length=200, blank=True)
+    nim = models.CharField(max_length=50, blank=True)
+    major = models.CharField(max_length=120, blank=True)
+    enrollment_year = models.PositiveIntegerField(null=True, blank=True)
+    avatar_url = models.URLField(blank=True)
 
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = ["username"]
@@ -167,3 +172,27 @@ class AttendanceRecord(models.Model):
     class Meta:
         ordering = ["timestamp"]
         unique_together = (("session", "student"),)
+
+
+class UserActivityLog(models.Model):
+    TYPE_LOGIN = "login"
+    TYPE_DEVICE = "device"
+    TYPE_SESSION = "session"
+    TYPE_PROFILE = "profile"
+    TYPE_OTHER = "other"
+    TYPE_CHOICES = [
+        (TYPE_LOGIN, "Login/Logout"),
+        (TYPE_DEVICE, "Device"),
+        (TYPE_SESSION, "Session"),
+        (TYPE_PROFILE, "Profile"),
+        (TYPE_OTHER, "Other"),
+    ]
+
+    user = models.ForeignKey("accounts.CustomUser", on_delete=models.CASCADE, related_name="activity_logs")
+    activity_type = models.CharField(max_length=20, choices=TYPE_CHOICES, default=TYPE_OTHER)
+    message = models.CharField(max_length=255, blank=True)
+    metadata = models.JSONField(default=dict, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-created_at"]

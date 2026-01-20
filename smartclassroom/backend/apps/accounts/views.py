@@ -1,4 +1,5 @@
 import json
+from datetime import datetime, timedelta
 from django.core.files.base import ContentFile
 
 from django.contrib.auth import authenticate, login, logout
@@ -13,12 +14,23 @@ from rest_framework_simplejwt.views import TokenObtainPairView
 from .biometrics.face_processing import process_face_image
 from .biometrics.voice_processing import analyze_voice_sample, compute_enrollment_embedding
 from .biometrics.face_service import get_face_service
-from .models import CustomUser, FaceEnrollment, FaceSample, VoiceEnrollment, VoiceSample, AttendanceSession, AttendanceRecord
+from .models import (
+    CustomUser,
+    FaceEnrollment,
+    FaceSample,
+    VoiceEnrollment,
+    VoiceSample,
+    AttendanceSession,
+    AttendanceRecord,
+    UserActivityLog,
+)
 from .serializers import (
+    ActivityLogSerializer,
     FaceEnrollmentSerializer,
     FaceEnrollmentStartResponseSerializer,
     FaceSampleSerializer,
     FaceSampleUploadSerializer,
+    ProfileSerializer,
     RegisterSerializer,
     VoiceEnrollmentSerializer,
     VoiceEnrollmentStartResponseSerializer,
@@ -28,6 +40,8 @@ from .serializers import (
     AttendanceRecordSerializer,
     AttendanceSessionSerializer,
 )
+from apps.quiz.sessions.models import DeviceResponse, QuizSession, SessionQuestion
+from apps.classrooms.models import ClassSession, SessionNote
 from django.utils import timezone
 
 
@@ -99,15 +113,20 @@ class ProfileView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        user = request.user
-        return Response(
-            {
-                "id": user.id,
-                "email": user.email,
-                "username": user.username,
-                "role": user.role,
-            }
+        serializer = ProfileSerializer(request.user)
+        return Response(serializer.data)
+
+    def patch(self, request):
+        serializer = ProfileSerializer(request.user, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        UserActivityLog.objects.create(
+            user=request.user,
+            activity_type=UserActivityLog.TYPE_PROFILE,
+            message="Profil diperbarui",
+            metadata={k: v for k, v in request.data.items()},
         )
+        return Response(serializer.data)
 
 
 class FaceEnrollmentStartView(APIView):
@@ -245,6 +264,115 @@ class VoiceEnrollmentSampleUploadView(APIView):
             )
 
         return Response(VoiceSampleSerializer(sample).data, status=201)
+
+
+class MyScheduleView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        now = timezone.now()
+        start = request.query_params.get("start")
+        end = request.query_params.get("end")
+
+        def parse_dt(value, default):
+            if not value:
+                return default
+            dt = datetime.fromisoformat(value)
+            if timezone.is_naive(dt):
+                dt = timezone.make_aware(dt)
+            return dt
+
+        try:
+            start_dt = parse_dt(start, now)
+            end_dt = parse_dt(end, now + timedelta(days=14))
+        except Exception:
+            return Response({"detail": "Format tanggal tidak valid. Gunakan ISO 8601."}, status=400)
+
+        sessions = (
+            ClassSession.objects.filter(course_class__students=request.user, scheduled_start__gte=start_dt, scheduled_start__lte=end_dt)
+            .select_related("course_class__course", "course_class__lecturer", "classroom")
+            .order_by("scheduled_start")
+        )
+        payload = []
+        for s in sessions:
+            payload.append(
+                {
+                    "id": s.id,
+                    "course_code": s.course_class.course.code,
+                    "course_name": s.course_class.course.name,
+                    "topic": s.topic or s.course_class.course.name,
+                    "scheduled_start": s.scheduled_start,
+                    "scheduled_end": s.scheduled_end,
+                    "status": s.status,
+                    "classroom": s.classroom.name if s.classroom else "",
+                    "lecturer": s.course_class.lecturer.email if s.course_class.lecturer else "",
+                }
+            )
+        return Response(payload)
+
+
+class MyResultsView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        responses = (
+            DeviceResponse.objects.filter(participant__user=request.user)
+            .select_related("session_question__session", "option__question__package")
+            .order_by("session_question__session_id")
+        )
+        sessions = {}
+        for resp in responses:
+            session = resp.session_question.session
+            if session.id not in sessions:
+                sessions[session.id] = {
+                    "session_id": session.id,
+                    "session_code": session.code,
+                    "package_title": session.package.title,
+                    "total": 0,
+                    "correct": 0,
+                    "last_submitted": resp.submitted_at,
+                }
+            entry = sessions[session.id]
+            entry["total"] += 1
+            if resp.option.is_correct:
+                entry["correct"] += 1
+            if resp.submitted_at and resp.submitted_at > entry["last_submitted"]:
+                entry["last_submitted"] = resp.submitted_at
+
+        return Response(list(sessions.values()))
+
+
+class MyNotesView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        notes = (
+            SessionNote.objects.filter(class_session__course_class__students=request.user)
+            .select_related("class_session__course_class__course")
+            .order_by("-updated_at")[:50]
+        )
+        payload = []
+        for n in notes:
+            payload.append(
+                {
+                    "id": n.id,
+                    "class_session_id": n.class_session_id,
+                    "course_name": n.class_session.course_class.course.name,
+                    "topic": n.class_session.topic,
+                    "summary": n.summary,
+                    "transcript": n.transcript[:5000],
+                    "updated_at": n.updated_at,
+                }
+            )
+        return Response(payload)
+
+
+class MyActivityView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        logs = UserActivityLog.objects.filter(user=request.user).order_by("-created_at")[:50]
+        return Response(ActivityLogSerializer(logs, many=True).data)
 
 
 class VoiceEnrollmentCompleteView(APIView):
