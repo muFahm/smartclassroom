@@ -67,12 +67,14 @@
 
 .navbar-right {
   flex: 0 0 auto;
+  position: relative;
 }
 
 .navbar-user {
   display: flex;
   align-items: center;
   cursor: pointer;
+  position: relative;
 }
 
 .navbar-user-avatar {
@@ -91,4 +93,64 @@
 .navbar-user-avatar:hover {
   background: #d1d5db;
   border-color: #9ca3af;
+}
+
+/* Dropdown Menu */
+.navbar-dropdown {
+  position: absolute;
+  top: 48px;
+  right: 0;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  min-width: 200px;
+  overflow: hidden;
+  z-index: 1001;
+  animation: slideDown 0.2s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.navbar-dropdown-header {
+  padding: 16px;
+  border-bottom: 1px solid #e5e7eb;
+  background: #f9fafb;
+}
+
+.navbar-dropdown-name {
+  margin: 0 0 4px 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.navbar-dropdown-role {
+  margin: 0;
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.navbar-dropdown-logout {
+  width: 100%;
+  padding: 12px 16px;
+  background: transparent;
+  border: none;
+  text-align: left;
+  font-size: 14px;
+  color: #dc2626;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.navbar-dropdown-logout:hover {
+  background: #fee2e2;
 }

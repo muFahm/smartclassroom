@@ -1,7 +1,13 @@
-import React from "react";
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { logout, getUser } from "../utils/auth";
 import "./Navbar.css";
 
 export default function Navbar({ activeMode, setActiveMode }) {
+  const navigate = useNavigate();
+  const [showDropdown, setShowDropdown] = useState(false);
+  const user = getUser();
+
   const modes = [
     { id: "default", label: "Dashboard Utama" },
     { id: "kuis", label: "Kuis" },
@@ -11,6 +17,11 @@ export default function Navbar({ activeMode, setActiveMode }) {
     { id: "brainstorming", label: "Brainstorming" },
     { id: "belajar", label: "Belajar" },
   ];
+
+  const handleLogout = () => {
+    logout();
+    navigate("/login");
+  };
 
   return (
     <nav className="navbar">
@@ -31,10 +42,27 @@ export default function Navbar({ activeMode, setActiveMode }) {
       </div>
 
       <div className="navbar-right">
-        <div className="navbar-user">
+        <div 
+          className="navbar-user"
+          onClick={() => setShowDropdown(!showDropdown)}
+        >
           <div className="navbar-user-avatar">
             <span>👤</span>
           </div>
+          {showDropdown && (
+            <div className="navbar-dropdown">
+              <div className="navbar-dropdown-header">
+                <p className="navbar-dropdown-name">{user?.username || 'Admin'}</p>
+                <p className="navbar-dropdown-role">Admin Prodi</p>
+              </div>
+              <button 
+                className="navbar-dropdown-logout"
+                onClick={handleLogout}
+              >
+                🚪 Logout
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </nav>
