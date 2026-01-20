@@ -21,15 +21,16 @@ export const SENSOR_DATA = {
 // Format: occupancy object dengan key = nomor kursi, value = status (1=terisi, 0=kosong)
 export const CHAIR_DATA = {
   "701": {
-    total: 30,
-    occupied: 18,
-    percentage: 60,
+    total: 32,
+    occupied: 20,
+    percentage: 63,
     occupancy: {
       1: 0, 2: 1, 3: 1, 4: 1, 5: 0, 6: 1,
       7: 1, 8: 0, 9: 1, 10: 1, 11: 0, 12: 1,
       13: 0, 14: 1, 15: 1, 16: 0, 17: 1, 18: 1,
       19: 1, 20: 0, 21: 1, 22: 1, 23: 0, 24: 1,
-      25: 0, 26: 1, 27: 1, 28: 0, 29: 1, 30: 1
+      25: 0, 26: 1, 27: 1, 28: 0, 29: 1, 30: 1,
+      31: 1, 32: 0
     }
   },
   "702": {

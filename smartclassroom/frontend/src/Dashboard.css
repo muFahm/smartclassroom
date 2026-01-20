@@ -1510,39 +1510,46 @@
 
 /* Kursi Grid Adjustments for Belajar Mode */
 .mode-belajar .belajar-left-bottom-row .kursi-content {
-  padding: 24px 8px 8px 12px !important;
+  padding: 8px 8px 8px 16px !important;
   overflow: auto !important;
 }
 
 .mode-belajar .belajar-left-bottom-row .kursi-grid {
   gap: 6px !important;
   margin-top: 6px !important;
-  padding: 20px 8px 8px 12px !important;
+  padding: 6px 8px 8px 16px !important;
 }
 
 .mode-belajar .belajar-left-bottom-row .kursi-row {
   gap: 6px !important;
   justify-content: flex-start !important;
   padding-left: 4px !important;
+  margin-left: 6px !important;
 }
 
 .mode-belajar .belajar-left-bottom-row .kursi-row:first-child {
-  margin-top: 10px !important;
+  margin-top: 2px !important;
 }
 
 /* Override untuk X-shape layout (Kelas 703) */
 .mode-belajar .belajar-left-bottom-row .layout-x-shape .kursi-grid {
-  padding: 20px 8px 8px 12px !important;
+  padding: 6px 8px 8px 32px !important;
+  transform: translateX(12px);
 }
 
 .mode-belajar .belajar-left-bottom-row .layout-x-shape .kursi-row {
-  padding-left: 4px !important;
-  justify-content: flex-start !important;
+  padding-left: 6px !important;
+  margin-left: 0 !important;
+  justify-content: center !important;
+}
+
+.mode-belajar .belajar-left-bottom-row .layout-x-shape .kursi-seat {
+  margin-left: 2px !important;
 }
 
 .mode-belajar .belajar-left-bottom-row .kursi-seat {
-  width: 20px !important;
-  height: 20px !important;
+  width: 22px !important;
+  height: 22px !important;
   font-size: 9px !important;
   border-radius: 4px !important;
 }

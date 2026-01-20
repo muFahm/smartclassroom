@@ -6,16 +6,16 @@
 export const CLASSROOM_LAYOUTS = {
   701: {
     name: "Kelas 701",
-    totalSeats: 30,
+    totalSeats: 32,
     type: "standard-offset",
     description:
-      "5 baris: 2 baris depan (6 kursi) + 3 baris belakang (6 kursi dengan indent)",
+      "5 baris: 2 baris depan (7 kursi) + 3 baris belakang (6 kursi dengan indent)",
     layout: [
-      [6, 5, 4, 3, 2, 1], // Baris 1 - depan
-      [7, 8, 9, 10, 11, 12], // Baris 2 - depan
-      [null, 18, 17, 16, 15, 14, 13], // Baris 3 - indent (null = empty space)
-      [null, 19, 20, 21, 22, 23, 24], // Baris 4 - indent
-      [null, 30, 29, 28, 27, 26, 25], // Baris 5 - indent
+      [31, 6, 5, 4, 3, 2, 1], // Baris 1 - depan (7 kursi)
+      [32, 7, 8, 9, 10, 11, 12], // Baris 2 - depan (7 kursi)
+      [null, 18, 17, 16, 15, 14, 13], // Baris 3 - indent (6 kursi)
+      [null, 19, 20, 21, 22, 23, 24], // Baris 4 - indent (6 kursi)
+      [null, 30, 29, 28, 27, 26, 25], // Baris 5 - indent (6 kursi)
     ],
   },
 
