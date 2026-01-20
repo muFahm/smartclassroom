@@ -11,7 +11,7 @@ export default function ClassroomOverview({ onSelectClass }) {
       studentsActive: 28,
       temperature: 22,
       lightLevel: 85,
-      status: "aktif"
+      status: "aktif",
     },
     {
       id: "702",
@@ -20,7 +20,7 @@ export default function ClassroomOverview({ onSelectClass }) {
       studentsActive: 45,
       temperature: 23,
       lightLevel: 78,
-      status: "aktif"
+      status: "aktif",
     },
     {
       id: "703",
@@ -29,15 +29,19 @@ export default function ClassroomOverview({ onSelectClass }) {
       studentsActive: 26,
       temperature: 21,
       lightLevel: 92,
-      status: "aktif"
+      status: "aktif",
     },
   ];
 
   // Hitung statistik agregat
   const totalCapacity = classrooms.reduce((sum, c) => sum + c.capacity, 0);
   const totalActive = classrooms.reduce((sum, c) => sum + c.studentsActive, 0);
-  const avgTemperature = (classrooms.reduce((sum, c) => sum + c.temperature, 0) / classrooms.length).toFixed(1);
-  const avgLight = (classrooms.reduce((sum, c) => sum + c.lightLevel, 0) / classrooms.length).toFixed(0);
+  const avgTemperature = (
+    classrooms.reduce((sum, c) => sum + c.temperature, 0) / classrooms.length
+  ).toFixed(1);
+  const avgLight = (
+    classrooms.reduce((sum, c) => sum + c.lightLevel, 0) / classrooms.length
+  ).toFixed(0);
 
   return (
     <div className="overview-container">
@@ -52,7 +56,9 @@ export default function ClassroomOverview({ onSelectClass }) {
         <div className="stat-card">
           <div className="stat-icon students">👥</div>
           <div className="stat-content">
-            <div className="stat-number">{totalActive}/{totalCapacity}</div>
+            <div className="stat-number">
+              {totalActive}/{totalCapacity}
+            </div>
             <div className="stat-label">Mahasiswa Aktif</div>
           </div>
         </div>
@@ -104,7 +110,7 @@ export default function ClassroomOverview({ onSelectClass }) {
             <div className="classroom-body">
               <div className="info-row">
                 <span className="info-icon">👥</span>
-                <span className="info-label">Mahasiswa  :</span>
+                <span className="info-label">Mahasiswa :</span>
                 <span className="info-value">
                   {classroom.studentsActive}/{classroom.capacity}
                 </span>
@@ -112,13 +118,13 @@ export default function ClassroomOverview({ onSelectClass }) {
 
               <div className="info-row">
                 <span className="info-icon">🌡️</span>
-                <span className="info-label">Suhu   :</span>
+                <span className="info-label">Suhu :</span>
                 <span className="info-value">{classroom.temperature}°C</span>
               </div>
 
               <div className="info-row">
                 <span className="info-icon">💡</span>
-                <span className="info-label">Cahaya  :</span>
+                <span className="info-label">Cahaya :</span>
                 <span className="info-value">{classroom.lightLevel}%</span>
               </div>
             </div>
@@ -134,7 +140,8 @@ export default function ClassroomOverview({ onSelectClass }) {
       <div className="overview-tips">
         <div className="tips-icon">💡</div>
         <div className="tips-content">
-          <strong>Tips:</strong> Klik pada kartu kelas untuk melihat detail lengkap dan monitoring real-time per kelas.
+          <strong>Tips:</strong> Klik pada kartu kelas untuk melihat detail
+          lengkap dan monitoring real-time per kelas.
         </div>
       </div>
     </div>

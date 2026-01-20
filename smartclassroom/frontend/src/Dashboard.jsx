@@ -65,37 +65,45 @@ export default function Dashboard() {
 
   return (
     <>
-      <Navbar activeMode={activeMode} setActiveMode={setActiveMode} isOverview={activeMode === "overview"} />
+      <Navbar
+        activeMode={activeMode}
+        setActiveMode={setActiveMode}
+        isOverview={activeMode === "overview"}
+      />
 
-      <div className={`dashboard-container ${activeMode === "overview" ? "no-navbar" : ""}`}>
-        <div className={`dashboard-grid ${activeMode === "overview" ? "overview-mode" : ""}`}>
+      <div
+        className={`dashboard-container ${activeMode === "overview" ? "no-navbar" : ""}`}
+      >
+        <div
+          className={`dashboard-grid ${activeMode === "overview" ? "overview-mode" : ""}`}
+        >
           {/* ========================================== */}
           {/* SIDEBAR (HIDDEN saat OVERVIEW) */}
           {/* ========================================== */}
           {activeMode !== "overview" && (
-          <div className="dashboard-left-column">
-            <PilihanKelas 
-              selectedClass={selectedClass}
-              setSelectedClass={setSelectedClass}
-            />
-            <DateTimeCard />
+            <div className="dashboard-left-column">
+              <PilihanKelas
+                selectedClass={selectedClass}
+                setSelectedClass={setSelectedClass}
+              />
+              <DateTimeCard />
 
-            {/* Suhu & Cahaya - Side by Side */}
-            <div className="sidebar-sensor-row">
-              <Suhu />
-              <Cahaya />
+              {/* Suhu & Cahaya - Side by Side */}
+              <div className="sidebar-sensor-row">
+                <Suhu />
+                <Cahaya />
+              </div>
+
+              <PosisiKursi mode="sidebar" classroomId={selectedClass} />
+
+              {/* ✅ Widget dengan activeMode prop */}
+              <Widget
+                key={activeMode}
+                widgets={widgets}
+                setWidgets={setWidgets}
+                activeMode={activeMode}
+              />
             </div>
-
-            <PosisiKursi mode="sidebar" classroomId={selectedClass} />
-
-            {/* ✅ Widget dengan activeMode prop */}
-            <Widget
-              key={activeMode}
-              widgets={widgets}
-              setWidgets={setWidgets}
-              activeMode={activeMode}
-            />
-          </div>
           )}
 
           {/* ========================================== */}
@@ -104,7 +112,9 @@ export default function Dashboard() {
           <div className={`dashboard-right-column ${getModeClass()}`}>
             {/* ==================== MODE OVERVIEW ==================== */}
             {activeMode === "overview" && (
-              <ClassroomOverview onSelectClass={handleSelectClassFromOverview} />
+              <ClassroomOverview
+                onSelectClass={handleSelectClassFromOverview}
+              />
             )}
 
             {/* ==================== MODE DEFAULT ==================== */}
@@ -238,7 +248,11 @@ export default function Dashboard() {
                 {/* Column 1 - Posisi Kursi (Full Height) */}
                 {widgets.posisiKursi && (
                   <div className="widget-wrapper grid-col1">
-                    <PosisiKursi mode="denah" showStats={true} classroomId={selectedClass} />
+                    <PosisiKursi
+                      mode="denah"
+                      showStats={true}
+                      classroomId={selectedClass}
+                    />
                   </div>
                 )}
 
