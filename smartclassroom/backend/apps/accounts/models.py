@@ -9,11 +9,6 @@ def _face_sample_upload_to(instance, filename: str) -> str:
     return f"biometrics/faces/user_{instance.user_id}/{prompt}/{ts}_{filename}"
 
 
-def _voice_sample_upload_to(instance, filename: str) -> str:
-    ts = timezone.now().strftime("%Y%m%d%H%M%S")
-    return f"biometrics/voices/user_{instance.user_id}/{ts}_{filename}"
-
-
 class CustomUser(AbstractUser):
     email = models.EmailField(unique=True)
     ROLE_CHOICES = (
@@ -80,6 +75,11 @@ class FaceSample(models.Model):
         ordering = ["-created_at"]
 
 
+def _voice_sample_upload_to(instance, filename: str) -> str:
+    ts = timezone.now().strftime("%Y%m%d%H%M%S")
+    return f"biometrics/voices/user_{instance.user_id}/{ts}_{filename}"
+
+
 class VoiceEnrollment(models.Model):
     user = models.ForeignKey(
         "accounts.CustomUser",
@@ -112,7 +112,6 @@ class VoiceSample(models.Model):
         blank=True,
     )
     audio = models.FileField(upload_to=_voice_sample_upload_to)
-
     duration_ms = models.PositiveIntegerField(null=True, blank=True)
     voice_active_ms = models.PositiveIntegerField(null=True, blank=True)
     voice_ratio = models.FloatField(null=True, blank=True)
@@ -124,23 +123,29 @@ class VoiceSample(models.Model):
         ordering = ["-created_at"]
 
 
+class FaceLabelMapping(models.Model):
+    label = models.CharField(max_length=200, unique=True)
+    user = models.ForeignKey(
+        "accounts.CustomUser",
+        on_delete=models.CASCADE,
+        related_name="face_label_mappings",
+    )
+
+
 class AttendanceSession(models.Model):
+    name = models.CharField(max_length=200, default="", blank=True)
+    is_active = models.BooleanField(default=False)
+    started_at = models.DateTimeField(null=True, blank=True)
+    ended_at = models.DateTimeField(null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
     host = models.ForeignKey(
         "accounts.CustomUser",
         on_delete=models.CASCADE,
         related_name="attendance_sessions",
     )
-    name = models.CharField(max_length=200, blank=True, default="")
-    is_active = models.BooleanField(default=False)
-    started_at = models.DateTimeField(null=True, blank=True)
-    ended_at = models.DateTimeField(null=True, blank=True)
-    created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         ordering = ["-created_at"]
-
-    def __str__(self):
-        return f"Session {self.id} by {self.host.email}"
 
 
 class AttendanceRecord(models.Model):
@@ -160,17 +165,5 @@ class AttendanceRecord(models.Model):
     timestamp = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        unique_together = ("session", "student")
         ordering = ["timestamp"]
-
-
-class FaceLabelMapping(models.Model):
-    label = models.CharField(max_length=200, unique=True)
-    user = models.ForeignKey(
-        "accounts.CustomUser",
-        on_delete=models.CASCADE,
-        related_name="face_label_mappings",
-    )
-
-    def __str__(self):
-        return f"{self.label} -> {self.user.email}"
+        unique_together = (("session", "student"),)

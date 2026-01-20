@@ -12,7 +12,8 @@ from rest_framework_simplejwt.views import TokenObtainPairView
 
 from .biometrics.face_processing import process_face_image
 from .biometrics.voice_processing import analyze_voice_sample, compute_enrollment_embedding
-from .models import CustomUser, FaceEnrollment, FaceSample, VoiceEnrollment, VoiceSample
+from .biometrics.face_service import get_face_service
+from .models import CustomUser, FaceEnrollment, FaceSample, VoiceEnrollment, VoiceSample, AttendanceSession, AttendanceRecord
 from .serializers import (
     FaceEnrollmentSerializer,
     FaceEnrollmentStartResponseSerializer,
@@ -23,7 +24,11 @@ from .serializers import (
     VoiceEnrollmentStartResponseSerializer,
     VoiceSampleSerializer,
     VoiceSampleUploadSerializer,
+    AttendanceSessionStartResponseSerializer,
+    AttendanceRecordSerializer,
+    AttendanceSessionSerializer,
 )
+from django.utils import timezone
 
 
 @csrf_exempt
@@ -268,7 +273,6 @@ class VoiceEnrollmentCompleteView(APIView):
         try:
             embedding, _ = compute_enrollment_embedding(sample.audio.path)
         except Exception:
-            # Model may not be installed yet; keep embedding empty like face enrollment MVP.
             embedding = []
 
         enrollment.embedding = embedding
@@ -287,17 +291,12 @@ class VoiceEnrollmentCompleteView(APIView):
 # -------------------
 # Attendance API
 # -------------------
-from .biometrics.face_service import get_face_service
-from .models import AttendanceSession, AttendanceRecord
-from .serializers import AttendanceSessionStartResponseSerializer, AttendanceRecordSerializer, AttendanceSessionSerializer
-from django.utils import timezone
 
 
 class FaceEncodingsReloadView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
-        # Only allow lecturers/staff to trigger reload
         if request.user.role != "lecturer":
             return Response({"detail": "Forbidden"}, status=403)
         fs = get_face_service()
@@ -312,7 +311,6 @@ class AttendanceSessionStartView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
-        # only lecturers can start sessions
         if request.user.role != "lecturer":
             return Response({"detail": "Forbidden"}, status=403)
 

@@ -127,5 +127,6 @@ class AttendanceSessionSerializer(serializers.ModelSerializer):
 
 # Set model references (avoids circular import problems)
 from .models import AttendanceSession, AttendanceRecord  # noqa: E402
+
 AttendanceRecordSerializer.Meta.model = AttendanceRecord
 AttendanceSessionSerializer.Meta.model = AttendanceSession

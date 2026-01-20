@@ -50,12 +50,6 @@ export default function LoginPage() {
           {loading ? "Memuat..." : "Masuk"}
         </button>
       </form>
-      <p style={{ marginTop: "15px", textAlign: "center" }}>
-        Belum punya akun?{" "}
-        <a href="/register" style={{ color: "#007bff", textDecoration: "none" }}>
-          Daftar di sini
-        </a>
-      </p>
     </div>
   );
 }

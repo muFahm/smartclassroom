@@ -2,12 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-try:
-    import cv2
-except ImportError as exc:
-    cv2 = None
-    _CV2_IMPORT_ERROR = exc
-
+import cv2
 import numpy as np
 
 
@@ -16,17 +11,7 @@ class FaceQuality:
     blur_score: float
 
 
-def _ensure_cv2_available() -> None:
-    if cv2 is None:
-        raise RuntimeError(
-            "cv2 is required for face image processing but is not installed."
-            " Install opencv-python-headless in the backend container."
-        ) from _CV2_IMPORT_ERROR
-
-
 def decode_image_bytes(image_bytes: bytes) -> np.ndarray:
-    _ensure_cv2_available()
-
     data = np.frombuffer(image_bytes, dtype=np.uint8)
     img = cv2.imdecode(data, cv2.IMREAD_COLOR)
     if img is None:
@@ -43,18 +28,20 @@ def crop_center_square(img: np.ndarray) -> np.ndarray:
 
 
 def resize_to(img: np.ndarray, size: int = 256) -> np.ndarray:
-    _ensure_cv2_available()
     return cv2.resize(img, (size, size), interpolation=cv2.INTER_AREA)
 
 
 def compute_blur_score(img: np.ndarray) -> float:
-    _ensure_cv2_available()
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     return float(cv2.Laplacian(gray, cv2.CV_64F).var())
 
 
 def process_face_image(image_bytes: bytes, output_size: int = 256) -> tuple[bytes, FaceQuality]:
-    """Center-crop square, resize, and compute blur score. Returns JPEG bytes."""
+    """MVP face processing: center-crop square + resize + blur score.
+
+    Later we can replace crop_center_square with a real face detector + alignment.
+    Returns JPEG bytes.
+    """
 
     img = decode_image_bytes(image_bytes)
     img = crop_center_square(img)
