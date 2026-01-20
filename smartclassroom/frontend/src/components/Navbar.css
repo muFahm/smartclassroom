@@ -36,6 +36,12 @@
   margin-right: 20px;
 }
 
+/* Hide navbar-center saat overview mode */
+.navbar:has(> .navbar-center:empty),
+.navbar:has(+ div > .navbar-center:hidden) {
+  justify-content: space-between;
+}
+
 .navbar-link {
   font-size: 13px;
   font-weight: 500;

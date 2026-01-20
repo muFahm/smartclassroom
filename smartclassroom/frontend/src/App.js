@@ -1,5 +1,10 @@
 import React from "react";
-import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
 import Dashboard from "./Dashboard";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
@@ -41,7 +46,7 @@ export default function App() {
         <Route
           path="/"
           element={
-            localStorage.getItem('token') ? (
+            localStorage.getItem("token") ? (
               <Navigate to="/dashboard" replace />
             ) : (
               <Navigate to="/login" replace />

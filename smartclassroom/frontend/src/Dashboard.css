@@ -5,12 +5,20 @@
 .dashboard-container {
   margin: 0;
   margin-top: 48px;
-  margin-bottom: 40px;
-  padding: 16px;
+  margin-bottom: 0;
+  padding: 12px;
   background-color: #f3f4f6;
-  height: calc(100vh - 88px);
-  overflow: hidden; /* NO SCROLL - semuanya fit dalam 1 layar */
+  height: calc(100vh - 48px - 32px);
+  overflow: hidden; /* NO SCROLL */
   box-sizing: border-box;
+}
+
+/* No navbar saat overview - adjust untuk navbar tetap ada */
+.dashboard-container.no-navbar {
+  margin-top: 48px;
+  margin-bottom: 0;
+  height: calc(100vh - 48px - 32px);
+  padding: 12px;
 }
 
 .dashboard-grid {
@@ -19,6 +27,13 @@
   gap: 16px;
   height: 100%;
   width: 100%;
+  overflow: hidden;
+}
+
+/* OVERVIEW MODE - Full width tanpa sidebar */
+.dashboard-grid.overview-mode {
+  grid-template-columns: 1fr;
+  height: 100%;
   overflow: hidden;
 }
 
@@ -86,6 +101,14 @@
   overflow: hidden;
   min-height: 0;
   min-width: 0;
+}
+
+/* OVERVIEW MODE - Full height, fit dalam 1 layar */
+.dashboard-right-column.mode-overview {
+  height: 100%;
+  overflow: hidden;
+  grid-template-columns: 1fr;
+  gap: 12px;
 }
 
 /* ====================================================== */

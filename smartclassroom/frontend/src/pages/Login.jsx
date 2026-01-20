@@ -1,59 +1,64 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import './Login.css';
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import "./Login.css";
 
 function Login() {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
-    username: '',
-    password: ''
+    username: "",
+    password: "",
   });
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value
+      [e.target.name]: e.target.value,
     });
-    setError(''); // Clear error when user types
+    setError(""); // Clear error when user types
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    setError('');
+    setError("");
 
     try {
-      const response = await fetch('http://localhost:8000/api/accounts/login/', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
+      const response = await fetch(
+        "http://localhost:8000/api/accounts/login/",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(formData),
         },
-        body: JSON.stringify(formData),
-      });
+      );
 
       const data = await response.json();
 
       if (response.ok) {
         // Save token and user data to localStorage
-        localStorage.setItem('token', data.token);
-        localStorage.setItem('user', JSON.stringify(data.user));
-        
+        localStorage.setItem("token", data.token);
+        localStorage.setItem("user", JSON.stringify(data.user));
+
         // Redirect to dashboard
-        navigate('/dashboard');
+        navigate("/dashboard");
       } else {
         // Handle error messages from backend
         if (data.errors) {
-          const errorMsg = Object.values(data.errors).flat().join(', ');
+          const errorMsg = Object.values(data.errors).flat().join(", ");
           setError(errorMsg);
         } else {
-          setError(data.message || 'Login gagal. Periksa username dan password Anda.');
+          setError(
+            data.message || "Login gagal. Periksa username dan password Anda.",
+          );
         }
       }
     } catch (err) {
-      setError('Terjadi kesalahan. Pastikan server backend berjalan.');
-      console.error('Login error:', err);
+      setError("Terjadi kesalahan. Pastikan server backend berjalan.");
+      console.error("Login error:", err);
     } finally {
       setLoading(false);
     }
@@ -69,12 +74,8 @@ function Login() {
 
         <form className="login-form" onSubmit={handleSubmit}>
           <h2>Login Admin Prodi</h2>
-          
-          {error && (
-            <div className="error-message">
-              {error}
-            </div>
-          )}
+
+          {error && <div className="error-message">{error}</div>}
 
           <div className="form-group">
             <label htmlFor="username">Username</label>
@@ -104,21 +105,17 @@ function Login() {
             />
           </div>
 
-          <button 
-            type="submit" 
-            className="btn-login"
-            disabled={loading}
-          >
-            {loading ? 'Loading...' : 'Login'}
+          <button type="submit" className="btn-login" disabled={loading}>
+            {loading ? "Loading..." : "Login"}
           </button>
 
           <div className="login-footer">
             <p>
-              Belum terdaftar sebagai admin? 
-              <button 
+              Belum terdaftar sebagai admin?
+              <button
                 type="button"
                 className="link-button"
-                onClick={() => navigate('/register')}
+                onClick={() => navigate("/register")}
                 disabled={loading}
               >
                 Daftar admin

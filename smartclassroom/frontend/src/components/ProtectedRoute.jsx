@@ -1,5 +1,5 @@
-import React from 'react';
-import { Navigate } from 'react-router-dom';
+import React from "react";
+import { Navigate } from "react-router-dom";
 
 /**
  * ProtectedRoute Component
@@ -7,8 +7,8 @@ import { Navigate } from 'react-router-dom';
  * Redirects to login if user is not authenticated
  */
 function ProtectedRoute({ children }) {
-  const token = localStorage.getItem('token');
-  const user = localStorage.getItem('user');
+  const token = localStorage.getItem("token");
+  const user = localStorage.getItem("user");
 
   // Check if user is authenticated
   if (!token || !user) {

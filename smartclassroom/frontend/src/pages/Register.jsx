@@ -1,39 +1,39 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import './Register.css';
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import "./Register.css";
 
 function Register() {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
-    username: '',
-    email: '',
-    password: '',
-    confirmPassword: '',
-    fullName: '',
-    position: 'admin' // Admin Prodi
+    username: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+    fullName: "",
+    position: "admin", // Admin Prodi
   });
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value
+      [e.target.name]: e.target.value,
     });
-    setError(''); // Clear error when user types
+    setError(""); // Clear error when user types
   };
 
   const validateForm = () => {
     if (formData.password !== formData.confirmPassword) {
-      setError('Password dan konfirmasi password tidak sama');
+      setError("Password dan konfirmasi password tidak sama");
       return false;
     }
     if (formData.password.length < 6) {
-      setError('Password minimal 6 karakter');
+      setError("Password minimal 6 karakter");
       return false;
     }
-    if (!formData.email.includes('@')) {
-      setError('Email tidak valid');
+    if (!formData.email.includes("@")) {
+      setError("Email tidak valid");
       return false;
     }
     return true;
@@ -41,48 +41,51 @@ function Register() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (!validateForm()) {
       return;
     }
 
     setLoading(true);
-    setError('');
+    setError("");
 
     try {
-      const response = await fetch('http://localhost:8000/api/accounts/register/', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
+      const response = await fetch(
+        "http://localhost:8000/api/accounts/register/",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            username: formData.username,
+            email: formData.email,
+            password: formData.password,
+            confirm_password: formData.confirmPassword,
+            full_name: formData.fullName,
+            position: formData.position,
+          }),
         },
-        body: JSON.stringify({
-          username: formData.username,
-          email: formData.email,
-          password: formData.password,
-          confirm_password: formData.confirmPassword,
-          full_name: formData.fullName,
-          position: formData.position
-        }),
-      });
+      );
 
       const data = await response.json();
 
       if (response.ok) {
         // Redirect to login page after successful registration
-        alert('Registrasi berhasil! Silakan login dengan akun Anda.');
-        navigate('/login');
+        alert("Registrasi berhasil! Silakan login dengan akun Anda.");
+        navigate("/login");
       } else {
         // Handle error messages from backend
         if (data.errors) {
-          const errorMsg = Object.values(data.errors).flat().join(', ');
+          const errorMsg = Object.values(data.errors).flat().join(", ");
           setError(errorMsg);
         } else {
-          setError(data.message || 'Registrasi gagal. Coba lagi.');
+          setError(data.message || "Registrasi gagal. Coba lagi.");
         }
       }
     } catch (err) {
-      setError('Terjadi kesalahan. Pastikan server backend berjalan.');
-      console.error('Register error:', err);
+      setError("Terjadi kesalahan. Pastikan server backend berjalan.");
+      console.error("Register error:", err);
     } finally {
       setLoading(false);
     }
@@ -98,12 +101,8 @@ function Register() {
 
         <form className="register-form" onSubmit={handleSubmit}>
           <h2>Daftar Admin Prodi</h2>
-          
-          {error && (
-            <div className="error-message">
-              {error}
-            </div>
-          )}
+
+          {error && <div className="error-message">{error}</div>}
 
           <div className="form-group">
             <label htmlFor="fullName">Nama Lengkap</label>
@@ -177,21 +176,17 @@ function Register() {
             </div>
           </div>
 
-          <button 
-            type="submit" 
-            className="btn-register"
-            disabled={loading}
-          >
-            {loading ? 'Loading...' : 'Daftar'}
+          <button type="submit" className="btn-register" disabled={loading}>
+            {loading ? "Loading..." : "Daftar"}
           </button>
 
           <div className="register-footer">
             <p>
-              Sudah punya akun? 
-              <button 
+              Sudah punya akun?
+              <button
                 type="button"
                 className="link-button"
-                onClick={() => navigate('/login')}
+                onClick={() => navigate("/login")}
                 disabled={loading}
               >
                 Login di sini

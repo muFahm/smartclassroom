@@ -1,12 +1,14 @@
 # Smart Classroom Backend - Setup Instructions
 
 ## 1. Install Dependencies
+
 ```bash
 pip install djangorestframework
 pip install django-cors-headers
 ```
 
 ## 2. Run Migrations
+
 ```bash
 cd backend
 python manage.py makemigrations
@@ -14,11 +16,13 @@ python manage.py migrate
 ```
 
 ## 3. Create Superuser (Optional)
+
 ```bash
 python manage.py createsuperuser
 ```
 
 ## 4. Run Server
+
 ```bash
 python manage.py runserver
 ```
@@ -28,7 +32,9 @@ Server will run at: http://localhost:8000
 ## API Endpoints
 
 ### Authentication
+
 - **POST** `/api/accounts/register/` - Register new admin
+
   ```json
   {
     "username": "admin1",
@@ -41,6 +47,7 @@ Server will run at: http://localhost:8000
   ```
 
 - **POST** `/api/accounts/login/` - Login admin
+
   ```json
   {
     "username": "admin1",
@@ -57,6 +64,7 @@ Server will run at: http://localhost:8000
 ## Response Format
 
 ### Success Response
+
 ```json
 {
   "success": true,
@@ -74,6 +82,7 @@ Server will run at: http://localhost:8000
 ```
 
 ### Error Response
+
 ```json
 {
   "success": false,
@@ -85,6 +94,7 @@ Server will run at: http://localhost:8000
 ```
 
 ## Testing with Postman/Thunder Client
+
 1. Register: POST to http://localhost:8000/api/accounts/register/
 2. Copy the token from response
 3. Login: POST to http://localhost:8000/api/accounts/login/

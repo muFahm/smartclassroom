@@ -9,16 +9,16 @@
  * @param {object} user - User data object
  */
 export const login = (token, user) => {
-  localStorage.setItem('token', token);
-  localStorage.setItem('user', JSON.stringify(user));
+  localStorage.setItem("token", token);
+  localStorage.setItem("user", JSON.stringify(user));
 };
 
 /**
  * Remove user authentication data from localStorage
  */
 export const logout = () => {
-  localStorage.removeItem('token');
-  localStorage.removeItem('user');
+  localStorage.removeItem("token");
+  localStorage.removeItem("user");
 };
 
 /**
@@ -26,7 +26,7 @@ export const logout = () => {
  * @returns {string|null} JWT token or null
  */
 export const getToken = () => {
-  return localStorage.getItem('token');
+  return localStorage.getItem("token");
 };
 
 /**
@@ -34,7 +34,7 @@ export const getToken = () => {
  * @returns {object|null} User object or null
  */
 export const getUser = () => {
-  const userStr = localStorage.getItem('user');
+  const userStr = localStorage.getItem("user");
   return userStr ? JSON.parse(userStr) : null;
 };
 

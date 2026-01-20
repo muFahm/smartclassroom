@@ -14,6 +14,7 @@ import KlasifikasiGerakan from "./components/KlasifikasiGerakan";
 import AktivitasMahasiswa from "./components/AktivitasMahasiswa";
 import StatistikPengenalan from "./components/StatistikPengenalan";
 import SoalKuis from "./components/SoalKuis";
+import ClassroomOverview from "./components/ClassroomOverview";
 import Footer from "./components/Footer";
 import { KUIS_ACTIVE } from "./utils/mockData";
 import "./Dashboard.css";
@@ -23,8 +24,8 @@ export default function Dashboard() {
   // STATE MANAGEMENT
   // ========================================
 
-  // Mode aktif dashboard
-  const [activeMode, setActiveMode] = useState("default");
+  // Mode aktif dashboard - DEFAULT "overview"
+  const [activeMode, setActiveMode] = useState("overview");
 
   // Selected classroom
   const [selectedClass, setSelectedClass] = useState("701");
@@ -56,15 +57,22 @@ export default function Dashboard() {
     return `mode-${activeMode}`;
   };
 
+  // Handle select classroom dari overview
+  const handleSelectClassFromOverview = (classId) => {
+    setSelectedClass(classId);
+    setActiveMode("default");
+  };
+
   return (
     <>
-      <Navbar activeMode={activeMode} setActiveMode={setActiveMode} />
+      <Navbar activeMode={activeMode} setActiveMode={setActiveMode} isOverview={activeMode === "overview"} />
 
-      <div className="dashboard-container">
-        <div className="dashboard-grid">
+      <div className={`dashboard-container ${activeMode === "overview" ? "no-navbar" : ""}`}>
+        <div className={`dashboard-grid ${activeMode === "overview" ? "overview-mode" : ""}`}>
           {/* ========================================== */}
-          {/* SIDEBAR (STATIS - Tidak berubah di semua mode) */}
+          {/* SIDEBAR (HIDDEN saat OVERVIEW) */}
           {/* ========================================== */}
+          {activeMode !== "overview" && (
           <div className="dashboard-left-column">
             <PilihanKelas 
               selectedClass={selectedClass}
@@ -88,11 +96,17 @@ export default function Dashboard() {
               activeMode={activeMode}
             />
           </div>
+          )}
 
           {/* ========================================== */}
           {/* MAIN AREA (DINAMIS - Berubah sesuai mode) */}
           {/* ========================================== */}
           <div className={`dashboard-right-column ${getModeClass()}`}>
+            {/* ==================== MODE OVERVIEW ==================== */}
+            {activeMode === "overview" && (
+              <ClassroomOverview onSelectClass={handleSelectClassFromOverview} />
+            )}
+
             {/* ==================== MODE DEFAULT ==================== */}
             {activeMode === "default" && (
               <>

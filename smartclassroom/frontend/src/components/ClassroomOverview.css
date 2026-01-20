@@ -1,0 +1,351 @@
+/* ====================================================== */
+/*              CLASSROOM OVERVIEW STYLES                  */
+/* ====================================================== */
+
+.overview-container {
+  padding: 12px;
+  background: white;
+  border-radius: 12px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  gap: 8px;
+}
+
+/* HEADER */
+.overview-header {
+  margin-bottom: 10px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.overview-header h2 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 700;
+  color: #1f2937;
+}
+
+.overview-header p {
+  margin: 2px 0 0 0;
+  font-size: 11px;
+  color: #6b7280;
+}
+
+/* STATISTIK AGREGAT */
+.overview-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 9px;
+  margin-bottom: 10px;
+  flex-shrink: 0;
+}
+
+.stat-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+  border: 1px solid #bae6fd;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
+  border-color: #7dd3fc;
+}
+
+.stat-icon {
+  font-size: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  background: white;
+  border-radius: 6px;
+  flex-shrink: 0;
+}
+
+.stat-content {
+  flex: 1;
+}
+
+.stat-number {
+  font-size: 16px;
+  font-weight: 700;
+  color: #1e40af;
+  line-height: 1;
+}
+
+.stat-label {
+  font-size: 9px;
+  color: #6b7280;
+  margin-top: 1px;
+  text-transform: uppercase;
+  letter-spacing: 0.2px;
+}
+
+.stat-icon.students {
+  background: #fef3c7;
+}
+
+.stat-icon.temperature {
+  background: #fecaca;
+}
+
+.stat-icon.light {
+  background: #fcd34d;
+}
+
+.stat-icon.classes {
+  background: #c7d2fe;
+}
+
+.stat-content {
+  flex: 1;
+}
+
+.stat-number {
+  font-size: 24px;
+  font-weight: 700;
+  color: #1e40af;
+  line-height: 1;
+}
+
+.stat-label {
+  font-size: 12px;
+  color: #6b7280;
+  margin-top: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* RINCIAN PER KELAS TITLE */
+.overview-title {
+  margin-bottom: 8px;
+  flex-shrink: 0;
+}
+
+.overview-title h3 {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: #1f2937;
+  padding-bottom: 6px;
+  border-bottom: 2px solid #e5e7eb;
+}
+
+/* CLASSROOM GRID */
+.classrooms-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 9px;
+  flex: 1;
+  min-height: 200px;
+}
+
+/* CLASSROOM CARD */
+.classroom-card {
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.classroom-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 24px rgba(59, 130, 246, 0.15);
+  border-color: #93c5fd;
+}
+
+.classroom-header {
+  background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+  padding: 10px;
+  border-bottom: 2px solid #bfdbfe;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.classroom-name {
+  font-size: 16px;
+  font-weight: 600;
+  color: #1e40af;
+}
+
+.classroom-status {
+  font-size: 10px;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: 12px;
+  background: white;
+}
+
+.classroom-body {
+  padding: 10px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 12px;
+  min-height: 0;
+}
+
+.info-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.info-icon {
+  font-size: 12px;
+  flex-shrink: 0;
+}
+
+.info-label {
+  color: #6b7280;
+  min-width: 60px;
+  font-size: 14px;
+}
+
+.info-value {
+  font-weight: 600;
+  color: #1f2937;
+  flex: 1;
+  font-size: 14px;
+}
+
+.classroom-footer {
+  padding: 6px 10px;
+  border-top: 1px solid #e5e7eb;
+  background: #f9fafb;
+}
+
+.btn-detail {
+  width: 100%;
+  padding: 8px 10px;
+  background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%);
+  color: white;
+  border: none;
+  border-radius: 5px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-detail:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+.btn-detail:active {
+  transform: translateY(0);
+}
+
+/* TIPS */
+.overview-tips {
+  display: flex;
+  gap: 6px;
+  padding: 8px 10px;
+  background: #fef3c7;
+  border-left: 2px solid #f59e0b;
+  border-radius: 5px;
+  align-items: flex-start;
+  flex-shrink: 0;
+  font-size: 11px;
+  margin-top: auto;
+}
+
+.tips-icon {
+  font-size: 14px;
+  flex-shrink: 0;
+  margin-top: 0px;
+}
+
+.tips-content {
+  color: #92400e;
+  line-height: 1.2;
+  font-weight: 500;
+}
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+  .overview-container {
+    padding: 16px;
+  }
+
+  .overview-header h2 {
+    font-size: 24px;
+  }
+
+  .overview-stats {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+
+  .stat-card {
+    flex-direction: column;
+    text-align: center;
+    gap: 8px;
+  }
+
+  .classrooms-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .stat-number {
+    font-size: 20px;
+  }
+
+  .stat-label {
+    font-size: 11px;
+  }
+}
+
+@media (max-width: 480px) {
+  .overview-container {
+    padding: 12px;
+    border-radius: 12px;
+  }
+
+  .overview-header h2 {
+    font-size: 20px;
+  }
+
+  .overview-header p {
+    font-size: 12px;
+  }
+
+  .overview-stats {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .classroom-header {
+    flex-direction: column;
+    gap: 8px;
+    align-items: flex-start;
+  }
+
+  .classroom-name {
+    font-size: 14px;
+  }
+
+  .stat-number {
+    font-size: 18px;
+  }
+}
