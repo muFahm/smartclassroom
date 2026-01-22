@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   ChevronDown,
   ChevronUp,
@@ -11,8 +12,9 @@ import {
 } from "lucide-react";
 import "./ManajemenKelas.css";
 
-export default function ManajemenKelas() {
+export default function ManajemenKelas({ onSelect }) {
   const [isOpen, setIsOpen] = useState(false);
+  const navigate = useNavigate();
 
   const menuItems = [
     { id: "ruang-kelas", label: "Ruang Kelas", icon: Users },
@@ -28,8 +30,14 @@ export default function ManajemenKelas() {
   ];
 
   const handleMenuClick = (id) => {
-    console.log("Menu clicked:", id);
-    // Tambahkan logika navigasi atau action di sini
+    if (id === "kuis") {
+      navigate("/dashboard/kuis");
+      return;
+    }
+    if (onSelect) {
+      onSelect(id);
+    }
+    navigate("/dashboard");
   };
 
   return (

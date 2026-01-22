@@ -36,7 +36,10 @@ export default function Navbar({ activeMode, setActiveMode, isOverview }) {
             <button
               key={mode.id}
               className={`navbar-link ${activeMode === mode.id ? "active" : ""}`}
-              onClick={() => setActiveMode(mode.id)}
+              onClick={() => {
+                setActiveMode(mode.id);
+                navigate("/dashboard");
+              }}
             >
               {mode.label}
             </button>

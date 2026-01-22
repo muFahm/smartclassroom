@@ -5,7 +5,7 @@
 
 /**
  * Save user authentication data to localStorage
- * @param {string} token - JWT token
+ * @param {string} token - Auth token
  * @param {object} user - User data object
  */
 export const login = (token, user) => {
@@ -22,8 +22,8 @@ export const logout = () => {
 };
 
 /**
- * Get JWT token from localStorage
- * @returns {string|null} JWT token or null
+ * Get token from localStorage
+ * @returns {string|null} token or null
  */
 export const getToken = () => {
   return localStorage.getItem("token");
@@ -52,5 +52,5 @@ export const isAuthenticated = () => {
  */
 export const getAuthHeader = () => {
   const token = getToken();
-  return token ? { Authorization: `Bearer ${token}` } : {};
+  return token ? { Authorization: `Token ${token}` } : {};
 };

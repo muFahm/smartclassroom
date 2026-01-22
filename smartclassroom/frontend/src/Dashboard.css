@@ -103,6 +103,21 @@
   min-width: 0;
 }
 
+/* ROUTER-DRIVEN QUIZ PAGE */
+.dashboard-right-column.mode-kuis-page {
+  display: block;
+  overflow: hidden;
+}
+
+.quiz-route-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: #6b7280;
+  font-size: 13px;
+}
+
 /* OVERVIEW MODE - Full height, fit dalam 1 layar */
 .dashboard-right-column.mode-overview {
   height: 100%;

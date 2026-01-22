@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     "corsheaders",
     # Local apps
     "accounts",
+    "apps.quiz.quizzes",
 ]
 
 MIDDLEWARE = [
