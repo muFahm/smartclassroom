@@ -86,6 +86,8 @@ export default function Dashboard() {
               <PilihanKelas
                 selectedClass={selectedClass}
                 setSelectedClass={setSelectedClass}
+                singleClassMode={true}
+                singleClassValue={selectedClass}
               />
               <DateTimeCard />
 

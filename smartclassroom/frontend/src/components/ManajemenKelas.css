@@ -5,7 +5,7 @@
 .manajemen-kelas-card {
   background: #ffffff;
   border-radius: 8px;
-  padding: 10px 12px;
+  padding: 10px 12px 6px 12px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   border: 1px solid #e5e7eb;
   width: 100%;
@@ -131,7 +131,7 @@
 }
 
 .menu-emoji {
-  font-size: 16px;
+  font-size: 13px;
   flex-shrink: 0;
   display: flex;
   align-items: center;
@@ -141,7 +141,7 @@
 }
 
 .menu-label {
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 500;
   color: #4b5563;
   transition: all 0.15s ease;
@@ -173,17 +173,17 @@
   .menu-emoji {
     width: 14px;
     height: 14px;
-    font-size: 14px;
+    font-size: 13px;
   }
 }
 
 @media (min-width: 1920px) {
   .manajemen-kelas-title {
-    font-size: 14px;
+    font-size: 13px;
   }
 
   .menu-label {
-    font-size: 14px;
+    font-size: 13px;
   }
 
   .menu-item {

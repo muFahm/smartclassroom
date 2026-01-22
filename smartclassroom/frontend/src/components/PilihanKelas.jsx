@@ -1,10 +1,19 @@
 import React, { useState } from "react";
 import "./PilihanKelas.css";
 
-export default function PilihanKelas({ selectedClass, setSelectedClass }) {
+// Tambah prop singleClassMode dan singleClassValue
+export default function PilihanKelas({ selectedClass, setSelectedClass, singleClassMode = false, singleClassValue = "" }) {
   const [isOpen, setIsOpen] = useState(false);
-
   const kelasOptions = ["701", "702", "703"];
+
+  // Jika singleClassMode aktif, hanya tampilkan teks saja
+  if (singleClassMode) {
+    return (
+      <div className="pilihan-kelas-card center-kelas-info">
+        <div className="kelas-info-center">Kelas {singleClassValue}</div>
+      </div>
+    );
+  }
 
   const handleSelect = (kelas) => {
     setSelectedClass(kelas);
@@ -14,7 +23,6 @@ export default function PilihanKelas({ selectedClass, setSelectedClass }) {
   return (
     <div className="pilihan-kelas-card">
       <h3 className="pilihan-kelas-title">Pilihan Kelas</h3>
-
       <div className="dropdown-container">
         <button className="dropdown-button" onClick={() => setIsOpen(!isOpen)}>
           <span className="dropdown-selected">Kelas {selectedClass}</span>
@@ -34,15 +42,12 @@ export default function PilihanKelas({ selectedClass, setSelectedClass }) {
             />
           </svg>
         </button>
-
         {isOpen && (
           <div className="dropdown-menu">
             {kelasOptions.map((kelas) => (
               <div
                 key={kelas}
-                className={`dropdown-item ${
-                  selectedClass === kelas ? "active" : ""
-                }`}
+                className={`dropdown-item ${selectedClass === kelas ? "active" : ""}`}
                 onClick={() => handleSelect(kelas)}
               >
                 Kelas {kelas}
