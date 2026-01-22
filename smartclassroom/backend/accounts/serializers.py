@@ -6,7 +6,7 @@ class UserSerializer(serializers.ModelSerializer):
     """Serializer for user data response"""
     class Meta:
         model = CustomUser
-        fields = ['id', 'username', 'email', 'full_name', 'position', 'role']
+        fields = ['id', 'username', 'email', 'full_name', 'position', 'role', 'major', 'nim', 'enrollment_year', 'avatar_url']
         read_only_fields = ['id']
 
 
@@ -24,7 +24,7 @@ class RegisterSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CustomUser
-        fields = ['username', 'email', 'password', 'confirm_password', 'full_name', 'position']
+        fields = ['username', 'email', 'password', 'confirm_password', 'full_name', 'position', 'major', 'nim', 'enrollment_year', 'avatar_url']
 
     def validate(self, data):
         """Validate password match and email format"""
@@ -57,6 +57,10 @@ class RegisterSerializer(serializers.ModelSerializer):
             password=validated_data['password'],
             full_name=validated_data.get('full_name', ''),
             position=validated_data.get('position', 'admin'),
+            major=validated_data.get('major', ''),
+            nim=validated_data.get('nim', ''),
+            enrollment_year=validated_data.get('enrollment_year'),
+            avatar_url=validated_data.get('avatar_url', ''),
             role='admin'
         )
         return user
