@@ -9,6 +9,11 @@ class CustomUser(AbstractUser):
     email = models.EmailField(unique=True)
     full_name = models.CharField(max_length=200, blank=True, null=True)
     position = models.CharField(max_length=100, default='admin', help_text='Position in Prodi')
+    major = models.CharField(max_length=120, blank=True, default='')
+    nim = models.CharField(max_length=50, blank=True, default='')
+    enrollment_year = models.PositiveIntegerField(null=True, blank=True)
+    avatar_url = models.URLField(blank=True, default='')
+    avatar_url = models.URLField(blank=True, default="")
     
     # Keep role for future expansion
     ROLE_CHOICES = (
