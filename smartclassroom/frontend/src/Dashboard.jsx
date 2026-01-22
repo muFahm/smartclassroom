@@ -15,6 +15,7 @@ import AktivitasMahasiswa from "./components/AktivitasMahasiswa";
 import StatistikPengenalan from "./components/StatistikPengenalan";
 import SoalKuis from "./components/SoalKuis";
 import ClassroomOverview from "./components/ClassroomOverview";
+import ManajemenKelas from "./components/ManajemenKelas";
 import Footer from "./components/Footer";
 import { KUIS_ACTIVE } from "./utils/mockData";
 import "./Dashboard.css";
@@ -96,7 +97,10 @@ export default function Dashboard() {
 
               <PosisiKursi mode="sidebar" classroomId={selectedClass} />
 
-              {/* ✅ Widget dengan activeMode prop */}
+              {/* Manajemen Kelas - Dropdown Menu */}
+              <ManajemenKelas />
+
+              {/* Widget Toggle - Tampilkan/Sembunyikan komponen */}
               <Widget
                 key={activeMode}
                 widgets={widgets}

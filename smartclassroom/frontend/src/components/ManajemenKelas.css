@@ -1,0 +1,192 @@
+/* ====================================================== */
+/*              MANAJEMEN KELAS COMPONENT                  */
+/* ====================================================== */
+
+.manajemen-kelas-card {
+  background: #ffffff;
+  border-radius: 8px;
+  padding: 10px 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e5e7eb;
+  width: 100%;
+  transition: all 0.3s ease;
+}
+
+.manajemen-kelas-card:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* ====================================================== */
+/*                      HEADER                             */
+/* ====================================================== */
+
+.manajemen-kelas-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 0 8px 0;
+  cursor: pointer;
+  background: transparent;
+  border: none;
+  transition: all 0.2s ease;
+}
+
+.manajemen-kelas-header:hover .manajemen-kelas-title {
+  color: #1e3a8a;
+}
+
+.manajemen-kelas-title {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: #1e40af;
+  user-select: none;
+  transition: color 0.2s ease;
+}
+
+.toggle-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #353839;
+  transition: all 0.2s ease;
+  border-radius: 4px;
+}
+
+.toggle-button:hover {
+  background-color: #f3f4f6;
+  color: #1f2937;
+}
+
+.toggle-button:active {
+  transform: scale(0.95);
+}
+
+/* ====================================================== */
+/*                   DROPDOWN CONTENT                      */
+/* ====================================================== */
+
+.manajemen-kelas-content {
+  padding: 0;
+  background-color: #ffffff;
+  animation: slideDown 0.2s ease-out;
+  margin-top: 1px;
+  border-top: 1px solid #f3f4f6;
+  padding-top: 4px;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ====================================================== */
+/*                     MENU ITEMS                          */
+/* ====================================================== */
+
+.menu-item {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  background: none;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  text-align: left;
+  margin-bottom: 2px;
+}
+
+.menu-item:last-child {
+  margin-bottom: 0;
+}
+
+.menu-item:hover {
+  background-color: #f3f4f6;
+  transform: translateX(2px);
+}
+
+.menu-item:active {
+  background-color: #e5e7eb;
+  transform: scale(0.98);
+}
+
+.menu-icon {
+  color: #3b82f6;
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+}
+
+.menu-emoji {
+  font-size: 16px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+}
+
+.menu-label {
+  font-size: 14px;
+  font-weight: 500;
+  color: #4b5563;
+  transition: all 0.15s ease;
+}
+
+.menu-item:hover .menu-label {
+  color: #1e40af;
+  font-weight: 600;
+}
+
+/* ====================================================== */
+/*              RESPONSIVE ADJUSTMENTS                     */
+/* ====================================================== */
+
+@media (max-width: 1440px) {
+  .manajemen-kelas-title {
+    font-size: 13px;
+  }
+
+  .menu-label {
+    font-size: 13px;
+  }
+
+  .menu-item {
+    padding: 7px 10px;
+  }
+
+  .menu-icon,
+  .menu-emoji {
+    width: 14px;
+    height: 14px;
+    font-size: 14px;
+  }
+}
+
+@media (min-width: 1920px) {
+  .manajemen-kelas-title {
+    font-size: 14px;
+  }
+
+  .menu-label {
+    font-size: 14px;
+  }
+
+  .menu-item {
+    padding: 9px 12px;
+  }
+}
