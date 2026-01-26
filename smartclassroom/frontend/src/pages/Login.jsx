@@ -43,8 +43,8 @@ function Login() {
         localStorage.setItem("token", data.token);
         localStorage.setItem("user", JSON.stringify(data.user));
 
-        // Redirect to dashboard
-        navigate("/dashboard");
+        // Redirect to class overview
+        navigate("/classoverview");
       } else {
         // Handle error messages from backend
         if (data.errors) {

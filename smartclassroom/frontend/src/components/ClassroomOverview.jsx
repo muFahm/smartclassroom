@@ -47,7 +47,7 @@ export default function ClassroomOverview({ onSelectClass }) {
     <div className="overview-container">
       {/* HEADER */}
       <div className="overview-header">
-        <h2>Dashboard Overview</h2>
+        <h2>Class Overview</h2>
         <p>Pantau semua kelas dengan ringkasan real-time</p>
       </div>
 

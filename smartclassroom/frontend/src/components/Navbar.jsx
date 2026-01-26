@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { logout, getUser } from "../utils/auth";
 import "./Navbar.css";
 
-export default function Navbar({ activeMode, setActiveMode, isOverview }) {
+export default function Navbar({ activeMode, setActiveMode, isOverview, selectedClass }) {
   const navigate = useNavigate();
   const [showDropdown, setShowDropdown] = useState(false);
   const user = getUser();
@@ -38,7 +38,7 @@ export default function Navbar({ activeMode, setActiveMode, isOverview }) {
               className={`navbar-link ${activeMode === mode.id ? "active" : ""}`}
               onClick={() => {
                 setActiveMode(mode.id);
-                navigate("/dashboard");
+                navigate(`/classoverview/${selectedClass || "701"}`);
               }}
             >
               {mode.label}

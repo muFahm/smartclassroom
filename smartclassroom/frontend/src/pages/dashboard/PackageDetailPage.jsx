@@ -16,7 +16,7 @@ const createDefaultQuestion = (order = 1) => ({
 });
 
 export default function PackageDetailPage() {
-  const { packageId } = useParams();
+  const { packageId, classId } = useParams();
   const navigate = useNavigate();
   const [pkg, setPkg] = useState(null);
   const [questions, setQuestions] = useState([]);
@@ -167,7 +167,12 @@ export default function PackageDetailPage() {
           <div className="quiz-subtitle">Detail paket kuis dan daftar pertanyaan.</div>
         </div>
         <div className="quiz-actions">
-          <button className="quiz-button secondary" onClick={() => navigate("/dashboard/kuis")}>Kembali</button>
+          <button
+            className="quiz-button secondary"
+            onClick={() => navigate(`/classoverview/${classId || "701"}/kuis`)}
+          >
+            Kembali
+          </button>
         </div>
       </div>
 

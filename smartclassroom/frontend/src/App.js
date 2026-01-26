@@ -5,6 +5,7 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import ProtectedRoute from "./components/ProtectedRoute";
 import DashboardHome from "./pages/dashboard/DashboardHome";
+import DashboardOverview from "./pages/dashboard/DashboardOverview";
 import QuizPackagesPage from "./pages/dashboard/QuizPackagesPage";
 import PackageDetailPage from "./pages/dashboard/PackageDetailPage";
 
@@ -15,26 +16,35 @@ export default function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route
-          path="/dashboard"
+          path="/classoverview"
           element={
             <ProtectedRoute>
               <Dashboard />
             </ProtectedRoute>
           }
         >
-          <Route index element={<DashboardHome />} />
-          <Route path="kuis" element={<QuizPackagesPage />} />
-          <Route path="kuis/:packageId" element={<PackageDetailPage />} />
+          <Route index element={<DashboardOverview />} />
+          <Route path=":classId" element={<DashboardHome />} />
+          <Route path=":classId/kuis" element={<QuizPackagesPage />} />
+          <Route path=":classId/kuis/:packageId" element={<PackageDetailPage />} />
         </Route>
         <Route
           path="/"
           element={
             localStorage.getItem("token") ? (
-              <Navigate to="/dashboard" replace />
+              <Navigate to="/classoverview" replace />
             ) : (
               <Navigate to="/login" replace />
             )
           }
+        />
+        <Route
+          path="/dashboard"
+          element={<Navigate to="/classoverview" replace />}
+        />
+        <Route
+          path="/dashboard/:classId/*"
+          element={<Navigate to="/classoverview" replace />}
         />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>

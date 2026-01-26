@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { quizRequest } from "../../api/quizClient";
 import "./QuizPages.css";
 
@@ -17,6 +17,8 @@ export default function QuizPackagesPage() {
   const [form, setForm] = useState(defaultForm);
   const [submitting, setSubmitting] = useState(false);
   const navigate = useNavigate();
+  const { classId } = useParams();
+  const resolvedClassId = classId || "701";
 
   const loadPackages = async () => {
     setLoading(true);
@@ -125,7 +127,12 @@ export default function QuizPackagesPage() {
               {packages.map((pkg) => (
                 <tr key={pkg.id}>
                   <td>
-                    <button className="quiz-link" onClick={() => navigate(`/dashboard/kuis/${pkg.id}`)}>
+                    <button
+                      className="quiz-link"
+                      onClick={() =>
+                        navigate(`/classoverview/${resolvedClassId}/kuis/${pkg.id}`)
+                      }
+                    >
                       {pkg.title}
                     </button>
                   </td>

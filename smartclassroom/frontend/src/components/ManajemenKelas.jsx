@@ -12,7 +12,7 @@ import {
 } from "lucide-react";
 import "./ManajemenKelas.css";
 
-export default function ManajemenKelas({ onSelect }) {
+export default function ManajemenKelas({ onSelect, selectedClass }) {
   const [isOpen, setIsOpen] = useState(false);
   const navigate = useNavigate();
 
@@ -31,13 +31,13 @@ export default function ManajemenKelas({ onSelect }) {
 
   const handleMenuClick = (id) => {
     if (id === "kuis") {
-      navigate("/dashboard/kuis");
+      navigate(`/classoverview/${selectedClass || "701"}/kuis`);
       return;
     }
     if (onSelect) {
       onSelect(id);
     }
-    navigate("/dashboard");
+    navigate(`/classoverview/${selectedClass || "701"}`);
   };
 
   return (

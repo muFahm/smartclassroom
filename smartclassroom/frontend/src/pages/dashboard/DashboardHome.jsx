@@ -9,24 +9,17 @@ import AktivitasMahasiswa from "../../components/AktivitasMahasiswa";
 import StatistikPengenalan from "../../components/StatistikPengenalan";
 import PosisiKursi from "../../components/PosisiKursi";
 import SoalKuis from "../../components/SoalKuis";
-import ClassroomOverview from "../../components/ClassroomOverview";
 import { KUIS_ACTIVE } from "../../utils/mockData";
 
 export default function DashboardHome() {
   const {
     activeMode,
-    setActiveMode,
     selectedClass,
     widgets,
-    handleSelectClassFromOverview,
   } = useOutletContext();
 
   return (
     <>
-      {activeMode === "overview" && (
-        <ClassroomOverview onSelectClass={handleSelectClassFromOverview} />
-      )}
-
       {activeMode === "default" && (
         <>
           {widgets.posisiKursi && (

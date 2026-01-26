@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Outlet, useLocation } from "react-router-dom";
+import { Outlet, useLocation, useParams } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import PilihanKelas from "./components/PilihanKelas";
 import DateTimeCard from "./components/DateTimeCard";
@@ -16,11 +16,22 @@ export default function Dashboard() {
   // STATE MANAGEMENT
   // ========================================
 
-  // Mode aktif dashboard - DEFAULT "overview"
-  const [activeMode, setActiveMode] = useState("overview");
+  const location = useLocation();
+  const { classId } = useParams();
+
+  const getInitialMode = (pathname) => {
+    if (pathname === "/classoverview" || pathname === "/classoverview/") {
+      return "overview";
+    }
+    if (pathname.includes("/kuis")) return "kuis-page";
+    return "default";
+  };
+
+  // Mode aktif dashboard
+  const [activeMode, setActiveMode] = useState(getInitialMode(location.pathname));
 
   // Selected classroom
-  const [selectedClass, setSelectedClass] = useState("701");
+  const [selectedClass, setSelectedClass] = useState(classId || "701");
 
   // Visibility widgets - DEFAULT SEMUA TRUE untuk testing
   const [widgets, setWidgets] = useState({
@@ -34,26 +45,43 @@ export default function Dashboard() {
     posisiKursi: true,
   });
 
-  const location = useLocation();
   const previousModeRef = useRef(activeMode);
 
   useEffect(() => {
-    if (location.pathname.startsWith("/dashboard/kuis")) {
+    if (location.pathname === "/classoverview" || location.pathname === "/classoverview/") {
+      if (activeMode !== "overview") {
+        previousModeRef.current = activeMode;
+        setActiveMode("overview");
+      }
+      return;
+    }
+
+    if (location.pathname.includes("/kuis")) {
       if (activeMode !== "kuis-page") {
         previousModeRef.current = activeMode;
         setActiveMode("kuis-page");
       }
-    } else if (activeMode === "kuis-page") {
+      return;
+    }
+
+    if (activeMode === "overview" || activeMode === "kuis-page") {
       setActiveMode(previousModeRef.current || "default");
     }
   }, [location.pathname, activeMode]);
 
-  const getModeClass = () => `mode-${activeMode}`;
+  useEffect(() => {
+    if (classId) {
+      setSelectedClass(classId);
+    }
+  }, [classId]);
 
-  const handleSelectClassFromOverview = (classId) => {
-    setSelectedClass(classId);
-    setActiveMode("default");
-  };
+  useEffect(() => {
+    if (location.state?.selectedClass) {
+      setSelectedClass(location.state.selectedClass);
+    }
+  }, [location.state?.selectedClass]);
+
+  const getModeClass = () => `mode-${activeMode}`;
 
   const handleMenuSelect = (id) => {
     const modeMap = {
@@ -73,6 +101,7 @@ export default function Dashboard() {
         activeMode={activeMode}
         setActiveMode={setActiveMode}
         isOverview={activeMode === "overview"}
+        selectedClass={selectedClass}
       />
 
       <div
@@ -103,7 +132,7 @@ export default function Dashboard() {
               <PosisiKursi mode="sidebar" classroomId={selectedClass} />
 
               {/* Manajemen Kelas - Dropdown Menu */}
-              <ManajemenKelas onSelect={handleMenuSelect} />
+              <ManajemenKelas onSelect={handleMenuSelect} selectedClass={selectedClass} />
 
               {/* Widget Toggle - Tampilkan/Sembunyikan komponen */}
               <Widget
@@ -127,7 +156,6 @@ export default function Dashboard() {
                 setSelectedClass,
                 widgets,
                 setWidgets,
-                handleSelectClassFromOverview,
               }}
             />
           </div>
