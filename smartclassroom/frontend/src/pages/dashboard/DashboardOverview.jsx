@@ -8,8 +8,8 @@ export default function DashboardOverview() {
 
   const handleSelectClass = (classId) => {
     setSelectedClass(classId);
-    setActiveMode("default");
-    navigate(`/classoverview/${classId}`, { replace: false });
+    setActiveMode("overview");
+    navigate(`/classoverview/${classId}/dashboard`, { replace: false });
   };
 
   return <ClassroomOverview onSelectClass={handleSelectClass} />;

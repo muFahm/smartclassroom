@@ -38,7 +38,7 @@ export default function Navbar({ activeMode, setActiveMode, isOverview, selected
               className={`navbar-link ${activeMode === mode.id ? "active" : ""}`}
               onClick={() => {
                 setActiveMode(mode.id);
-                navigate(`/classoverview/${selectedClass || "701"}`);
+                navigate(`/classoverview/${selectedClass || "701"}/dashboard`);
               }}
             >
               {mode.label}

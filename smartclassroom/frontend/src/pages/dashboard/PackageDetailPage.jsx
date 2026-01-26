@@ -169,7 +169,9 @@ export default function PackageDetailPage() {
         <div className="quiz-actions">
           <button
             className="quiz-button secondary"
-            onClick={() => navigate(`/classoverview/${classId || "701"}/kuis`)}
+            onClick={() =>
+              navigate(`/classoverview/${classId || "701"}/dashboard/kuis`)
+            }
           >
             Kembali
           </button>

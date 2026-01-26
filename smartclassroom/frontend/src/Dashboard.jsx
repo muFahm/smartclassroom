@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Outlet, useLocation, useParams } from "react-router-dom";
+import { Outlet, useLocation, useNavigate, useParams } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import PilihanKelas from "./components/PilihanKelas";
 import DateTimeCard from "./components/DateTimeCard";
@@ -18,12 +18,14 @@ export default function Dashboard() {
 
   const location = useLocation();
   const { classId } = useParams();
+  const navigate = useNavigate();
 
   const getInitialMode = (pathname) => {
     if (pathname === "/classoverview" || pathname === "/classoverview/") {
       return "overview";
     }
-    if (pathname.includes("/kuis")) return "kuis-page";
+    if (pathname.includes("/dashboard/kuis")) return "kuis-page";
+    if (pathname.includes("/dashboard")) return "default";
     return "default";
   };
 
@@ -56,7 +58,7 @@ export default function Dashboard() {
       return;
     }
 
-    if (location.pathname.includes("/kuis")) {
+    if (location.pathname.includes("/dashboard/kuis")) {
       if (activeMode !== "kuis-page") {
         previousModeRef.current = activeMode;
         setActiveMode("kuis-page");
@@ -85,7 +87,7 @@ export default function Dashboard() {
 
   const handleMenuSelect = (id) => {
     const modeMap = {
-      "ruang-kelas": "default",
+      "jadwal-kelas": "jadwal-kelas",
       absensi: "default",
       "polling-device": "default",
       "light-temp": "default",
@@ -120,6 +122,7 @@ export default function Dashboard() {
                 setSelectedClass={setSelectedClass}
                 singleClassMode={true}
                 singleClassValue={selectedClass}
+                onClickSingle={() => navigate("/classoverview")}
               />
               <DateTimeCard />
 
@@ -147,17 +150,19 @@ export default function Dashboard() {
           {/* ========================================== */}
           {/* MAIN AREA (DINAMIS - Berubah sesuai mode) */}
           {/* ========================================== */}
-          <div className={`dashboard-right-column ${getModeClass()}`}>
-            <Outlet
-              context={{
-                activeMode,
-                setActiveMode,
-                selectedClass,
-                setSelectedClass,
-                widgets,
-                setWidgets,
-              }}
-            />
+          <div className="dashboard-right-column">
+            <div className={`dashboard-right-content ${getModeClass()}`}>
+              <Outlet
+                context={{
+                  activeMode,
+                  setActiveMode,
+                  selectedClass,
+                  setSelectedClass,
+                  widgets,
+                  setWidgets,
+                }}
+              />
+            </div>
           </div>
         </div>
       </div>

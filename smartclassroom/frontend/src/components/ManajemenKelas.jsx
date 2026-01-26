@@ -17,7 +17,7 @@ export default function ManajemenKelas({ onSelect, selectedClass }) {
   const navigate = useNavigate();
 
   const menuItems = [
-    { id: "ruang-kelas", label: "Ruang Kelas", icon: Users },
+    { id: "jadwal-kelas", label: "Jadwal Kelas", icon: Users },
     { id: "kuis", label: "Kuis", icon: ClipboardCheck },
     {
       id: "registrasi-biometrik",
@@ -31,13 +31,13 @@ export default function ManajemenKelas({ onSelect, selectedClass }) {
 
   const handleMenuClick = (id) => {
     if (id === "kuis") {
-      navigate(`/classoverview/${selectedClass || "701"}/kuis`);
+      navigate(`/classoverview/${selectedClass || "701"}/dashboard/kuis`);
       return;
     }
     if (onSelect) {
       onSelect(id);
     }
-    navigate(`/classoverview/${selectedClass || "701"}`);
+    navigate(`/classoverview/${selectedClass || "701"}/dashboard`);
   };
 
   return (

@@ -130,7 +130,7 @@ export default function QuizPackagesPage() {
                     <button
                       className="quiz-link"
                       onClick={() =>
-                        navigate(`/classoverview/${resolvedClassId}/kuis/${pkg.id}`)
+                        navigate(`/classoverview/${resolvedClassId}/dashboard/kuis/${pkg.id}`)
                       }
                     >
                       {pkg.title}

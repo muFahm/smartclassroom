@@ -24,9 +24,16 @@ export default function App() {
           }
         >
           <Route index element={<DashboardOverview />} />
-          <Route path=":classId" element={<DashboardHome />} />
-          <Route path=":classId/kuis" element={<QuizPackagesPage />} />
-          <Route path=":classId/kuis/:packageId" element={<PackageDetailPage />} />
+          <Route
+            path=":classId"
+            element={<Navigate to="dashboard" replace />}
+          />
+          <Route path=":classId/dashboard" element={<DashboardHome />} />
+          <Route path=":classId/dashboard/kuis" element={<QuizPackagesPage />} />
+          <Route
+            path=":classId/dashboard/kuis/:packageId"
+            element={<PackageDetailPage />}
+          />
         </Route>
         <Route
           path="/"

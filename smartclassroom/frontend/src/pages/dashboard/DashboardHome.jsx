@@ -10,6 +10,7 @@ import StatistikPengenalan from "../../components/StatistikPengenalan";
 import PosisiKursi from "../../components/PosisiKursi";
 import SoalKuis from "../../components/SoalKuis";
 import { KUIS_ACTIVE } from "../../utils/mockData";
+import ClassOverviewDetail from "./ClassOverviewDetail";
 
 export default function DashboardHome() {
   const {
@@ -72,6 +73,10 @@ export default function DashboardHome() {
             </div>
           )}
         </>
+      )}
+
+      {activeMode === "jadwal-kelas" && (
+        <ClassOverviewDetail showEnterDashboard={false} />
       )}
 
       {activeMode === "kuis" && (

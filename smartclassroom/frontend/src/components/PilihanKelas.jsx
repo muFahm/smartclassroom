@@ -2,14 +2,27 @@ import React, { useState } from "react";
 import "./PilihanKelas.css";
 
 // Tambah prop singleClassMode dan singleClassValue
-export default function PilihanKelas({ selectedClass, setSelectedClass, singleClassMode = false, singleClassValue = "" }) {
+export default function PilihanKelas({
+  selectedClass,
+  setSelectedClass,
+  singleClassMode = false,
+  singleClassValue = "",
+  onClickSingle,
+}) {
   const [isOpen, setIsOpen] = useState(false);
   const kelasOptions = ["701", "702", "703"];
 
   // Jika singleClassMode aktif, hanya tampilkan teks saja
   if (singleClassMode) {
     return (
-      <div className="pilihan-kelas-card center-kelas-info">
+      <div
+        className={`pilihan-kelas-card center-kelas-info ${
+          onClickSingle ? "center-kelas-info--clickable" : ""
+        }`}
+        onClick={onClickSingle}
+        role={onClickSingle ? "button" : undefined}
+        tabIndex={onClickSingle ? 0 : undefined}
+      >
         <div className="kelas-info-center">Kelas {singleClassValue}</div>
       </div>
     );
