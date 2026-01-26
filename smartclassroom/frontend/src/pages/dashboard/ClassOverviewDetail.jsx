@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import "./ClassOverviewDetail.css";
 import { fetchMultipleStudents, getStudentFromCache } from "../../services/studentDataService";
+import { fetchLecturersByCourse, getLecturersFromCache } from "../../services/lecturerDataService";
 
 const WEEKDAY_NAMES = [
   "Sunday",
@@ -52,8 +53,17 @@ const buildInitials = (value = "") =>
     .map((part) => part[0].toUpperCase())
     .join("") || "?";
 
-const getPhotoPlaceholder = () =>
-  "https://ui-avatars.com/api/?background=0D8ABC&color=fff&name=User";
+const getPhotoPlaceholder = (name = "User") =>
+  `https://ui-avatars.com/api/?background=0D8ABC&color=fff&name=${encodeURIComponent(
+    name,
+  )}`;
+
+const resolvePhotoSrc = (photo) => {
+  if (!photo) return null;
+  if (photo.startsWith("data:")) return photo;
+  if (photo.startsWith("http://") || photo.startsWith("https://")) return photo;
+  return `data:image/jpeg;base64,${photo}`;
+};
 
 const SIS_TOKEN = process.env.REACT_APP_SIS_TOKEN || "XX";
 const SIS_SEMESTER = process.env.REACT_APP_SIS_SEMESTER || "20251";
@@ -75,6 +85,8 @@ export default function ClassOverviewDetail({ showEnterDashboard = true }) {
   const [error, setError] = useState("");
   const [studentData, setStudentData] = useState(new Map()); // Map<nim, {name, photo}>
   const [loadingStudents, setLoadingStudents] = useState(false);
+  const [lecturerData, setLecturerData] = useState(new Map()); // Map<staffId, {name, photo}>
+  const [loadingLecturers, setLoadingLecturers] = useState(false);
 
   useEffect(() => {
     let isMounted = true;
@@ -178,6 +190,46 @@ export default function ClassOverviewDetail({ showEnterDashboard = true }) {
       })
       .finally(() => {
         setLoadingStudents(false);
+      });
+  }, [selectedCourse]);
+
+  // Fetch lecturer data when course is selected
+  useEffect(() => {
+    const idCourse = selectedCourse?.kelas?.IdCourse;
+    if (!selectedCourse || !idCourse) {
+      return;
+    }
+
+    setLecturerData(new Map());
+
+    const cached = getLecturersFromCache(idCourse);
+    if (cached?.lecturers?.length) {
+      const map = new Map();
+      cached.lecturers.forEach((lect) => {
+        if (lect?.id) {
+          map.set(lect.id, { name: lect.name, photo: lect.photo });
+        }
+      });
+      setLecturerData(map);
+      return;
+    }
+
+    setLoadingLecturers(true);
+    fetchLecturersByCourse(idCourse)
+      .then((result) => {
+        const map = new Map();
+        (result?.lecturers || []).forEach((lect) => {
+          if (lect?.id) {
+            map.set(lect.id, { name: lect.name, photo: lect.photo });
+          }
+        });
+        setLecturerData(map);
+      })
+      .catch((error) => {
+        console.error("Error fetching lecturer data:", error);
+      })
+      .finally(() => {
+        setLoadingLecturers(false);
       });
   }, [selectedCourse]);
 
@@ -383,19 +435,39 @@ export default function ClassOverviewDetail({ showEnterDashboard = true }) {
               <div className="detail-card detail-card--compact">
                 {Object.values(selectedCourse?.dosen || {})
                   .filter((item) => typeof item === "object")
-                  .map((dosen) => (
-                    <div key={dosen?.IdStaff || dosen?.StaffId} className="person-row">
-                      <img
-                        src={dosen?.photo ? getPhotoPlaceholder() : getPhotoPlaceholder()}
-                        alt={dosen?.StaffName}
-                        className="avatar"
-                      />
-                      <div>
-                        <strong>{dosen?.StaffName}</strong>
-                        <div className="muted">{dosen?.StaffId}</div>
+                  .map((dosen) => {
+                    const staffId = dosen?.IdStaff || dosen?.StaffId;
+                    const lecturerInfo = staffId ? lecturerData.get(staffId) : null;
+                    const displayName = lecturerInfo?.name || dosen?.StaffName || "Dosen";
+                    const photoSrc = resolvePhotoSrc(lecturerInfo?.photo);
+
+                    return (
+                      <div key={staffId || displayName} className="person-row">
+                        {photoSrc ? (
+                          <img
+                            src={photoSrc}
+                            alt={displayName}
+                            className="avatar"
+                            loading="lazy"
+                            onError={(event) => {
+                              event.currentTarget.onerror = null;
+                              event.currentTarget.src = getPhotoPlaceholder(displayName);
+                            }}
+                          />
+                        ) : (
+                          <div className="avatar avatar--text">
+                            {buildInitials(displayName)}
+                          </div>
+                        )}
+                        <div>
+                          <strong>{displayName}</strong>
+                          <div className="muted">
+                            {loadingLecturers && !lecturerInfo ? "Memuat..." : staffId}
+                          </div>
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
               </div>
             ) : (
               <div className="detail-placeholder">
@@ -415,12 +487,26 @@ export default function ClassOverviewDetail({ showEnterDashboard = true }) {
                   const studentInfo = studentData.get(nim);
                   const displayName = studentInfo?.name || nim;
                   const isLoading = loadingStudents && !studentInfo;
+                  const photoSrc = resolvePhotoSrc(studentInfo?.photo);
                   
                   return (
                     <div key={nim} className="person-row">
-                      <div className="avatar avatar--text">
-                        {studentInfo?.name ? buildInitials(studentInfo.name) : buildInitials(nim || "?")}
-                      </div>
+                      {photoSrc ? (
+                        <img
+                          src={photoSrc}
+                          alt={displayName}
+                          className="avatar"
+                          loading="lazy"
+                          onError={(event) => {
+                            event.currentTarget.onerror = null;
+                            event.currentTarget.src = getPhotoPlaceholder();
+                          }}
+                        />
+                      ) : (
+                        <div className="avatar avatar--text">
+                          {studentInfo?.name ? buildInitials(studentInfo.name) : buildInitials(nim || "?")}
+                        </div>
+                      )}
                       <div>
                         <strong>{displayName}</strong>
                         <div className="muted">

@@ -5,7 +5,7 @@
 import { parseNIM } from '../utils/nimParser';
 
 const CACHE_KEY = 'studentDataCache';
-const CACHE_VERSION = 'v1';
+const CACHE_VERSION = 'v2';
 const CACHE_EXPIRY_DAYS = 7;
 
 // In-memory cache untuk session saat ini
