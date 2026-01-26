@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import "./ClassOverviewDetail.css";
+import { fetchMultipleStudents, getStudentFromCache } from "../../services/studentDataService";
 
 const WEEKDAY_NAMES = [
   "Sunday",
@@ -72,6 +73,8 @@ export default function ClassOverviewDetail({ showEnterDashboard = true }) {
   const [classData, setClassData] = useState({});
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [studentData, setStudentData] = useState(new Map()); // Map<nim, {name, photo}>
+  const [loadingStudents, setLoadingStudents] = useState(false);
 
   useEffect(() => {
     let isMounted = true;
@@ -138,6 +141,45 @@ export default function ClassOverviewDetail({ showEnterDashboard = true }) {
     if (!selectedCourseId) return null;
     return classEntries.find((entry) => entry?.kelas?.IdCourse === selectedCourseId);
   }, [classEntries, selectedCourseId]);
+
+  // Fetch student data when course is selected
+  useEffect(() => {
+    if (!selectedCourse || !selectedCourse.Std || selectedCourse.Std.length === 0) {
+      return;
+    }
+
+    const nims = selectedCourse.Std.map((student) => student?.nim).filter(Boolean);
+    if (nims.length === 0) return;
+
+    // Check if all students are already in cache
+    const allCached = nims.every((nim) => getStudentFromCache(nim));
+    if (allCached) {
+      // Load from cache immediately
+      const cached = new Map();
+      nims.forEach((nim) => {
+        const data = getStudentFromCache(nim);
+        if (data) cached.set(nim, data);
+      });
+      setStudentData(cached);
+      return;
+    }
+
+    // Fetch missing students
+    setLoadingStudents(true);
+    fetchMultipleStudents(nims, (loaded, total) => {
+      // Optional: update progress
+      console.log(`Loading students: ${loaded}/${total}`);
+    })
+      .then((results) => {
+        setStudentData(results);
+      })
+      .catch((error) => {
+        console.error('Error fetching student data:', error);
+      })
+      .finally(() => {
+        setLoadingStudents(false);
+      });
+  }, [selectedCourse]);
 
   const calendarDays = useMemo(() => {
     return getCalendarDays(currentMonth.getFullYear(), currentMonth.getMonth());
@@ -368,17 +410,26 @@ export default function ClassOverviewDetail({ showEnterDashboard = true }) {
             <h3>Daftar Mahasiswa</h3>
             {!loading && selectedCourse ? (
               <div className="detail-card detail-card--students">
-                {(selectedCourse?.Std || []).map((student) => (
-                  <div key={student?.nim} className="person-row">
-                    <div className="avatar avatar--text">
-                      {buildInitials(student?.nim || "?")}
+                {(selectedCourse?.Std || []).map((student) => {
+                  const nim = student?.nim;
+                  const studentInfo = studentData.get(nim);
+                  const displayName = studentInfo?.name || nim;
+                  const isLoading = loadingStudents && !studentInfo;
+                  
+                  return (
+                    <div key={nim} className="person-row">
+                      <div className="avatar avatar--text">
+                        {studentInfo?.name ? buildInitials(studentInfo.name) : buildInitials(nim || "?")}
+                      </div>
+                      <div>
+                        <strong>{displayName}</strong>
+                        <div className="muted">
+                          {isLoading ? "Memuat..." : studentInfo?.name ? nim : "Mahasiswa"}
+                        </div>
+                      </div>
                     </div>
-                    <div>
-                      <strong>{student?.nim}</strong>
-                      <div className="muted">Mahasiswa</div>
-                    </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             ) : (
               <div className="detail-placeholder">
