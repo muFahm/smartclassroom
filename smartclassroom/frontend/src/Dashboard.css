@@ -249,7 +249,7 @@
 /*            NO SCROLL - Everything Fits in View         */
 /* ====================================================== */
 
-.dashboard-right-column.mode-kuis {
+.dashboard-right-content.mode-kuis {
   display: grid;
   grid-template-columns: 2fr 1fr; /* Left: 66%, Right: 33% */
   grid-template-rows: 1fr;
@@ -310,7 +310,7 @@
 /*             MODE DISKUSI - Discussion Layout           */
 /* ====================================================== */
 
-.dashboard-right-column.mode-diskusi {
+.dashboard-right-content.mode-diskusi {
   display: grid;
   grid-template-columns: 2fr 1fr;
   grid-template-rows: auto 1fr auto;
@@ -403,7 +403,7 @@
 /*     Focus: Posisi Kursi Denah (Object Detection)      */
 /* ====================================================== */
 
-.dashboard-right-column.mode-kolaborasi {
+.dashboard-right-content.mode-kolaborasi {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
   grid-template-rows: 1fr auto;
@@ -587,7 +587,7 @@
 /*      Focus: Transkrip Suara (Speech-to-Text)          */
 /* ====================================================== */
 
-.dashboard-right-column.mode-presentasi {
+.dashboard-right-content.mode-presentasi {
   display: grid;
   grid-template-columns: 2fr 1fr; /* Left: 66%, Right: 33% */
   grid-template-rows: 1fr;
@@ -725,7 +725,7 @@
 /*    Focus: Transkrip + Statistik + Posisi Duduk        */
 /* ====================================================== */
 
-.dashboard-right-column.mode-brainstorming {
+.dashboard-right-content.mode-brainstorming {
   display: grid;
   grid-template-columns: 1.2fr 1fr; /* Left: 55%, Right: 45% */
   grid-template-rows: 1fr;
@@ -1349,7 +1349,7 @@
     gap: 18px;
   }
 
-  .dashboard-right-column.mode-default {
+  .dashboard-right-content.mode-default {
     grid-template-columns: 340px 1fr;
     grid-template-rows: minmax(200px, 220px) minmax(180px, 200px) 1fr;
     gap: 14px;
@@ -1414,7 +1414,7 @@
 /*   Focus: Aktivitas + Ekspresi Wajah (Student Monitoring) */
 /* ====================================================== */
 
-.dashboard-right-column.mode-belajar {
+.dashboard-right-content.mode-belajar {
   display: grid !important;
   grid-template-columns: 1fr 1fr !important; /* Equal split: 50% + 50% */
   grid-template-rows: 1fr !important;
