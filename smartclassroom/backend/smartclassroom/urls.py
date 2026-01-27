@@ -5,6 +5,7 @@ from django.urls import path, include
 urlpatterns = [
     path("api/accounts/", include("accounts.urls")),
     path("api/quiz/", include("apps.quiz.quizzes.urls")),
+    path("api/attendance/", include("apps.attendance.urls")),
 ]
 
 # Serve media files in development

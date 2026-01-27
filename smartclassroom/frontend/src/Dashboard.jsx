@@ -90,7 +90,7 @@ export default function Dashboard() {
   const handleMenuSelect = (id) => {
     const modeMap = {
       "jadwal-kelas": "jadwal-kelas",
-      absensi: "default",
+      absensi: "absensi",
       "polling-device": "default",
       "light-temp": "default",
       "registrasi-biometrik": "default",

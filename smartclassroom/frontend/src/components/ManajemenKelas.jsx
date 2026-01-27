@@ -34,6 +34,7 @@ export default function ManajemenKelas({ onSelect, selectedClass }) {
       navigate(`/classoverview/${selectedClass || "701"}/dashboard/kuis`);
       return;
     }
+    // For absensi, jadwal-kelas, and other modes, let the parent handle it
     if (onSelect) {
       onSelect(id);
     }

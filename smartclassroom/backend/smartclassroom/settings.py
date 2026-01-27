@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     # Local apps
     "accounts",
     "apps.quiz.quizzes",
+    "apps.attendance",
 ]
 
 MIDDLEWARE = [

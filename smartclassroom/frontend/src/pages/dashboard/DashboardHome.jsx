@@ -9,6 +9,7 @@ import AktivitasMahasiswa from "../../components/AktivitasMahasiswa";
 import StatistikPengenalan from "../../components/StatistikPengenalan";
 import PosisiKursi from "../../components/PosisiKursi";
 import SoalKuis from "../../components/SoalKuis";
+import AbsensiManagement from "../../components/AbsensiManagement";
 import { KUIS_ACTIVE } from "../../utils/mockData";
 import ClassOverviewDetail from "./ClassOverviewDetail";
 
@@ -77,6 +78,10 @@ export default function DashboardHome() {
 
       {activeMode === "jadwal-kelas" && (
         <ClassOverviewDetail showEnterDashboard={false} />
+      )}
+
+      {activeMode === "absensi" && (
+        <AbsensiManagement />
       )}
 
       {activeMode === "kuis" && (
