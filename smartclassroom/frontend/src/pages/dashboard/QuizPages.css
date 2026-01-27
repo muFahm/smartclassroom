@@ -295,3 +295,21 @@
   background: #f3f4f6;
 }
 
+/* Preview scrollbar styling */
+.quiz-pane-left > div:first-child > div:last-child::-webkit-scrollbar {
+  width: 8px;
+}
+
+.quiz-pane-left > div:first-child > div:last-child::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+
+.quiz-pane-left > div:first-child > div:last-child::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 10px;
+}
+
+.quiz-pane-left > div:first-child > div:last-child::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg, #5568d3 0%, #653a8a 100%);
+}

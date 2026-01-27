@@ -40,6 +40,7 @@ export default function PackageDetailPage() {
   const [selectedQuestion, setSelectedQuestion] = useState(null);
   const [showBankModal, setShowBankModal] = useState(false);
   const [uploadingImage, setUploadingImage] = useState(false);
+  const [editingQuestionId, setEditingQuestionId] = useState(null);
 
   const loadData = async () => {
     setLoading(true);
@@ -249,6 +250,8 @@ export default function PackageDetailPage() {
     try {
       const payload = { ...questionForm, package_id: packageId };
       console.log("📤 Submitting question:", {
+        mode: editingQuestionId ? "UPDATE" : "CREATE",
+        id: editingQuestionId,
         body_text: payload.body_text,
         question_type: payload.question_type,
         media_url: payload.media_url,
@@ -256,17 +259,52 @@ export default function PackageDetailPage() {
         options_count: payload.options.length
       });
       
-      await quizRequest(`/api/quiz/questions/`, {
-        method: "POST",
-        body: JSON.stringify(payload),
-      });
+      if (editingQuestionId) {
+        // Mode UPDATE - edit pertanyaan yang ada
+        await quizRequest(`/api/quiz/questions/${editingQuestionId}/`, {
+          method: "PUT",
+          body: JSON.stringify(payload),
+        });
+        console.log("✅ Question updated successfully");
+      } else {
+        // Mode CREATE - buat pertanyaan baru
+        await quizRequest(`/api/quiz/questions/`, {
+          method: "POST",
+          body: JSON.stringify(payload),
+        });
+        console.log("✅ Question created successfully");
+      }
+      
+      // Reset form dan editing state
       setQuestionForm(createDefaultQuestion(questions.length + 2));
+      setEditingQuestionId(null);
       await loadData();
     } catch (err) {
       setError(err.message);
     } finally {
       setSaving(false);
     }
+  };
+
+  const handleEditQuestion = (question) => {
+    // Populate form dengan data pertanyaan untuk edit
+    setQuestionForm({
+      body_text: question.body_text,
+      explanation: question.explanation || "",
+      media_url: question.media_url || "",
+      question_type: question.question_type,
+      difficulty_tag: question.difficulty_tag || "",
+      order: question.order,
+      is_active: question.is_active,
+      options: question.options.map(opt => ({
+        label: opt.label,
+        body_text: opt.body_text,
+        is_correct: opt.is_correct
+      }))
+    });
+    setEditingQuestionId(question.id); // Set ID untuk mode edit
+    setSelectedQuestion(null); // Close preview
+    window.scrollTo({ top: 0, behavior: 'smooth' }); // Scroll to form
   };
 
   const deleteQuestion = async (id) => {
@@ -322,10 +360,35 @@ export default function PackageDetailPage() {
         {/* Left pane: Editor/Preview */}
         <section className="quiz-pane quiz-pane-left">
           {selectedQuestion ? (
-            <QuestionPreview question={selectedQuestion} onClose={() => setSelectedQuestion(null)} />
+            <QuestionPreview 
+              question={selectedQuestion} 
+              onClose={() => setSelectedQuestion(null)}
+              onEdit={handleEditQuestion}
+            />
           ) : (
             <div className="quiz-card">
-              <h3>Tambah Pertanyaan Baru</h3>
+              <div style={{ 
+                display: "flex", 
+                alignItems: "center", 
+                justifyContent: "space-between",
+                marginBottom: "12px" 
+              }}>
+                <h3 style={{ margin: 0 }}>
+                  {editingQuestionId ? "✏️ Edit Pertanyaan" : "Tambah Pertanyaan Baru"}
+                </h3>
+                {editingQuestionId && (
+                  <span style={{
+                    background: "#fef3c7",
+                    color: "#92400e",
+                    padding: "4px 12px",
+                    borderRadius: "12px",
+                    fontSize: "0.85em",
+                    fontWeight: "500"
+                  }}>
+                    Mode Edit
+                  </span>
+                )}
+              </div>
               <form className="quiz-form quiz-form--stack" onSubmit={handleCreateQuestion}>
                 <label>
                   Teks Pertanyaan
@@ -467,8 +530,21 @@ export default function PackageDetailPage() {
                 )}
                 {error && <p className="quiz-error">{error}</p>}
                 <div className="quiz-submit-row">
+                  {editingQuestionId && (
+                    <button 
+                      type="button" 
+                      className="quiz-button secondary" 
+                      onClick={() => {
+                        setQuestionForm(createDefaultQuestion(questions.length + 1));
+                        setEditingQuestionId(null);
+                        setError("");
+                      }}
+                    >
+                      Batal
+                    </button>
+                  )}
                   <button type="submit" className="quiz-button" disabled={saving}>
-                    {saving ? "Menyimpan..." : "Simpan Pertanyaan"}
+                    {saving ? "Menyimpan..." : (editingQuestionId ? "Update Pertanyaan" : "Simpan Pertanyaan")}
                   </button>
                 </div>
               </form>
@@ -528,8 +604,8 @@ export default function PackageDetailPage() {
   );
 }
 
-// Komponen preview pertanyaan di pane kiri
-function QuestionPreview({ question, onClose }) {
+// Komponen preview pertanyaan di pane kiri dengan styling estetik
+function QuestionPreview({ question, onClose, onEdit }) {
   // Debug: log question data
   console.log("🔍 Preview question:", {
     id: question.id,
@@ -539,51 +615,267 @@ function QuestionPreview({ question, onClose }) {
     has_media: !!question.media_url
   });
   
+  const typeConfig = {
+    multiple: { label: "Pilihan Ganda", icon: "📝", color: "#3b82f6" },
+    truefalse: { label: "Benar/Salah", icon: "✓✗", color: "#10b981" }
+  };
+  
+  const config = typeConfig[question.question_type] || typeConfig.multiple;
+  
   return (
-    <div className="quiz-card">
-      <div className="quiz-header">
-        <h3>Preview Pertanyaan #{question.order}</h3>
-        <button className="quiz-button secondary" onClick={onClose}>
-          Tutup
-        </button>
+    <div className="quiz-card" style={{ height: "100%", display: "flex", flexDirection: "column" }}>
+      {/* Header dengan actions */}
+      <div className="quiz-header" style={{ 
+        background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+        color: "white",
+        padding: "20px",
+        borderRadius: "12px 12px 0 0",
+        marginBottom: "0"
+      }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", width: "100%" }}>
+          <div style={{ flex: 1 }}>
+            <div style={{ fontSize: "0.85em", opacity: 0.9, marginBottom: "4px" }}>Preview Pertanyaan</div>
+            <h3 style={{ margin: 0, fontSize: "1.3em" }}>Soal #{question.order}</h3>
+          </div>
+          <div style={{ display: "flex", gap: "8px", flexShrink: 0 }}>
+            <button 
+              className="quiz-button"
+              onClick={() => onEdit(question)}
+              style={{ 
+                background: "rgba(255,255,255,0.2)",
+                border: "1px solid rgba(255,255,255,0.3)",
+                color: "white",
+                padding: "8px 16px",
+                fontSize: "0.9em",
+                backdropFilter: "blur(10px)"
+              }}
+              title="Edit pertanyaan"
+            >
+              ✏️ Edit
+            </button>
+            <button 
+              className="quiz-button secondary" 
+              onClick={onClose}
+              style={{
+                background: "rgba(255,255,255,0.2)",
+                border: "1px solid rgba(255,255,255,0.3)",
+                color: "white",
+                padding: "8px 16px",
+                fontSize: "0.9em"
+              }}
+            >
+              ✕
+            </button>
+          </div>
+        </div>
       </div>
-      <div style={{ marginTop: "16px" }}>
-        <strong>Teks Pertanyaan:</strong>
-        <p>{question.body_text}</p>
+
+      {/* Content area dengan scroll */}
+      <div style={{ 
+        flex: 1, 
+        overflowY: "auto", 
+        padding: "24px",
+        background: "#f9fafb"
+      }}>
+        {/* Type badge */}
+        <div style={{ marginBottom: "20px" }}>
+          <span style={{
+            display: "inline-flex",
+            alignItems: "center",
+            gap: "6px",
+            background: config.color,
+            color: "white",
+            padding: "6px 14px",
+            borderRadius: "20px",
+            fontSize: "0.85em",
+            fontWeight: "500",
+            boxShadow: "0 2px 8px rgba(0,0,0,0.1)"
+          }}>
+            <span>{config.icon}</span>
+            <span>{config.label}</span>
+          </span>
+        </div>
+
+        {/* Question text */}
+        <div style={{
+          background: "white",
+          padding: "20px",
+          borderRadius: "12px",
+          marginBottom: "20px",
+          boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
+          border: "1px solid #e5e7eb"
+        }}>
+          <div style={{ 
+            fontSize: "0.75em", 
+            textTransform: "uppercase", 
+            letterSpacing: "0.5px",
+            color: "#6b7280",
+            marginBottom: "8px",
+            fontWeight: "600"
+          }}>
+            Pertanyaan
+          </div>
+          <p style={{ 
+            fontSize: "1.05em", 
+            lineHeight: "1.6",
+            color: "#1f2937",
+            margin: 0
+          }}>
+            {question.body_text}
+          </p>
+        </div>
+
+        {/* Image if exists */}
         {question.media_url && (
-          <>
-            <strong>Gambar:</strong>
-            <div style={{ marginTop: "8px", marginBottom: "12px" }}>
+          <div style={{
+            background: "white",
+            padding: "16px",
+            borderRadius: "12px",
+            marginBottom: "20px",
+            boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
+            border: "1px solid #e5e7eb"
+          }}>
+            <div style={{ 
+              fontSize: "0.75em", 
+              textTransform: "uppercase", 
+              letterSpacing: "0.5px",
+              color: "#6b7280",
+              marginBottom: "12px",
+              fontWeight: "600",
+              display: "flex",
+              alignItems: "center",
+              gap: "6px"
+            }}>
+              <span>🖼️</span>
+              <span>Gambar Soal</span>
+            </div>
+            <div style={{ 
+              borderRadius: "8px", 
+              overflow: "hidden",
+              border: "2px solid #e5e7eb"
+            }}>
               <img 
                 src={question.media_url} 
                 alt="Gambar soal" 
-                style={{ maxWidth: "100%", maxHeight: "300px", borderRadius: "8px", border: "1px solid #e5e7eb", display: "block" }}
+                style={{ 
+                  width: "100%", 
+                  maxHeight: "350px", 
+                  objectFit: "contain",
+                  display: "block",
+                  background: "#f3f4f6"
+                }}
                 onError={(e) => { 
                   console.error("Failed to load image:", question.media_url);
                   e.target.style.display = 'none';
-                  e.target.nextSibling.style.display = 'block';
+                  e.target.nextSibling.style.display = 'flex';
                 }}
               />
-              <p style={{ display: "none", color: "#999", fontSize: "0.9em", fontStyle: "italic", marginTop: "8px" }}>
-                Gambar tidak dapat dimuat
-              </p>
+              <div style={{ 
+                display: "none",
+                flexDirection: "column",
+                alignItems: "center",
+                justifyContent: "center",
+                padding: "40px",
+                background: "#f9fafb",
+                color: "#9ca3af",
+                textAlign: "center",
+                gap: "8px"
+              }}>
+                <span style={{ fontSize: "2em" }}>🖼️</span>
+                <span style={{ fontSize: "0.9em" }}>Gambar tidak dapat dimuat</span>
+              </div>
             </div>
-          </>
+          </div>
         )}
-        <strong>Tipe:</strong>
-        <p>
-          {question.question_type === "multiple" && "Pilihan Ganda"}
-          {question.question_type === "truefalse" && "Benar/Salah"}
-        </p>
-        <strong>Opsi Jawaban:</strong>
-        <ul style={{ marginTop: "8px", paddingLeft: "16px" }}>
-          {question.options?.map((option) => (
-            <li key={option.id} className={`quiz-option ${option.is_correct ? "correct" : ""}`}>
-              <span className="quiz-pill">{option.label}</span> {option.body_text}
-              {option.is_correct && <strong> ✓ Benar</strong>}
-            </li>
-          ))}
-        </ul>
+
+        {/* Options */}
+        <div style={{
+          background: "white",
+          padding: "20px",
+          borderRadius: "12px",
+          boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
+          border: "1px solid #e5e7eb"
+        }}>
+          <div style={{ 
+            fontSize: "0.75em", 
+            textTransform: "uppercase", 
+            letterSpacing: "0.5px",
+            color: "#6b7280",
+            marginBottom: "16px",
+            fontWeight: "600"
+          }}>
+            Pilihan Jawaban
+          </div>
+          <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+            {question.options?.map((option, idx) => (
+              <div 
+                key={option.id}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "12px",
+                  padding: "16px",
+                  background: option.is_correct 
+                    ? "linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%)"
+                    : "#f9fafb",
+                  border: option.is_correct
+                    ? "2px solid #10b981"
+                    : "2px solid #e5e7eb",
+                  borderRadius: "10px",
+                  transition: "all 0.2s ease",
+                  position: "relative",
+                  overflow: "hidden"
+                }}
+              >
+                {/* Option label badge */}
+                <div style={{
+                  minWidth: "36px",
+                  height: "36px",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  background: option.is_correct ? "#10b981" : "#6b7280",
+                  color: "white",
+                  borderRadius: "8px",
+                  fontWeight: "700",
+                  fontSize: "0.95em",
+                  boxShadow: "0 2px 4px rgba(0,0,0,0.1)"
+                }}>
+                  {option.label}
+                </div>
+                
+                {/* Option text */}
+                <div style={{ 
+                  flex: 1,
+                  fontSize: "1em",
+                  color: "#1f2937",
+                  fontWeight: option.is_correct ? "500" : "normal"
+                }}>
+                  {option.body_text}
+                </div>
+                
+                {/* Correct indicator */}
+                {option.is_correct && (
+                  <div style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "6px",
+                    background: "#10b981",
+                    color: "white",
+                    padding: "6px 12px",
+                    borderRadius: "20px",
+                    fontSize: "0.85em",
+                    fontWeight: "600",
+                    boxShadow: "0 2px 4px rgba(16, 185, 129, 0.3)"
+                  }}>
+                    <span>✓</span>
+                    <span>Jawaban Benar</span>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
     </div>
   );
