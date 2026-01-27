@@ -31,14 +31,28 @@ class QuizQuestionSerializer(serializers.ModelSerializer):
         read_only_fields = ["package"]
 
     def validate_options(self, value: List[dict]):
-        if len(value) < 2:
-            raise serializers.ValidationError("Setidaknya harus ada dua opsi jawaban.")
-        correct_count = sum(1 for option in value if option.get("is_correct"))
         question_type = self.initial_data.get("question_type", QuizQuestion.TYPE_SINGLE)
+        
+        # Validasi max 4 opsi untuk polling device
+        if len(value) > 4:
+            raise serializers.ValidationError("Maksimal 4 opsi jawaban untuk polling device.")
+        
+        # True/False harus tepat 2 opsi
+        if question_type == QuizQuestion.TYPE_TRUE_FALSE:
+            if len(value) != 2:
+                raise serializers.ValidationError("Soal True/False harus memiliki tepat 2 opsi.")
+        else:
+            if len(value) < 2:
+                raise serializers.ValidationError("Setidaknya harus ada dua opsi jawaban.")
+        
+        correct_count = sum(1 for option in value if option.get("is_correct"))
         if correct_count == 0:
             raise serializers.ValidationError("Tentukan minimal satu jawaban yang benar.")
-        if question_type == QuizQuestion.TYPE_SINGLE and correct_count != 1:
-            raise serializers.ValidationError("Soal pilihan tunggal hanya boleh punya satu jawaban benar.")
+        
+        # Pilihan Ganda (single/multiple) dan True/False: hanya 1 benar untuk polling device
+        if correct_count != 1:
+            raise serializers.ValidationError("Hanya boleh ada satu jawaban yang benar.")
+        
         return value
 
     def create(self, validated_data):

@@ -68,7 +68,6 @@ class QuizQuestion(TimeStampedModel):
 
     class Meta:
         ordering = ["order", "id"]
-        unique_together = ("package", "order")
 
     def __str__(self) -> str:
         return f"{self.package.title} - Q{self.order}"

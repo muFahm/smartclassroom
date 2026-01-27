@@ -1,11 +1,14 @@
-from django.db.models import Q
+from django.db.models import Q, Max
 from django.shortcuts import get_object_or_404
+from django.core.files.storage import default_storage
 from rest_framework import permissions, status, viewsets
+from rest_framework.decorators import action
 from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
+from rest_framework.parsers import MultiPartParser, FormParser
 
 from apps.common.permissions import IsLecturer, IsOwnerOrShared
-from .models import QuizPackage, QuizQuestion
+from .models import QuizPackage, QuizQuestion, QuizOption
 from .serializers import QuizPackageSerializer, QuizQuestionSerializer
 
 
@@ -86,3 +89,113 @@ class QuizQuestionViewSet(viewsets.ModelViewSet):
         if package.owner_id != self.request.user.id:
             raise ValidationError("Anda tidak memiliki akses ke paket ini.")
         return package
+
+
+class QuestionBankViewSet(viewsets.ReadOnlyModelViewSet):
+    """
+    ViewSet untuk Question Bank: list/search semua pertanyaan milik user.
+    Endpoint custom `copy_to_package` untuk reuse pertanyaan ke paket lain.
+    """
+    serializer_class = QuizQuestionSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    filterset_fields = ["question_type", "difficulty_tag"]
+    search_fields = ["body_text", "explanation", "package__topic", "package__title"]
+    ordering_fields = ["created_at", "order"]
+
+    def get_queryset(self):
+        user = self.request.user
+        if not _is_instructor(user):
+            return QuizQuestion.objects.none()
+        # Tampilkan semua pertanyaan dari paket milik user + paket shared
+        return QuizQuestion.objects.select_related("package").prefetch_related("options").filter(
+            Q(package__owner=user) | Q(package__visibility=QuizPackage.VISIBILITY_SHARED)
+        ).distinct()
+
+    @action(detail=True, methods=["post"])
+    def copy_to_package(self, request, pk=None):
+        """
+        Copy pertanyaan ini ke paket lain (duplicate).
+        Body: {"target_package_id": int}
+        """
+        source_question = self.get_object()
+        target_package_id = request.data.get("target_package_id")
+        if not target_package_id:
+            raise ValidationError({"target_package_id": "Wajib memilih paket tujuan."})
+        
+        target_package = get_object_or_404(QuizPackage, pk=target_package_id)
+        if target_package.owner_id != request.user.id:
+            raise ValidationError("Anda tidak memiliki akses ke paket tujuan.")
+        
+        # Hitung order baru
+        max_order = target_package.questions.aggregate(Max("order"))["order__max"] or 0
+        new_order = max_order + 1
+        
+        # Copy question
+        new_question = QuizQuestion.objects.create(
+            package=target_package,
+            body_text=source_question.body_text,
+            explanation=source_question.explanation,
+            media_url=source_question.media_url,
+            question_type=source_question.question_type,
+            difficulty_tag=source_question.difficulty_tag,
+            order=new_order,
+            is_active=source_question.is_active,
+        )
+        
+        # Copy options
+        options_to_create = []
+        for option in source_question.options.all():
+            options_to_create.append(
+                QuizOption(
+                    question=new_question,
+                    label=option.label,
+                    body_text=option.body_text,
+                    is_correct=option.is_correct,
+                )
+            )
+        QuizOption.objects.bulk_create(options_to_create)
+        
+        serializer = self.get_serializer(new_question)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+
+class QuizMediaUploadViewSet(viewsets.ViewSet):
+    """
+    ViewSet untuk upload gambar soal kuis.
+    """
+    permission_classes = [permissions.IsAuthenticated, IsLecturer]
+    parser_classes = [MultiPartParser, FormParser]
+
+    @action(detail=False, methods=["post"])
+    def upload_image(self, request):
+        """
+        Upload gambar dan return URL.
+        """
+        file = request.FILES.get("file")
+        if not file:
+            return Response(
+                {"error": "File tidak ditemukan"}, 
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        # Validasi tipe file
+        allowed_types = ["image/jpeg", "image/png", "image/gif", "image/webp"]
+        if file.content_type not in allowed_types:
+            return Response(
+                {"error": "Tipe file tidak didukung. Gunakan JPEG, PNG, GIF, atau WebP."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        # Validasi ukuran file (max 5MB)
+        if file.size > 5 * 1024 * 1024:
+            return Response(
+                {"error": "Ukuran file terlalu besar. Maksimal 5MB."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        # Simpan file
+        file_path = f"quiz_images/{request.user.id}/{file.name}"
+        saved_path = default_storage.save(file_path, file)
+        file_url = request.build_absolute_uri(default_storage.url(saved_path))
+        
+        return Response({"url": file_url}, status=status.HTTP_201_CREATED)

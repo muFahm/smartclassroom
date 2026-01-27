@@ -7,7 +7,6 @@ const defaultForm = {
   title: "",
   description: "",
   topic: "",
-  visibility: "private",
 };
 
 export default function QuizPackagesPage() {
@@ -80,36 +79,38 @@ export default function QuizPackagesPage() {
         <div className="quiz-pill">{packages.length} paket</div>
       </div>
 
-      <section className="quiz-card">
-        <h3>Buat Paket Baru</h3>
-        <form className="quiz-form" onSubmit={handleCreate}>
-          <label>
-            Judul
-            <input name="title" value={form.title} onChange={handleChange} required />
-          </label>
-          <label>
-            Topik
-            <input name="topic" value={form.topic} onChange={handleChange} />
-          </label>
-          <label>
-            Deskripsi
-            <textarea name="description" value={form.description} onChange={handleChange} rows={2} />
-          </label>
-          <label>
-            Visibilitas
-            <select name="visibility" value={form.visibility} onChange={handleChange}>
-              <option value="private">Private</option>
-              <option value="shared">Shared</option>
-            </select>
-          </label>
-          {error && <p className="quiz-error">{error}</p>}
-          <button type="submit" className="quiz-button" disabled={submitting}>
-            {submitting ? "Menyimpan..." : "Simpan"}
-          </button>
-        </form>
-      </section>
+      {/* 2-pane layout */}
+      <div className="quiz-builder-panes">
+        {/* Left pane: Create form */}
+        <section className="quiz-pane quiz-pane-left">
+          <div className="quiz-card">
+            <h3>Buat Paket Baru</h3>
+            <form className="quiz-form quiz-form--stack" onSubmit={handleCreate}>
+              <label>
+                Judul
+                <input name="title" value={form.title} onChange={handleChange} required />
+              </label>
+              <label>
+                Topik
+                <input name="topic" value={form.topic} onChange={handleChange} />
+              </label>
+              <label>
+                Deskripsi
+                <textarea name="description" value={form.description} onChange={handleChange} rows={3} />
+              </label>
+              {error && <p className="quiz-error">{error}</p>}
+              <div className="quiz-submit-row">
+                <button type="submit" className="quiz-button" disabled={submitting}>
+                  {submitting ? "Menyimpan..." : "Simpan"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </section>
 
-      <section className="quiz-card">
+        {/* Right pane: Package list */}
+        <section className="quiz-pane quiz-pane-right">
+          <div className="quiz-card">
         {loading ? (
           <p>Memuat...</p>
         ) : (
@@ -154,7 +155,9 @@ export default function QuizPackagesPage() {
             </tbody>
           </table>
         )}
-      </section>
+          </div>
+        </section>
+      </div>
     </div>
   );
 }
