@@ -75,17 +75,31 @@ class LoginSerializer(serializers.Serializer):
     )
 
     def validate(self, data):
-        """Validate credentials"""
+        """Validate credentials - accepts either username or email"""
         username = data.get('username')
         password = data.get('password')
 
         if username and password:
-            # Authenticate user
+            # Try to authenticate with username first
             user = authenticate(
                 request=self.context.get('request'),
                 username=username,
                 password=password
             )
+
+            # If authentication failed and input looks like an email, try to find user by email
+            if not user and '@' in username:
+                try:
+                    # Find user by email
+                    user_obj = CustomUser.objects.get(email=username)
+                    # Authenticate using the actual username
+                    user = authenticate(
+                        request=self.context.get('request'),
+                        username=user_obj.username,
+                        password=password
+                    )
+                except CustomUser.DoesNotExist:
+                    pass
 
             if not user:
                 raise serializers.ValidationError({

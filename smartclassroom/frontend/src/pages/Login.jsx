@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { detectRoleFromEmail, UserRole } from "../services/authDataService";
 import "./Login.css";
 
 function Login() {
@@ -10,6 +11,7 @@ function Login() {
   });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleChange = (e) => {
     setFormData({
@@ -43,8 +45,20 @@ function Login() {
         sessionStorage.setItem("token", data.token);
         sessionStorage.setItem("user", JSON.stringify(data.user));
 
-        // Redirect to class overview
-        navigate("/classoverview");
+        // Detect role from user email and redirect accordingly
+        const userEmail = data.user.email;
+        const roleDetection = detectRoleFromEmail(userEmail);
+        
+        // Store user role in sessionStorage
+        sessionStorage.setItem("userRole", roleDetection.role);
+
+        // Redirect based on role
+        if (roleDetection.role === UserRole.MAHASISWA) {
+          navigate("/mahasiswa");
+        } else {
+          // Dosen or Admin - redirect to classoverview
+          navigate("/classoverview");
+        }
       } else {
         // Handle error messages from backend
         if (data.errors) {
@@ -66,63 +80,94 @@ function Login() {
 
   return (
     <div className="login-container">
-      <div className="login-card">
-        <div className="login-header">
-          <h1>Smart Classroom</h1>
-          <p>Universitas Trisakti - FTI</p>
+      <div className="login-wrapper">
+        {/* Left side - Illustration */}
+        <div className="login-illustration">
+          <div className="illustration-content">
+            <img 
+              src="/study-illustration.png" 
+              alt="Smart Classroom Illustration"
+              className="illustration-image"
+            />
+            <h2>Selamat Datang di Smart Classroom</h2>
+            <p>Platform pembelajaran interaktif untuk Universitas Trisakti</p>
+          </div>
         </div>
 
-        <form className="login-form" onSubmit={handleSubmit}>
-          <h2>Login Admin Prodi</h2>
-
-          {error && <div className="error-message">{error}</div>}
-
-          <div className="form-group">
-            <label htmlFor="username">Username</label>
-            <input
-              type="text"
-              id="username"
-              name="username"
-              value={formData.username}
-              onChange={handleChange}
-              placeholder="Masukkan username"
-              required
-              disabled={loading}
-            />
+        {/* Right side - Login Card */}
+        <div className="login-card">
+          <div className="login-header">
+            <h1>Smart Classroom</h1>
+            <p>Universitas Trisakti - FTI</p>
           </div>
 
-          <div className="form-group">
-            <label htmlFor="password">Password</label>
-            <input
-              type="password"
-              id="password"
-              name="password"
-              value={formData.password}
-              onChange={handleChange}
-              placeholder="Masukkan password"
-              required
-              disabled={loading}
-            />
-          </div>
+          <form className="login-form" onSubmit={handleSubmit}>
+            <h2>Login</h2>
 
-          <button type="submit" className="btn-login" disabled={loading}>
-            {loading ? "Loading..." : "Login"}
-          </button>
+            {error && <div className="error-message">{error}</div>}
 
-          <div className="login-footer">
-            <p>
-              Belum terdaftar sebagai admin?
-              <button
-                type="button"
-                className="link-button"
-                onClick={() => navigate("/register")}
+            <div className="form-group">
+              <label htmlFor="username">Username atau Email</label>
+              <input
+                type="text"
+                id="username"
+                name="username"
+                value={formData.username}
+                onChange={handleChange}
+                placeholder="Masukkan username atau email"
+                required
                 disabled={loading}
-              >
-                Daftar admin
-              </button>
-            </p>
-          </div>
-        </form>
+              />
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="password">Password</label>
+              <div className="password-input-wrapper">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  id="password"
+                  name="password"
+                  value={formData.password}
+                  onChange={handleChange}
+                  placeholder="Masukkan password"
+                  required
+                  disabled={loading}
+                />
+                <button
+                  type="button"
+                  className="password-toggle-btn"
+                  onClick={() => setShowPassword(!showPassword)}
+                  disabled={loading}
+                  aria-label={showPassword ? "Hide password" : "Show password"}
+                >
+                  <iconify-icon 
+                    icon={showPassword ? "ph:eye" : "ph:eye-closed"} 
+                    width="20" 
+                    height="20"
+                  ></iconify-icon>
+                </button>
+              </div>
+            </div>
+
+            <button type="submit" className="btn-login" disabled={loading}>
+              {loading ? "Loading..." : "Login"}
+            </button>
+
+            <div className="login-footer">
+              <p>
+                Belum punya akun?
+                <button
+                  type="button"
+                  className="link-button"
+                  onClick={() => navigate("/register")}
+                  disabled={loading}
+                >
+                  Daftar di sini
+                </button>
+              </p>
+            </div>
+          </form>
+        </div>
       </div>
     </div>
   );

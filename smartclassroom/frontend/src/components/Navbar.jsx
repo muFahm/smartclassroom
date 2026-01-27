@@ -7,6 +7,7 @@ export default function Navbar({ activeMode, setActiveMode, isOverview, selected
   const navigate = useNavigate();
   const [showDropdown, setShowDropdown] = useState(false);
   const user = getUser();
+  const userRole = sessionStorage.getItem("userRole");
 
   const modes = [
     { id: "default", label: "Dashboard Utama" },
@@ -20,7 +21,15 @@ export default function Navbar({ activeMode, setActiveMode, isOverview, selected
 
   const handleLogout = () => {
     logout();
+    sessionStorage.removeItem("userRole");
     navigate("/login");
+  };
+
+  // Get role label for display
+  const getRoleLabel = () => {
+    if (userRole === "mahasiswa") return "Mahasiswa";
+    if (userRole === "dosen") return "Dosen";
+    return "Admin Prodi";
   };
 
   return (
@@ -29,8 +38,8 @@ export default function Navbar({ activeMode, setActiveMode, isOverview, selected
         <h1 className="navbar-logo">Smart Classroom</h1>
       </div>
 
-      {/* Hide mode buttons saat overview */}
-      {!isOverview && (
+      {/* Hide mode buttons saat overview atau mahasiswa */}
+      {!isOverview && userRole !== "mahasiswa" && (
         <div className="navbar-center">
           {modes.map((mode) => (
             <button
@@ -59,9 +68,9 @@ export default function Navbar({ activeMode, setActiveMode, isOverview, selected
             <div className="navbar-dropdown">
               <div className="navbar-dropdown-header">
                 <p className="navbar-dropdown-name">
-                  {user?.username || "Admin"}
+                  {user?.full_name || user?.username || "User"}
                 </p>
-                <p className="navbar-dropdown-role">Admin Prodi</p>
+                <p className="navbar-dropdown-role">{getRoleLabel()}</p>
               </div>
               <button className="navbar-dropdown-logout" onClick={handleLogout}>
                 🚪 Logout

@@ -8,7 +8,7 @@
   background-image:
     radial-gradient(at 20% 30%, rgba(59, 130, 246, 0.1) 0px, transparent 50%),
     radial-gradient(at 80% 70%, rgba(147, 197, 253, 0.15) 0px, transparent 50%);
-  padding: 40px 20px;
+  padding: 20px;
   overflow-y: auto;
   scrollbar-width: none; /* Firefox */
   -ms-overflow-style: none; /* IE/Edge */
@@ -18,24 +18,82 @@
   display: none; /* Chrome/Safari */
 }
 
-.register-card {
+/* Split Layout Wrapper */
+.register-wrapper {
+  display: flex;
   background: white;
-  border-radius: 20px;
-  border: 1px solid #e0e7ff;
+  border-radius: 24px;
   box-shadow:
-    0 4px 20px rgba(59, 130, 246, 0.08),
+    0 4px 30px rgba(59, 130, 246, 0.12),
     0 0 0 1px rgba(59, 130, 246, 0.05);
-  width: 100%;
-  max-width: 500px;
-  max-height: 90vh;
-  overflow-y: auto;
+  overflow: hidden;
   animation: slideUp 0.4s ease-out;
-  scrollbar-width: none; /* Firefox */
-  -ms-overflow-style: none; /* IE/Edge */
+  max-width: 1000px;
+  width: 100%;
+  max-height: 95vh;
+}
+
+/* Left side - Illustration Panel */
+.register-illustration {
+  flex: 1;
+  background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+  min-height: 600px;
+}
+
+.illustration-content {
+  text-align: center;
+  max-width: 350px;
+}
+
+.illustration-image {
+  width: 100%;
+  max-width: 320px;
+  height: auto;
+  margin-bottom: 24px;
+  animation: floatAnimation 3s ease-in-out infinite;
+}
+
+@keyframes floatAnimation {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.illustration-content h2 {
+  color: #1e40af;
+  font-size: 22px;
+  font-weight: 700;
+  margin: 0 0 12px 0;
+}
+
+.illustration-content p {
+  color: #3b82f6;
+  font-size: 14px;
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* Right side - Register Card */
+.register-card {
+  flex: 1;
+  background: white;
+  display: flex;
+  flex-direction: column;
+  max-width: 500px;
+  overflow-y: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 }
 
 .register-card::-webkit-scrollbar {
-  display: none; /* Chrome/Safari */
+  display: none;
 }
 
 @keyframes slideUp {
@@ -52,37 +110,40 @@
 .register-header {
   background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
   color: #1e40af;
-  padding: 28px 24px;
+  padding: 24px 28px;
   text-align: center;
   border-bottom: 2px solid #bfdbfe;
 }
 
 .register-header h1 {
-  margin: 0 0 8px 0;
-  font-size: 28px;
+  margin: 0 0 6px 0;
+  font-size: 24px;
   font-weight: 700;
 }
 
 .register-header p {
   margin: 0;
-  font-size: 14px;
+  font-size: 13px;
   opacity: 0.9;
 }
 
 .register-form {
-  padding: 32px 28px;
+  padding: 24px 28px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
 }
 
 .register-form h2 {
-  margin: 0 0 24px 0;
-  font-size: 24px;
+  margin: 0 0 20px 0;
+  font-size: 20px;
   font-weight: 600;
   color: #1f2937;
   text-align: center;
 }
 
 .form-group {
-  margin-bottom: 18px;
+  margin-bottom: 16px;
 }
 
 .form-row {
@@ -96,13 +157,51 @@
   margin-bottom: 6px;
   font-weight: 500;
   color: #374151;
-  font-size: 14px;
+  font-size: 13px;
+}
+
+.password-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.password-input-wrapper input {
+  padding-right: 45px;
+}
+
+.password-toggle-btn {
+  position: absolute;
+  right: 10px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #6b7280;
+  transition: color 0.2s ease;
+  z-index: 1;
+}
+
+.password-toggle-btn:hover:not(:disabled) {
+  color: #3b82f6;
+}
+
+.password-toggle-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.password-toggle-btn iconify-icon {
+  display: block;
 }
 
 .form-group input,
 .form-group select {
   width: 100%;
-  padding: 11px 14px;
+  padding: 10px 14px;
   border: 2px solid #e5e7eb;
   border-radius: 8px;
   font-size: 14px;
@@ -129,14 +228,40 @@
   cursor: not-allowed;
 }
 
+/* Email validation styles */
+.input-valid {
+  border-color: #22c55e !important;
+  background-color: #f0fdf4 !important;
+}
+
+.input-invalid {
+  border-color: #ef4444 !important;
+  background-color: #fef2f2 !important;
+}
+
+.email-validation {
+  display: block;
+  font-size: 12px;
+  margin-top: 4px;
+  font-weight: 500;
+}
+
+.email-validation.valid {
+  color: #16a34a;
+}
+
+.email-validation.invalid {
+  color: #dc2626;
+}
+
 .error-message {
   background-color: #fee2e2;
   border: 1px solid #fecaca;
   color: #991b1b;
-  padding: 12px 16px;
+  padding: 10px 14px;
   border-radius: 8px;
-  margin-bottom: 18px;
-  font-size: 14px;
+  margin-bottom: 16px;
+  font-size: 13px;
   animation: shake 0.3s ease;
 }
 
@@ -155,12 +280,12 @@
 
 .btn-register {
   width: 100%;
-  padding: 14px;
+  padding: 12px;
   background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%);
   color: white;
   border: none;
   border-radius: 8px;
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
@@ -183,14 +308,23 @@
 }
 
 .register-footer {
-  margin-top: 24px;
+  margin-top: 16px;
   text-align: center;
 }
 
 .register-footer p {
-  margin: 0;
+  margin: 0 0 8px 0;
   color: #6b7280;
-  font-size: 14px;
+  font-size: 13px;
+}
+
+.email-hint {
+  font-size: 11px !important;
+  color: #9ca3af !important;
+  background: #f3f4f6;
+  padding: 8px 12px;
+  border-radius: 6px;
+  margin-top: 12px !important;
 }
 
 .link-button {
@@ -214,26 +348,64 @@
 }
 
 /* Responsive */
-@media (max-width: 580px) {
+@media (max-width: 900px) {
+  .register-wrapper {
+    flex-direction: column;
+    max-width: 500px;
+    max-height: none;
+  }
+
+  .register-illustration {
+    min-height: auto;
+    padding: 30px 20px;
+  }
+
+  .illustration-image {
+    max-width: 180px;
+  }
+
+  .illustration-content h2 {
+    font-size: 18px;
+  }
+
+  .illustration-content p {
+    font-size: 13px;
+  }
+
   .register-card {
     max-width: 100%;
-    border-radius: 12px;
+  }
+}
+
+@media (max-width: 600px) {
+  .form-row {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .register-wrapper {
+    border-radius: 16px;
   }
 
-  .register-form {
-    padding: 24px 20px;
-  }
-
-  .register-header {
+  .register-illustration {
     padding: 24px 16px;
   }
 
-  .register-header h1 {
-    font-size: 24px;
+  .illustration-image {
+    max-width: 140px;
   }
 
-  .form-row {
-    grid-template-columns: 1fr;
-    gap: 18px;
+  .register-form {
+    padding: 20px 16px;
+  }
+
+  .register-header {
+    padding: 20px 16px;
+  }
+
+  .register-header h1 {
+    font-size: 20px;
   }
 }

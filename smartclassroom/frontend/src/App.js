@@ -8,6 +8,25 @@ import DashboardHome from "./pages/dashboard/DashboardHome";
 import DashboardOverview from "./pages/dashboard/DashboardOverview";
 import QuizPackagesPage from "./pages/dashboard/QuizPackagesPage";
 import PackageDetailPage from "./pages/dashboard/PackageDetailPage";
+import Mahasiswa from "./pages/mahasiswa/Mahasiswa";
+
+// Root redirect component - handles role-based navigation
+function RootRedirect() {
+  const token = sessionStorage.getItem("token");
+  const userRole = sessionStorage.getItem("userRole");
+  
+  if (!token) {
+    return <Navigate to="/login" replace />;
+  }
+  
+  // Redirect based on user role
+  if (userRole === "mahasiswa") {
+    return <Navigate to="/mahasiswa" replace />;
+  }
+  
+  // Default to classoverview for dosen/admin
+  return <Navigate to="/classoverview" replace />;
+}
 
 export default function App() {
   return (
@@ -15,6 +34,18 @@ export default function App() {
       <Routes>
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        
+        {/* Mahasiswa route */}
+        <Route
+          path="/mahasiswa"
+          element={
+            <ProtectedRoute>
+              <Mahasiswa />
+            </ProtectedRoute>
+          }
+        />
+        
+        {/* Dosen/Admin routes */}
         <Route
           path="/classoverview"
           element={
@@ -37,13 +68,7 @@ export default function App() {
         </Route>
         <Route
           path="/"
-          element={
-            sessionStorage.getItem("token") ? (
-              <Navigate to="/classoverview" replace />
-            ) : (
-              <Navigate to="/login" replace />
-            )
-          }
+          element={<RootRedirect />}
         />
         <Route
           path="/dashboard"
