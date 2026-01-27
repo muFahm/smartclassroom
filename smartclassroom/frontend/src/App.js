@@ -38,7 +38,7 @@ export default function App() {
         <Route
           path="/"
           element={
-            localStorage.getItem("token") ? (
+            sessionStorage.getItem("token") ? (
               <Navigate to="/classoverview" replace />
             ) : (
               <Navigate to="/login" replace />

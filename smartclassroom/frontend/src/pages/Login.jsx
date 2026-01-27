@@ -39,9 +39,9 @@ function Login() {
       const data = await response.json();
 
       if (response.ok) {
-        // Save token and user data to localStorage
-        localStorage.setItem("token", data.token);
-        localStorage.setItem("user", JSON.stringify(data.user));
+        // Save token and user data to sessionStorage (logout on browser close)
+        sessionStorage.setItem("token", data.token);
+        sessionStorage.setItem("user", JSON.stringify(data.user));
 
         // Redirect to class overview
         navigate("/classoverview");

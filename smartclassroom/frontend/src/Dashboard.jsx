@@ -54,6 +54,8 @@ export default function Dashboard() {
       if (activeMode !== "overview") {
         previousModeRef.current = activeMode;
         setActiveMode("overview");
+      } else if (previousModeRef.current === "overview") {
+        previousModeRef.current = "default";
       }
       return;
     }
