@@ -140,12 +140,14 @@ export default function Dashboard() {
               <ManajemenKelas onSelect={handleMenuSelect} selectedClass={selectedClass} />
 
               {/* Widget Toggle - Tampilkan/Sembunyikan komponen */}
-              <Widget
-                key={activeMode}
-                widgets={widgets}
-                setWidgets={setWidgets}
-                activeMode={activeMode}
-              />
+              {activeMode !== "jadwal-kelas" && (
+                <Widget
+                  key={activeMode}
+                  widgets={widgets}
+                  setWidgets={setWidgets}
+                  activeMode={activeMode}
+                />
+              )}
             </div>
           )}
 
