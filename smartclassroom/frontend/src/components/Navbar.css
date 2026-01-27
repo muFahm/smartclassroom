@@ -94,11 +94,22 @@
   justify-content: center;
   font-size: 18px;
   transition: all 0.2s;
+  overflow: hidden;
+  position: relative;
 }
 
 .navbar-user-avatar:hover {
   background: #d1d5db;
   border-color: #9ca3af;
+}
+
+.navbar-user-avatar span {
+  display: block;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 /* Dropdown Menu */
@@ -159,4 +170,29 @@
 
 .navbar-dropdown-logout:hover {
   background: #fee2e2;
+}
+
+/* Mahasiswa Navigation Tabs */
+.mahasiswa-nav-tabs {
+  justify-content: flex-end;
+  margin-right: 16px;
+  gap: 12px;
+}
+
+.mahasiswa-tab {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.mahasiswa-tab iconify-icon {
+  vertical-align: middle;
+}
+
+/* Avatar Photo for Mahasiswa */
+.avatar-photo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
 }

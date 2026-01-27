@@ -4,93 +4,188 @@
   display: flex;
   flex-direction: column;
   background: #f8fafc;
+  background-image:
+    radial-gradient(at 10% 20%, rgba(139, 92, 246, 0.05) 0px, transparent 50%),
+    radial-gradient(at 90% 80%, rgba(59, 130, 246, 0.05) 0px, transparent 50%);
 }
 
 .mahasiswa-main {
   flex: 1;
   display: flex;
   justify-content: center;
-  padding: 40px 24px;
+  padding: 32px 24px;
+  margin-top: 72px; /* Account for fixed navbar + spacing */
 }
 
 .mahasiswa-content {
   width: 100%;
-  max-width: 1200px;
+  max-width: 1100px;
 }
 
-.welcome-section {
-  text-align: center;
-  margin-bottom: 48px;
+/* Polling Section */
+.polling-section {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
 }
 
-.welcome-section h1 {
-  font-size: 32px;
-  font-weight: 700;
-  color: #1f2937;
-  margin: 0 0 12px 0;
-}
-
-.welcome-subtitle {
-  font-size: 16px;
-  color: #6b7280;
-  margin: 0;
-}
-
-.placeholder-section {
+.polling-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  grid-template-columns: 1fr 1fr;
   gap: 24px;
 }
 
+/* Quick Stats */
+.quick-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+.stat-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 20px;
+  background: white;
+  border-radius: 14px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  border: 1px solid #e5e7eb;
+}
+
+.stat-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+}
+
+.stat-icon.completed {
+  background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+}
+
+.stat-icon.answers {
+  background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%);
+}
+
+.stat-icon.accuracy {
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+}
+
+.stat-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.stat-value {
+  font-size: 24px;
+  font-weight: 700;
+  color: #1f2937;
+}
+
+.stat-label {
+  font-size: 13px;
+  color: #6b7280;
+}
+
+/* History & Schedule Sections */
+.history-section,
+.schedule-section {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 24px;
+}
+
+/* Placeholder Cards (for future features) */
 .placeholder-card {
   background: white;
   border-radius: 16px;
-  padding: 32px;
+  padding: 48px 32px;
   border: 1px solid #e5e7eb;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
   text-align: center;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.placeholder-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
 }
 
 .placeholder-icon {
-  font-size: 48px;
-  margin-bottom: 16px;
+  font-size: 56px;
+  margin-bottom: 20px;
 }
 
 .placeholder-card h2 {
-  font-size: 20px;
+  font-size: 22px;
   font-weight: 600;
   color: #1f2937;
   margin: 0 0 12px 0;
 }
 
 .placeholder-card p {
-  font-size: 14px;
+  font-size: 15px;
   color: #6b7280;
   line-height: 1.6;
   margin: 0;
+  max-width: 500px;
+  margin: 0 auto;
 }
 
 /* Responsive */
-@media (max-width: 768px) {
-  .mahasiswa-main {
-    padding: 24px 16px;
-  }
-
-  .welcome-section h1 {
-    font-size: 24px;
-  }
-
-  .placeholder-section {
+@media (max-width: 900px) {
+  .polling-grid {
     grid-template-columns: 1fr;
   }
 
-  .placeholder-card {
-    padding: 24px;
+  .quick-stats {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .mahasiswa-main {
+    padding: 20px 16px;
+  }
+
+  .welcome-section {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+    text-align: left;
+  }
+
+  .welcome-text h1 {
+    font-size: 22px;
+  }
+
+  .mahasiswa-tabs {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  .mahasiswa-tabs::-webkit-scrollbar {
+    display: none;
+  }
+
+  .tab-button {
+    white-space: nowrap;
+    padding: 10px 16px;
+    font-size: 13px;
+  }
+
+  .stat-card {
+    padding: 16px;
+  }
+
+  .stat-value {
+    font-size: 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .nim-badge {
+    font-size: 12px;
+    padding: 8px 14px;
   }
 }
