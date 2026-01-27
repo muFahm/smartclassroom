@@ -139,6 +139,7 @@ export default function ClassOverviewDetail({ showEnterDashboard = true }) {
   }, [classId, classData]);
 
   const selectedDayName = WEEKDAY_NAMES[selectedDate.getDay()];
+  const timelineWidth = (endOfDayMinutes - startOfDayMinutes) * PX_PER_MINUTE;
 
   const dayEntries = useMemo(() => {
     return classEntries
@@ -326,30 +327,34 @@ export default function ClassOverviewDetail({ showEnterDashboard = true }) {
             </div>
 
             <div className="timeline-horizontal">
-              <div className="timeline-hours">
-                {HOURS.map((hour) => (
-                  <div
-                    key={hour}
-                    className="timeline-hour"
-                    style={{ width: `${60 * PX_PER_MINUTE}px` }}
-                  >
-                    {`${hour.toString().padStart(2, "0")}:00`}
-                  </div>
-                ))}
-              </div>
-              <div className="timeline-track">
+              <div className="timeline-scroll">
                 <div
-                  className="timeline-track__grid"
-                  style={{ width: `${(endOfDayMinutes - startOfDayMinutes) * PX_PER_MINUTE}px` }}
+                  className="timeline-hours"
+                  style={{ width: `${timelineWidth}px` }}
                 >
                   {HOURS.map((hour) => (
                     <div
                       key={hour}
-                      className="timeline-line"
+                      className="timeline-hour"
                       style={{ width: `${60 * PX_PER_MINUTE}px` }}
-                    />
+                    >
+                      {`${hour.toString().padStart(2, "0")}:00`}
+                    </div>
                   ))}
                 </div>
+                <div className="timeline-track" style={{ width: `${timelineWidth}px` }}>
+                  <div
+                    className="timeline-track__grid"
+                    style={{ width: `${timelineWidth}px` }}
+                  >
+                    {HOURS.map((hour) => (
+                      <div
+                        key={hour}
+                        className="timeline-line"
+                        style={{ width: `${60 * PX_PER_MINUTE}px` }}
+                      />
+                    ))}
+                  </div>
 
                 {dayEntries.map((entry) => {
                   const start = parseMinutes(entry?.kelas?.mulai);
@@ -378,15 +383,16 @@ export default function ClassOverviewDetail({ showEnterDashboard = true }) {
                   );
                 })}
 
-                {loading && (
-                  <div className="timeline-empty">Memuat data kelas...</div>
-                )}
-                {!loading && error && (
-                  <div className="timeline-empty">{error}</div>
-                )}
-                {!loading && !error && dayEntries.length === 0 && (
-                  <div className="timeline-empty">Tidak ada kelas di hari ini.</div>
-                )}
+                  {loading && (
+                    <div className="timeline-empty">Memuat data kelas...</div>
+                  )}
+                  {!loading && error && (
+                    <div className="timeline-empty">{error}</div>
+                  )}
+                  {!loading && !error && dayEntries.length === 0 && (
+                    <div className="timeline-empty">Tidak ada kelas di hari ini.</div>
+                  )}
+                </div>
               </div>
             </div>
           </div>

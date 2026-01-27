@@ -137,6 +137,11 @@
   gap: 8px;
 }
 
+.timeline-scroll {
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
 .timeline-hours {
   display: flex;
   align-items: center;
@@ -150,8 +155,7 @@
 
 .timeline-track {
   position: relative;
-  overflow-x: auto;
-  overflow-y: hidden;
+  overflow: hidden;
   background: #f8fafc;
   border-radius: 12px;
   padding: 8px;
