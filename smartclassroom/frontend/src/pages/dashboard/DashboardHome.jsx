@@ -21,9 +21,13 @@ export default function DashboardHome() {
     widgets,
   } = useOutletContext();
 
+  const isDefaultMode = ["default", "polling-device", "registrasi-biometrik"].includes(
+    activeMode,
+  );
+
   return (
     <>
-      {activeMode === "default" && (
+      {isDefaultMode && (
         <>
           {widgets.posisiKursi && (
             <div className="widget-wrapper grid-posisi-denah">

@@ -91,13 +91,23 @@ export default function Dashboard() {
     const modeMap = {
       "jadwal-kelas": "jadwal-kelas",
       absensi: "absensi",
-      "polling-device": "default",
+      "polling-device": "polling-device",
       "light-temp": "light-temp",
-      "registrasi-biometrik": "default",
+      "registrasi-biometrik": "registrasi-biometrik",
     };
     const nextMode = modeMap[id] || "default";
     setActiveMode(nextMode);
   };
+
+  const shouldShowWidgetToggle = ![
+    "jadwal-kelas",
+    "kuis",
+    "kuis-page",
+    "registrasi-biometrik",
+    "absensi",
+    "polling-device",
+    "light-temp",
+  ].includes(activeMode);
 
   return (
     <>
@@ -129,10 +139,12 @@ export default function Dashboard() {
               <DateTimeCard />
 
               {/* Suhu & Cahaya - Side by Side */}
-              <div className="sidebar-sensor-row">
-                <Suhu />
-                <Cahaya />
-              </div>
+              {activeMode !== "light-temp" && (
+                <div className="sidebar-sensor-row">
+                  <Suhu />
+                  <Cahaya />
+                </div>
+              )}
 
               <PosisiKursi mode="sidebar" classroomId={selectedClass} />
 
@@ -140,7 +152,7 @@ export default function Dashboard() {
               <ManajemenKelas onSelect={handleMenuSelect} selectedClass={selectedClass} />
 
               {/* Widget Toggle - Tampilkan/Sembunyikan komponen */}
-              {activeMode !== "jadwal-kelas" && (
+              {shouldShowWidgetToggle && (
                 <Widget
                   key={activeMode}
                   widgets={widgets}
