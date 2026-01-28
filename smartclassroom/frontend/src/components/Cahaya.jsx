@@ -1,21 +1,55 @@
 import React, { useState, useEffect } from 'react';
+import { initEnvironmentROS2, getCurrentSensorData } from '../services/environmentService';
 import './Cahaya.css';
 
 export default function Cahaya() {
-  const [brightness, setBrightness] = useState(550);
+  const [lux, setLux] = useState(null);
+  const [isConnected, setIsConnected] = useState(false);
+  const [deviceId, setDeviceId] = useState(null);
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      const newBrightness = Math.floor(Math.random() * (700 - 400 + 1)) + 400;
-      setBrightness(newBrightness);
-    }, 10000);
+    // Initialize ROS2 connection for sensor data
+    const connection = initEnvironmentROS2(
+      // onSensorUpdate callback
+      (sensorData) => {
+        if (sensorData.lux !== null) {
+          setLux(sensorData.lux);
+          setDeviceId(sensorData.deviceId);
+        }
+      },
+      // onConnectionChange callback
+      (status) => {
+        setIsConnected(status.connected);
+      }
+    );
 
-    return () => clearInterval(interval);
+    // Get initial data if already connected
+    const currentData = getCurrentSensorData();
+    if (currentData.lux !== null) {
+      setLux(currentData.lux);
+      setDeviceId(currentData.deviceId);
+      setIsConnected(currentData.isConnected);
+    }
+
+    // Cleanup on unmount
+    return () => {
+      if (connection) {
+        connection.disconnect();
+      }
+    };
   }, []);
+
+  // Format lux display - only show value if connected and data exists
+  const displayLux = isConnected && lux !== null 
+    ? `${Math.round(lux)} Lux` 
+    : '-';
 
   return (
     <div className="cahaya-card">
-      <h3 className="cahaya-title">Cahaya</h3>
+      <div className="cahaya-header">
+        <h3 className="cahaya-title">Cahaya</h3>
+        <span className={`cahaya-status-dot ${isConnected ? 'connected' : ''}`} title={isConnected ? 'Connected' : 'Disconnected'}></span>
+      </div>
       <div className="cahaya-content">
         <svg 
           className="cahaya-icon" 
@@ -29,8 +63,13 @@ export default function Cahaya() {
             fill="currentColor"
           />
         </svg>
-        <div className="cahaya-value">{brightness} Lux</div>
+        <div className="cahaya-value">{displayLux}</div>
       </div>
+      {isConnected && deviceId && (
+        <div className="cahaya-footer">
+          <span className="cahaya-device-id">{deviceId}</span>
+        </div>
+      )}
     </div>
   );
 }

@@ -92,7 +92,7 @@ export default function Dashboard() {
       "jadwal-kelas": "jadwal-kelas",
       absensi: "absensi",
       "polling-device": "default",
-      "light-temp": "default",
+      "light-temp": "light-temp",
       "registrasi-biometrik": "default",
     };
     const nextMode = modeMap[id] || "default";

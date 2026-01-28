@@ -32,6 +32,18 @@ export const ROS2_CONFIG = {
       disconnect: "/smartclassroom/device/disconnect",
     },
 
+    // Environment Sensor & Actuator Topics
+    environment: {
+      // Sensor data from ESP32 (Subscribe)
+      illuminationAndTemperature: "/ILUMINATIONS_AND_TEMPERATURE",
+      
+      // Actuator commands (Publish)
+      acCommand: "/smartclassroom/actuator/ac/command",
+      acStatus: "/smartclassroom/actuator/ac/status",
+      lightCommand: "/smartclassroom/actuator/light/command",
+      lightStatus: "/smartclassroom/actuator/light/status",
+    },
+
     // Polling/Quiz Topics
     polling: {
       // Quiz session management

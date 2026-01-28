@@ -1,5 +1,8 @@
 from rest_framework import serializers
-from .models import AttendanceSession, AttendanceRecord
+from .models import (
+    AttendanceSession, AttendanceRecord,
+    SisCourse, SisLecturer, SisStudent, SisCourseClass, SisEnrollment
+)
 
 
 class AttendanceRecordSerializer(serializers.ModelSerializer):
@@ -110,3 +113,64 @@ class StudentAttendanceHistorySerializer(serializers.ModelSerializer):
             'lecturer_name', 'date', 'day_name', 'status',
             'face_recognized', 'recognized_at', 'notes'
         ]
+
+
+# ==========================================
+# SIS Data Serializers
+# ==========================================
+
+class SisCourseSerializer(serializers.ModelSerializer):
+    """Serializer for SIS Course"""
+    class Meta:
+        model = SisCourse
+        fields = ['id', 'code', 'name', 'credits', 'program']
+
+
+class SisLecturerSerializer(serializers.ModelSerializer):
+    """Serializer for SIS Lecturer"""
+    class Meta:
+        model = SisLecturer
+        fields = ['id', 'name', 'photo_url']
+
+
+class SisCourseClassSerializer(serializers.ModelSerializer):
+    """Serializer for SIS Course Class"""
+    course = SisCourseSerializer(read_only=True)
+    
+    class Meta:
+        model = SisCourseClass
+        fields = ['id', 'course', 'class_code', 'day', 'room', 'start_time', 'end_time']
+
+
+class StudentEnrollmentSerializer(serializers.ModelSerializer):
+    """Serializer untuk daftar mata kuliah yang diikuti mahasiswa"""
+    course_id = serializers.CharField(source='course_class.course.id')
+    course_code = serializers.CharField(source='course_class.course.code')
+    course_name = serializers.CharField(source='course_class.course.name')
+    class_code = serializers.CharField(source='course_class.class_code')
+    day = serializers.CharField(source='course_class.day')
+    room = serializers.CharField(source='course_class.room')
+    start_time = serializers.TimeField(source='course_class.start_time')
+    end_time = serializers.TimeField(source='course_class.end_time')
+    
+    class Meta:
+        model = SisEnrollment
+        fields = [
+            'id', 'course_id', 'course_code', 'course_name', 
+            'class_code', 'day', 'room', 'start_time', 'end_time'
+        ]
+
+
+class StudentCourseAttendanceSerializer(serializers.Serializer):
+    """Serializer untuk riwayat absensi per mata kuliah dengan 17 pertemuan"""
+    course_id = serializers.CharField()
+    course_code = serializers.CharField()
+    course_name = serializers.CharField()
+    class_code = serializers.CharField()
+    meetings = serializers.ListField(
+        child=serializers.DictField(),
+        help_text="List of 17 meetings with attendance status"
+    )
+    summary = serializers.DictField(
+        help_text="Summary counts: hadir, sakit, izin, dispensasi, alpha"
+    )

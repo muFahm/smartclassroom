@@ -928,6 +928,59 @@ export async function handleFaceRecognitionResult(faceData) {
   }
 }
 
+// ==========================================
+// Student Enrollment & Course Attendance API
+// ==========================================
+
+/**
+ * Get student's enrolled courses from SIS data
+ * @param {string} nim - NIM mahasiswa
+ * @returns {Promise<Array>} List of enrolled courses with course details
+ */
+export async function getStudentEnrollments(nim) {
+  try {
+    const data = await apiRequest(`/student/${nim}/enrollments/`);
+    console.log('📚 Fetched enrollments for NIM:', nim, data);
+    return data;
+  } catch (error) {
+    console.error('❌ Error fetching student enrollments:', error);
+    throw error;
+  }
+}
+
+/**
+ * Get student's attendance for a specific course (17 meetings grid)
+ * @param {string} nim - NIM mahasiswa
+ * @param {string} courseId - ID course
+ * @returns {Promise<Object>} Attendance grid data with 17 meetings
+ */
+export async function getStudentCourseAttendance(nim, courseId) {
+  try {
+    const data = await apiRequest(`/student/${nim}/course/${courseId}/attendance/`);
+    console.log('📊 Fetched course attendance:', data);
+    return data;
+  } catch (error) {
+    console.error('❌ Error fetching course attendance:', error);
+    throw error;
+  }
+}
+
+/**
+ * Get student's attendance summary for all enrolled courses
+ * @param {string} nim - NIM mahasiswa
+ * @returns {Promise<Array>} Attendance summary for each enrolled course
+ */
+export async function getStudentAllCoursesAttendance(nim) {
+  try {
+    const data = await apiRequest(`/student/${nim}/all-courses/`);
+    console.log('📈 Fetched all courses attendance:', data);
+    return data;
+  } catch (error) {
+    console.error('❌ Error fetching all courses attendance:', error);
+    throw error;
+  }
+}
+
 export default {
   ATTENDANCE_STATUS,
   ATTENDANCE_STATUS_LABEL,
@@ -949,4 +1002,8 @@ export default {
   getStudentAttendanceHistory,
   getStudentAttendanceSummary,
   handleFaceRecognitionResult,
+  // Student enrollment & course attendance
+  getStudentEnrollments,
+  getStudentCourseAttendance,
+  getStudentAllCoursesAttendance,
 };

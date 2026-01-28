@@ -4,6 +4,7 @@ import Navbar from "../../components/Navbar";
 import Footer from "../../components/Footer";
 import PollingDevice from "../../components/polling/PollingDevice";
 import LivePolling from "../../components/polling/LivePolling";
+import StudentAttendanceHistory from "../../components/StudentAttendanceHistory";
 import { getAssignedDevice } from "../../services/pollingDeviceService";
 import "./Mahasiswa.css";
 
@@ -118,30 +119,10 @@ export default function Mahasiswa() {
             </div>
           )}
 
-          {/* History Tab Content */}
+          {/* History Tab Content - Jadwal Kelas */}
           {activeTab === "history" && (
             <div className="history-section">
-              <div className="placeholder-card">
-                <div className="placeholder-icon">📊</div>
-                <h2>Riwayat Polling</h2>
-                <p>
-                  Lihat riwayat jawaban polling dan statistik partisipasi 
-                  Anda di berbagai mata kuliah.
-                </p>
-              </div>
-            </div>
-          )}
-
-          {/* Schedule Tab Content */}
-          {activeTab === "schedule" && (
-            <div className="schedule-section">
-              <div className="placeholder-card">
-                <div className="placeholder-icon">📅</div>
-                <h2>Jadwal Kelas</h2>
-                <p>
-                  Lihat jadwal mata kuliah Anda hari ini dan sepanjang minggu.
-                </p>
-              </div>
+              <StudentAttendanceHistory nim={nim} />
             </div>
           )}
         </div>

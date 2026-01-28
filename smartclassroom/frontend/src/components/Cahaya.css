@@ -1,39 +1,74 @@
 .cahaya-card {
   background: #ffffff;
-  border-radius: 6px;             /* lebih kecil */
-  padding: 8px 12px;              /* lebih kecil */
+  border-radius: 6px;
+  padding: 8px 12px;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
   border: 1px solid #e5e7eb;
-   width: 100%;                     /* UBAH: dari 180px jadi 100% */
-  height: 100%;;
+  width: 100%;
+  height: 100%;
+}
+
+.cahaya-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
 }
 
 .cahaya-title {
-  font-size: 12px;                /* ↓ kecil */
+  font-size: 12px;
   font-weight: 600;
   color: #1e40af;
-  margin: 0 0 6px 0;
+  margin: 0;
+}
+
+.cahaya-status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: #d1d5db;
+}
+
+.cahaya-status-dot.connected {
+  background-color: #22c55e;
+  animation: cahaya-pulse 2s infinite;
+}
+
+@keyframes cahaya-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
 }
 
 .cahaya-content {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;                       /* ↓ kecil */
-  padding: 6px 0;                 /* ↓ kecil */
+  gap: 6px;
+  padding: 6px 0;
   background: #f9fafb;
   border-radius: 6px;
 }
 
 .cahaya-icon {
   color: #f59e0b;
-  width: 18px;                    /* ↓ 24px → 18px */
+  width: 18px;
   height: 18px;
   flex-shrink: 0;
 }
 
 .cahaya-value {
-  font-size: 16px;                /* ↓ 18px → 16px */
+  font-size: 16px;
   font-weight: 700;
   color: #1f2937;
+}
+
+.cahaya-footer {
+  margin-top: 4px;
+  text-align: center;
+}
+
+.cahaya-device-id {
+  font-size: 8px;
+  color: #9ca3af;
+  font-family: monospace;
 }

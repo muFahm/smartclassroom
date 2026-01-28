@@ -1,21 +1,55 @@
 import React, { useState, useEffect } from 'react';
+import { initEnvironmentROS2, getCurrentSensorData } from '../services/environmentService';
 import './Suhu.css';
 
 export default function Suhu() {
-  const [temperature, setTemperature] = useState(22);
+  const [temperature, setTemperature] = useState(null);
+  const [isConnected, setIsConnected] = useState(false);
+  const [deviceId, setDeviceId] = useState(null);
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      const newTemp = Math.floor(Math.random() * (26 - 20 + 1)) + 20;
-      setTemperature(newTemp);
-    }, 10000);
+    // Initialize ROS2 connection for sensor data
+    const connection = initEnvironmentROS2(
+      // onSensorUpdate callback
+      (sensorData) => {
+        if (sensorData.temperature !== null) {
+          setTemperature(sensorData.temperature);
+          setDeviceId(sensorData.deviceId);
+        }
+      },
+      // onConnectionChange callback
+      (status) => {
+        setIsConnected(status.connected);
+      }
+    );
 
-    return () => clearInterval(interval);
+    // Get initial data if already connected
+    const currentData = getCurrentSensorData();
+    if (currentData.temperature !== null) {
+      setTemperature(currentData.temperature);
+      setDeviceId(currentData.deviceId);
+      setIsConnected(currentData.isConnected);
+    }
+
+    // Cleanup on unmount
+    return () => {
+      if (connection) {
+        connection.disconnect();
+      }
+    };
   }, []);
+
+  // Format temperature display - only show value if connected and data exists
+  const displayTemp = isConnected && temperature !== null 
+    ? `${Math.round(temperature)} °C` 
+    : '-';
 
   return (
     <div className="suhu-card">
-      <h3 className="suhu-title">Suhu</h3>
+      <div className="suhu-header">
+        <h3 className="suhu-title">Suhu</h3>
+        <span className={`suhu-status-dot ${isConnected ? 'connected' : ''}`} title={isConnected ? 'Connected' : 'Disconnected'}></span>
+      </div>
       <div className="suhu-content">
         <svg 
           className="suhu-icon" 
@@ -29,8 +63,13 @@ export default function Suhu() {
             fill="currentColor"
           />
         </svg>
-        <div className="suhu-value">{temperature} °C</div>
+        <div className="suhu-value">{displayTemp}</div>
       </div>
+      {isConnected && deviceId && (
+        <div className="suhu-footer">
+          <span className="suhu-device-id">{deviceId}</span>
+        </div>
+      )}
     </div>
   );
 }

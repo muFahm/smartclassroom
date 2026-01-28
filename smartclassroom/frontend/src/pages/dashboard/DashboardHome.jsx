@@ -10,6 +10,7 @@ import StatistikPengenalan from "../../components/StatistikPengenalan";
 import PosisiKursi from "../../components/PosisiKursi";
 import SoalKuis from "../../components/SoalKuis";
 import AbsensiManagement from "../../components/AbsensiManagement";
+import EnvironmentControl from "../../components/EnvironmentControl";
 import { KUIS_ACTIVE } from "../../utils/mockData";
 import ClassOverviewDetail from "./ClassOverviewDetail";
 
@@ -82,6 +83,10 @@ export default function DashboardHome() {
 
       {activeMode === "absensi" && (
         <AbsensiManagement />
+      )}
+
+      {activeMode === "light-temp" && (
+        <EnvironmentControl />
       )}
 
       {activeMode === "kuis" && (

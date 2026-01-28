@@ -4,13 +4,18 @@ from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
-from .models import AttendanceSession, AttendanceRecord
+from .models import (
+    AttendanceSession, AttendanceRecord,
+    SisCourse, SisLecturer, SisStudent, SisCourseClass, SisEnrollment
+)
 from .serializers import (
     AttendanceSessionSerializer,
     AttendanceSessionListSerializer,
     AttendanceSessionCreateSerializer,
     AttendanceRecordSerializer,
-    StudentAttendanceHistorySerializer
+    StudentAttendanceHistorySerializer,
+    StudentEnrollmentSerializer,
+    StudentCourseAttendanceSerializer
 )
 
 
@@ -248,4 +253,196 @@ def bulk_update_attendance(request, session_id):
         'updated': updated_records,
         'errors': errors,
         'total_updated': len(updated_records)
+    })
+
+
+# ==========================================
+# Student Enrollment & Attendance Endpoints
+# ==========================================
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def student_enrollments(request, nim):
+    """
+    Get list of courses a student is enrolled in this semester
+    Returns courses from SisEnrollment table
+    """
+    # Get enrollments for this student
+    enrollments = SisEnrollment.objects.filter(
+        student__nim=nim
+    ).select_related('course_class', 'course_class__course')
+    
+    if not enrollments.exists():
+        # Student not found in enrollment, return empty list
+        return Response({
+            'nim': nim,
+            'enrollments': [],
+            'message': 'No enrollments found for this student'
+        })
+    
+    serializer = StudentEnrollmentSerializer(enrollments, many=True)
+    return Response({
+        'nim': nim,
+        'enrollments': serializer.data
+    })
+
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def student_course_attendance(request, nim, course_id):
+    """
+    Get attendance history for a student in a specific course
+    Returns 17 meeting slots with attendance status
+    """
+    # Get all attendance records for this student in this course
+    records = AttendanceRecord.objects.filter(
+        student_id=nim,
+        session__course_id=course_id,
+        session__status='completed'
+    ).select_related('session').order_by('session__date')
+    
+    # Get course info
+    course = SisCourse.objects.filter(id=course_id).first()
+    if not course:
+        # Try to get from session if course not in SIS table
+        first_record = records.first()
+        if first_record:
+            course_code = first_record.session.course_code
+            course_name = first_record.session.course_name
+        else:
+            return Response({
+                'error': 'Course not found'
+            }, status=status.HTTP_404_NOT_FOUND)
+    else:
+        course_code = course.code
+        course_name = course.name
+    
+    # Build 17 meeting slots
+    meetings = []
+    summary = {
+        'hadir': 0,
+        'sakit': 0,
+        'izin': 0,
+        'dispensasi': 0,
+        'alpha': 0,
+        'belum': 0
+    }
+    
+    # Map existing records by date
+    record_map = {}
+    for record in records:
+        record_map[str(record.session.date)] = {
+            'date': record.session.date,
+            'status': record.status,
+            'day_name': record.session.day_name,
+            'session_id': str(record.session.id),
+            'face_recognized': record.face_recognized,
+            'notes': record.notes
+        }
+        # Count summary
+        if record.status in summary:
+            summary[record.status] += 1
+    
+    # Create 17 meeting slots
+    for i in range(1, 18):
+        if i <= len(record_map):
+            # Get the i-th record
+            record_list = list(record_map.values())
+            if i <= len(record_list):
+                meeting = record_list[i-1].copy()
+                meeting['meeting_number'] = i
+                meeting['attended'] = True
+                meetings.append(meeting)
+            else:
+                meetings.append({
+                    'meeting_number': i,
+                    'attended': False,
+                    'status': None,
+                    'date': None
+                })
+                summary['belum'] += 1
+        else:
+            # Future meeting
+            meetings.append({
+                'meeting_number': i,
+                'attended': False,
+                'status': None,
+                'date': None
+            })
+            summary['belum'] += 1
+    
+    # Get class code from enrollment
+    enrollment = SisEnrollment.objects.filter(
+        student__nim=nim,
+        course_class__course__id=course_id
+    ).first()
+    class_code = enrollment.course_class.class_code if enrollment else ''
+    
+    return Response({
+        'nim': nim,
+        'course_id': course_id,
+        'course_code': course_code,
+        'course_name': course_name,
+        'class_code': class_code,
+        'meetings': meetings,
+        'summary': summary,
+        'total_attended': len(record_map)
+    })
+
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def student_all_courses_attendance(request, nim):
+    """
+    Get attendance summary for all courses a student is enrolled in
+    """
+    # Get all enrollments
+    enrollments = SisEnrollment.objects.filter(
+        student__nim=nim
+    ).select_related('course_class', 'course_class__course')
+    
+    courses_attendance = []
+    
+    for enrollment in enrollments:
+        course = enrollment.course_class.course
+        
+        # Get attendance records for this course
+        records = AttendanceRecord.objects.filter(
+            student_id=nim,
+            session__course_id=course.id,
+            session__status='completed'
+        )
+        
+        # Count by status
+        summary = {
+            'hadir': records.filter(status='hadir').count(),
+            'sakit': records.filter(status='sakit').count(),
+            'izin': records.filter(status='izin').count(),
+            'dispensasi': records.filter(status='dispensasi').count(),
+            'alpha': records.filter(status='alpha').count(),
+        }
+        summary['total'] = sum(summary.values())
+        
+        # Calculate attendance percentage
+        if summary['total'] > 0:
+            summary['attendance_percentage'] = round(
+                (summary['hadir'] / summary['total']) * 100, 1
+            )
+        else:
+            summary['attendance_percentage'] = 0
+        
+        courses_attendance.append({
+            'course_id': course.id,
+            'course_code': course.code,
+            'course_name': course.name,
+            'class_code': enrollment.course_class.class_code,
+            'day': enrollment.course_class.day,
+            'start_time': str(enrollment.course_class.start_time) if enrollment.course_class.start_time else None,
+            'end_time': str(enrollment.course_class.end_time) if enrollment.course_class.end_time else None,
+            'summary': summary
+        })
+    
+    return Response({
+        'nim': nim,
+        'courses': courses_attendance
     })

@@ -34,8 +34,7 @@ export default function Navbar({
   // Mahasiswa tabs
   const mahasiswaTabs = [
     { id: "polling", label: "Polling & Kuis", icon: "mdi:poll" },
-    { id: "history", label: "Riwayat", icon: "mdi:history" },
-    { id: "schedule", label: "Jadwal", icon: "mdi:calendar" },
+    { id: "history", label: "Jadwal Kelas", icon: "mdi:calendar-clock" },
   ];
 
   // Fetch user photo based on role
