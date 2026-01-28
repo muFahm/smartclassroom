@@ -29,7 +29,7 @@ export default function Widget({
         { key: "statistikPengenalan", label: "Statistik Pengenalan" },
       ],
       kuis: [
-        { key: "hasilPolling", label: "Soal & Hasil Polling" },
+        { key: "hasilPolling", label: "Live Kuis" },
         { key: "klasifikasiGerakan", label: "Klasifikasi Gerakan" },
         { key: "transkripSuara", label: "Transkrip Suara" },
         { key: "statistikPengenalan", label: "Statistik Pengenalan" },

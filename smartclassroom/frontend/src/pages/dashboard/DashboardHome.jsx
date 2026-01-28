@@ -8,12 +8,11 @@ import KlasifikasiGerakan from "../../components/KlasifikasiGerakan";
 import AktivitasMahasiswa from "../../components/AktivitasMahasiswa";
 import StatistikPengenalan from "../../components/StatistikPengenalan";
 import PosisiKursi from "../../components/PosisiKursi";
-import SoalKuis from "../../components/SoalKuis";
+import LiveKuisCard from "../../components/LiveKuisCard";
 import AbsensiManagement from "../../components/AbsensiManagement";
 import EnvironmentControl from "../../components/EnvironmentControl";
 import PollingDeviceManagement from "../../components/polling/PollingDeviceManagement";
 import BiometricRegistration from "../../components/biometric/BiometricRegistration";
-import { KUIS_ACTIVE } from "../../utils/mockData";
 import ClassOverviewDetail from "./ClassOverviewDetail";
 
 export default function DashboardHome() {
@@ -105,14 +104,9 @@ export default function DashboardHome() {
         <>
           <div className="grid-left-main">
             {widgets.hasilPolling && (
-              <>
-                <div className="widget-wrapper grid-soal">
-                  <SoalKuis soal={KUIS_ACTIVE} />
-                </div>
-                <div className="widget-wrapper grid-polling">
-                  <HasilPolling mode="kuis" />
-                </div>
-              </>
+              <div className="widget-wrapper grid-live-kuis">
+                <LiveKuisCard />
+              </div>
             )}
 
             <div className="grid-mini-realtime">

@@ -74,6 +74,15 @@ export default function Dashboard() {
   }, [location.pathname, activeMode]);
 
   useEffect(() => {
+    const forcedMode = sessionStorage.getItem("preferredDashboardMode");
+    if (!forcedMode) return;
+    if (!location.pathname.includes("/classoverview") || !location.pathname.includes("/dashboard")) return;
+    if (location.pathname.includes("/dashboard/kuis")) return;
+    setActiveMode(forcedMode);
+    sessionStorage.removeItem("preferredDashboardMode");
+  }, [location.pathname]);
+
+  useEffect(() => {
     if (classId) {
       setSelectedClass(classId);
     }

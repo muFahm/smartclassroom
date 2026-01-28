@@ -217,9 +217,44 @@
 /* 2-pane layout */
 .quiz-builder-panes {
   display: grid;
-  grid-template-columns: 1.2fr 1fr;
+  grid-template-columns: 0.7fr 1.3fr;
   gap: 16px;
   align-items: start;
+}
+
+.quiz-icon-button {
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  padding: 6px 10px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  background: #ffffff;
+  color: #1f2937;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.quiz-icon-button.danger {
+  background: #fee2e2;
+  border-color: #fecaca;
+  color: #991b1b;
+}
+
+.quiz-duration {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: #475569;
+}
+
+.quiz-duration select {
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  padding: 4px 6px;
+  font-size: 12px;
 }
 
 .quiz-pane {

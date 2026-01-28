@@ -274,32 +274,23 @@
 .mode-kuis .grid-left-main {
   grid-area: left-main;
   display: grid;
-  grid-template-rows: auto 1fr auto; /* Soal - Polling - Realtime */
+  grid-template-rows: 1fr auto; /* Live Kuis - Mini Realtime */
   gap: 12px;
   overflow: hidden;
   min-height: 0;
   height: 100%;
 }
 
-/* Soal Kuis - Fixed height di atas */
-.mode-kuis .grid-soal {
+/* Live Kuis - utama */
+.mode-kuis .grid-live-kuis {
   grid-row: 1;
-  height: auto;
-  min-height: 140px;
-  max-height: 180px;
-  overflow: hidden;
-}
-
-/* Hasil Polling - Flex grow (PRIORITAS UTAMA) */
-.mode-kuis .grid-polling {
-  grid-row: 2;
   overflow: hidden;
   min-height: 0;
 }
 
 /* Mini Realtime Bar - Ekspresi Wajah + Suara */
 .mode-kuis .grid-mini-realtime {
-  grid-row: 3;
+  grid-row: 2;
   display: grid;
   grid-template-columns: 1fr 1fr; /* Side by side */
   gap: 10px;

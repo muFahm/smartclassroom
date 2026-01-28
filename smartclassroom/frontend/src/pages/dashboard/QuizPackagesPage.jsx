@@ -9,12 +9,17 @@ const defaultForm = {
   topic: "",
 };
 
+const DURATION_OPTIONS = [15, 30, 45, 60];
+const DURATION_STORAGE_KEY = "liveKuisDurationByPackage";
+const SELECTION_STORAGE_KEY = "liveKuisSelection";
+
 export default function QuizPackagesPage() {
   const [packages, setPackages] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [form, setForm] = useState(defaultForm);
   const [submitting, setSubmitting] = useState(false);
+  const [durationByPackage, setDurationByPackage] = useState({});
   const navigate = useNavigate();
   const { classId } = useParams();
   const resolvedClassId = classId || "701";
@@ -34,6 +39,13 @@ export default function QuizPackagesPage() {
 
   useEffect(() => {
     loadPackages();
+  }, []);
+
+  useEffect(() => {
+    const stored = JSON.parse(localStorage.getItem(DURATION_STORAGE_KEY) || "{}");
+    if (stored && typeof stored === "object") {
+      setDurationByPackage(stored);
+    }
   }, []);
 
   const handleChange = (event) => {
@@ -67,6 +79,28 @@ export default function QuizPackagesPage() {
     } catch (err) {
       setError(err.message);
     }
+  };
+
+  const handleDurationChange = (pkgId, value) => {
+    setDurationByPackage((prev) => {
+      const next = { ...prev, [pkgId]: value };
+      localStorage.setItem(DURATION_STORAGE_KEY, JSON.stringify(next));
+      return next;
+    });
+  };
+
+  const handleStartKuis = (pkg) => {
+    const duration = durationByPackage[pkg.id] || 30;
+    localStorage.setItem(
+      SELECTION_STORAGE_KEY,
+      JSON.stringify({
+        packageId: pkg.id,
+        packageTitle: pkg.title,
+        duration,
+      })
+    );
+    sessionStorage.setItem("preferredDashboardMode", "kuis");
+    navigate(`/classoverview/${resolvedClassId}/dashboard`);
   };
 
   return (
@@ -121,7 +155,8 @@ export default function QuizPackagesPage() {
                 <th>Topik</th>
                 <th>Soal</th>
                 <th>Dibuat</th>
-                <th></th>
+                <th>Durasi</th>
+                <th>Aksi</th>
               </tr>
             </thead>
             <tbody>
@@ -141,15 +176,37 @@ export default function QuizPackagesPage() {
                   <td>{pkg.question_count ?? pkg.questions?.length ?? 0}</td>
                   <td>{pkg.created_at ? new Date(pkg.created_at).toLocaleDateString() : "-"}</td>
                   <td>
-                    <button className="quiz-button danger" onClick={() => handleDelete(pkg.id)}>
-                      Hapus
-                    </button>
+                    <div className="quiz-duration">
+                      <iconify-icon icon="mdi:timer-outline" width="16" height="16"></iconify-icon>
+                      <select
+                        value={durationByPackage[pkg.id] || 30}
+                        onChange={(event) => handleDurationChange(pkg.id, Number(event.target.value))}
+                      >
+                        {DURATION_OPTIONS.map((value) => (
+                          <option key={value} value={value}>
+                            {value}s
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  </td>
+                  <td>
+                    <div className="quiz-actions">
+                      <button className="quiz-icon-button" onClick={() => handleStartKuis(pkg)}>
+                        <iconify-icon icon="mdi:play-circle" width="18" height="18"></iconify-icon>
+                        Start
+                      </button>
+                      <button className="quiz-icon-button danger" onClick={() => handleDelete(pkg.id)}>
+                        <iconify-icon icon="mdi:trash-can-outline" width="18" height="18"></iconify-icon>
+                        Hapus
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))}
               {packages.length === 0 && (
                 <tr>
-                  <td colSpan={5}>Belum ada paket</td>
+                  <td colSpan={6}>Belum ada paket</td>
                 </tr>
               )}
             </tbody>
