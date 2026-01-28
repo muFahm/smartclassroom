@@ -37,6 +37,18 @@ export function getAllAssignedDevices() {
 }
 
 /**
+ * Get all device assignments (nim -> deviceCode)
+ * @returns {Object} Assignment map
+ */
+export function getAllDeviceAssignments() {
+  try {
+    return JSON.parse(localStorage.getItem("all_device_assignments") || "{}");
+  } catch {
+    return {};
+  }
+}
+
+/**
  * Get current user's assigned device
  * @param {string} nim - Student NIM
  * @returns {Object|null} Device assignment or null
@@ -219,6 +231,114 @@ export function isValidDeviceCode(code) {
 let mqttClient = null;
 let connectionStatus = "disconnected";
 let messageCallbacks = new Map();
+
+// ============================================
+// Device Heartbeat Tracking (ROS2-ready)
+// ============================================
+
+const HEARTBEAT_TTL_MS = 45_000; // 3x 15s interval from device firmware
+let heartbeatTimer = null;
+const heartbeatStatusMap = new Map(); // deviceCode -> status
+const heartbeatSubscribers = new Set();
+
+function normalizeDeviceCode(payload = {}) {
+  const raw = payload.device_code || payload.device_id || "";
+  const code = String(raw).trim().toUpperCase();
+  return code.length === 4 ? code : "";
+}
+
+function notifyHeartbeatSubscribers() {
+  const snapshot = getDeviceHeartbeatSnapshot();
+  heartbeatSubscribers.forEach((callback) => {
+    try {
+      callback(snapshot);
+    } catch {
+      // ignore subscriber error
+    }
+  });
+}
+
+function updateHeartbeatStatus(payload = {}) {
+  const code = normalizeDeviceCode(payload);
+  if (!code) return;
+
+  heartbeatStatusMap.set(code, {
+    deviceCode: code,
+    status: "online",
+    batteryLevel: payload.battery_level ?? payload.batteryLevel ?? null,
+    rssi: payload.rssi ?? null,
+    lastSeen: Date.now(),
+    raw: payload,
+  });
+
+  notifyHeartbeatSubscribers();
+}
+
+function refreshHeartbeatStatuses() {
+  const now = Date.now();
+  let changed = false;
+  heartbeatStatusMap.forEach((status, code) => {
+    const isOnline = status.lastSeen && now - status.lastSeen <= HEARTBEAT_TTL_MS;
+    if (status.status === "online" && !isOnline) {
+      heartbeatStatusMap.set(code, {
+        ...status,
+        status: "offline",
+      });
+      changed = true;
+    }
+  });
+  if (changed) {
+    notifyHeartbeatSubscribers();
+  }
+}
+
+function ensureHeartbeatTimer() {
+  if (heartbeatTimer) return;
+  heartbeatTimer = setInterval(refreshHeartbeatStatuses, 5000);
+}
+
+/**
+ * Public: push heartbeat payload from ROS2/MQTT bridge
+ * Payload example (ESP32): { type:"heartbeat", device_id:"A1B2", rssi:-55, ts:123 }
+ */
+export function handleDeviceHeartbeat(payload) {
+  updateHeartbeatStatus(payload);
+}
+
+/**
+ * Initialize ROS2 heartbeat bridge (placeholder - to be wired when topic ready)
+ * This function is intentionally a no-op until ROS2 topic is finalized.
+ */
+export function initializeDeviceHeartbeatBridge() {
+  // TODO: connect to ROS2 topic ROS2_CONFIG.topics.device.heartbeat
+  // and call handleDeviceHeartbeat(message)
+}
+
+/**
+ * Subscribe to device heartbeat updates
+ * @param {(snapshot: Map) => void} callback
+ */
+export function subscribeDeviceHeartbeats(callback) {
+  heartbeatSubscribers.add(callback);
+  ensureHeartbeatTimer();
+  callback(getDeviceHeartbeatSnapshot());
+
+  return () => {
+    heartbeatSubscribers.delete(callback);
+    if (heartbeatSubscribers.size === 0 && heartbeatTimer) {
+      clearInterval(heartbeatTimer);
+      heartbeatTimer = null;
+    }
+  };
+}
+
+/**
+ * Get current heartbeat snapshot map
+ * @returns {Map<string, object>}
+ */
+export function getDeviceHeartbeatSnapshot() {
+  return new Map(heartbeatStatusMap);
+}
 
 /**
  * Initialize MQTT connection to HiveMQ Cloud
@@ -439,4 +559,8 @@ export default {
   clearLastAnswer,
   startDeviceSimulation,
   stopDeviceSimulation,
+  handleDeviceHeartbeat,
+  subscribeDeviceHeartbeats,
+  getDeviceHeartbeatSnapshot,
+  initializeDeviceHeartbeatBridge,
 };

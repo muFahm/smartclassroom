@@ -1,0 +1,220 @@
+.polling-device-management {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 20px;
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.polling-device-management__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.polling-device-management__header h2 {
+  margin: 0 0 4px;
+  font-size: 20px;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.polling-device-management__header p {
+  margin: 0;
+  color: #64748b;
+  font-size: 14px;
+}
+
+.polling-device-management__stats {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.stat-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 10px 14px;
+  min-width: 100px;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.08);
+}
+
+.stat-card.online {
+  border-color: #22c55e;
+}
+
+.stat-card.assigned {
+  border-color: #3b82f6;
+}
+
+.stat-label {
+  display: block;
+  font-size: 12px;
+  color: #64748b;
+}
+
+.stat-value {
+  font-size: 18px;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.polling-device-management__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 16px;
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.device-card {
+  background: #ffffff;
+  border-radius: 14px;
+  padding: 14px;
+  border: 1px solid #e2e8f0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  box-shadow: 0 6px 16px rgba(15, 23, 42, 0.08);
+}
+
+.device-card.assigned {
+  border-color: #3b82f6;
+}
+
+.device-card__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.device-code {
+  font-size: 18px;
+  font-weight: 700;
+  color: #0f172a;
+  margin-right: 8px;
+}
+
+.device-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 4px 8px;
+  border-radius: 999px;
+  background: #f1f5f9;
+  color: #64748b;
+}
+
+.device-status.online {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.device-status.offline {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.device-chip {
+  font-size: 11px;
+  padding: 4px 8px;
+  border-radius: 999px;
+  background: #e2e8f0;
+  color: #334155;
+}
+
+.device-card.assigned .device-chip {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+.device-card__body {
+  min-height: 60px;
+  display: flex;
+  align-items: center;
+}
+
+.student-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.student-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 999px;
+  object-fit: cover;
+  background: #e2e8f0;
+}
+
+.student-avatar--text {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.student-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.student-nim {
+  font-size: 12px;
+  color: #64748b;
+}
+
+.student-empty {
+  font-size: 13px;
+  color: #94a3b8;
+}
+
+.device-card__footer {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.btn-reset {
+  border: none;
+  background: #ef4444;
+  color: white;
+  padding: 8px 14px;
+  border-radius: 10px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn-reset:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.polling-device-management__loading {
+  font-size: 12px;
+  color: #64748b;
+  text-align: center;
+}
+
+@media (max-width: 768px) {
+  .polling-device-management {
+    padding: 12px;
+  }
+
+  .polling-device-management__grid {
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  }
+}
