@@ -40,21 +40,39 @@ function getCache() {
 }
 
 /**
- * Save cache ke localStorage
+ * Save cache ke localStorage (tanpa foto untuk menghemat ruang)
  */
 function saveCache(studentsData) {
   try {
     const expiry = Date.now() + CACHE_EXPIRY_DAYS * 24 * 60 * 60 * 1000;
+    
+    // Strip foto dari data untuk menghemat localStorage
+    const lightweightData = {};
+    for (const [nim, student] of Object.entries(studentsData)) {
+      lightweightData[nim] = {
+        nim: student.nim,
+        name: student.name,
+        // photo: tidak disimpan ke localStorage
+        fetchedAt: student.fetchedAt,
+      };
+    }
+    
     localStorage.setItem(
       CACHE_KEY,
       JSON.stringify({
         version: CACHE_VERSION,
         expiry,
-        students: studentsData,
+        students: lightweightData,
       })
     );
   } catch (error) {
-    console.error('Error saving cache:', error);
+    // Jika masih gagal, clear cache dan jangan simpan
+    console.warn('localStorage full, clearing student cache');
+    try {
+      localStorage.removeItem(CACHE_KEY);
+    } catch (e) {
+      // ignore
+    }
   }
 }
 

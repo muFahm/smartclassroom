@@ -42,8 +42,7 @@ class AttendanceSession(models.Model):
         ordering = ['-date', '-created_at']
         verbose_name = 'Attendance Session'
         verbose_name_plural = 'Attendance Sessions'
-        # Mencegah duplikasi sesi untuk kelas yang sama di tanggal yang sama
-        unique_together = ['course_code', 'class_name', 'date', 'lecturer_id']
+        # Removed unique_together to allow multiple sessions per day
     
     def __str__(self):
         return f"{self.course_name} - {self.class_name} ({self.date})"
@@ -65,6 +64,10 @@ class AttendanceSession(models.Model):
     @property
     def sick_count(self):
         return self.records.filter(status='sakit').count()
+    
+    @property
+    def izin_count(self):
+        return self.records.filter(status='izin').count()
     
     @property
     def permission_count(self):
@@ -97,6 +100,7 @@ class AttendanceRecord(models.Model):
     STATUS_CHOICES = (
         ('hadir', 'Hadir'),
         ('sakit', 'Sakit'),
+        ('izin', 'Izin'),
         ('dispensasi', 'Dispensasi'),
         ('alpha', 'Alpha'),
     )

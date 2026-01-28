@@ -32,6 +32,7 @@ class AttendanceSessionSerializer(serializers.ModelSerializer):
     total_students = serializers.IntegerField(read_only=True)
     present_count = serializers.IntegerField(read_only=True)
     sick_count = serializers.IntegerField(read_only=True)
+    izin_count = serializers.IntegerField(read_only=True)
     permission_count = serializers.IntegerField(read_only=True)
     absent_count = serializers.IntegerField(read_only=True)
     
@@ -42,7 +43,7 @@ class AttendanceSessionSerializer(serializers.ModelSerializer):
             'lecturer_id', 'lecturer_name', 'date', 'day_name',
             'start_time', 'end_time', 'status', 'created_at', 
             'updated_at', 'completed_at', 'records',
-            'total_students', 'present_count', 'sick_count', 
+            'total_students', 'present_count', 'sick_count', 'izin_count',
             'permission_count', 'absent_count'
         ]
         read_only_fields = ['id', 'created_at', 'updated_at', 'completed_at']
@@ -53,6 +54,7 @@ class AttendanceSessionListSerializer(serializers.ModelSerializer):
     total_students = serializers.IntegerField(read_only=True)
     present_count = serializers.IntegerField(read_only=True)
     sick_count = serializers.IntegerField(read_only=True)
+    izin_count = serializers.IntegerField(read_only=True)
     permission_count = serializers.IntegerField(read_only=True)
     absent_count = serializers.IntegerField(read_only=True)
     
@@ -63,7 +65,7 @@ class AttendanceSessionListSerializer(serializers.ModelSerializer):
             'lecturer_id', 'lecturer_name', 'date', 'day_name',
             'start_time', 'end_time', 'status', 'created_at', 
             'completed_at', 'total_students', 'present_count', 
-            'sick_count', 'permission_count', 'absent_count'
+            'sick_count', 'izin_count', 'permission_count', 'absent_count'
         ]
 
 

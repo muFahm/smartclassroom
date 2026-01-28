@@ -30,6 +30,8 @@ import {
   initROS2FaceRecognition,
   handleFaceRecognitionResult,
   getAttendanceHistory,
+  getSessionDetail,
+  updateSessionRecords,
 } from "../services/attendanceService";
 import { fetchMultipleStudents, getStudentFromCache } from "../services/studentDataService";
 import { fetchLecturersByCourse, getLecturersFromCache } from "../services/lecturerDataService";
@@ -74,6 +76,36 @@ const resolvePhotoSrc = (photo) => {
 
 export default function AbsensiManagement() {
   const { classId } = useParams();
+  
+  // Get logged-in user (lecturer) data
+  const getUser = () => {
+    try {
+      const userStr = sessionStorage.getItem('user');
+      if (!userStr) return null;
+      return JSON.parse(userStr);
+    } catch (error) {
+      console.error('Error parsing user data:', error);
+      return null;
+    }
+  };
+  
+  const user = getUser();
+  const lecturerId = user?.staff_id || user?.staffId || user?.id || user?.lecturer_id;
+  
+  // Debug: Log user and lecturerId on mount
+  useEffect(() => {
+    console.log('👤 User data:', user);
+    console.log('🆔 Lecturer ID:', lecturerId);
+    console.log('📋 User keys:', user ? Object.keys(user) : 'no user');
+    if (!lecturerId) {
+      console.warn('⚠️ No lecturer ID found in user session!');
+      console.warn('⚠️ Trying all possible ID fields:');
+      console.warn('  - staff_id:', user?.staff_id);
+      console.warn('  - staffId:', user?.staffId);
+      console.warn('  - id:', user?.id);
+      console.warn('  - lecturer_id:', user?.lecturer_id);
+    }
+  }, []);
 
   // Data states
   const [classData, setClassData] = useState({});
@@ -96,6 +128,12 @@ export default function AbsensiManagement() {
   const [historyData, setHistoryData] = useState([]);
   const [expandedDropdown, setExpandedDropdown] = useState(null);
   const [showDatePicker, setShowDatePicker] = useState(false);
+  
+  // History filter & edit states
+  const [historyFilter, setHistoryFilter] = useState({ courseId: '', startDate: '', endDate: '' });
+  const [historyLoading, setHistoryLoading] = useState(false);
+  const [editingSession, setEditingSession] = useState(null);
+  const [editAttendance, setEditAttendance] = useState([]);
 
   // Load class data
   useEffect(() => {
@@ -275,16 +313,19 @@ export default function AbsensiManagement() {
       };
     });
 
-    // Get lecturer info
+    // Get lecturer info - use logged in user's ID
+    // Try to get lecturer name from lecturerData cache, fallback to user name
     const firstLecturerId = lecturerData.keys().next().value;
     const lecturerInfo = firstLecturerId ? lecturerData.get(firstLecturerId) : null;
 
     const options = {
-      lecturerId: firstLecturerId || 'unknown',
-      lecturerName: lecturerInfo?.name || 'Unknown Lecturer',
+      lecturerId: lecturerId || firstLecturerId || 'unknown', // Use logged-in user's ID
+      lecturerName: user?.name || lecturerInfo?.name || '',
       selectedDate: selectedDate.toISOString().split('T')[0],
       dayName: selectedDayName,
     };
+    
+    console.log('📝 Creating session with lecturer_id:', options.lecturerId);
 
     try {
       const newSession = await createAttendanceSession(selectedCourse.kelas, students, options);
@@ -358,24 +399,121 @@ export default function AbsensiManagement() {
     downloadSessionAsJSON();
   };
 
-  // Load history
+  // Load history - load all sessions by lecturer
   const handleShowHistory = async () => {
-    console.log('🔍 Loading history...', { selectedCourseId });
+    if (!lecturerId) {
+      console.warn('⚠️ No lecturer ID available');
+      alert('Tidak dapat memuat riwayat: Data dosen tidak ditemukan');
+      return;
+    }
+    
+    console.log('🔍 Loading history for lecturer:', lecturerId);
+    setHistoryLoading(true);
+    setShowHistory(true);
     try {
-      let history;
-      if (selectedCourseId) {
-        history = await getAttendanceHistory({ courseCode: selectedCourseId });
-        console.log('📋 History loaded (filtered by course):', history);
-      } else {
-        history = await getAttendanceHistory();
-        console.log('📋 History loaded (all):', history);
+      // Load ALL sessions by this lecturer (not filtered by course)
+      const filters = { lecturerId: String(lecturerId) };
+      
+      // Apply additional filters if set
+      if (historyFilter.courseId) {
+        filters.courseId = historyFilter.courseId;
       }
+      if (historyFilter.startDate) {
+        filters.startDate = historyFilter.startDate;
+      }
+      if (historyFilter.endDate) {
+        filters.endDate = historyFilter.endDate;
+      }
+      
+      const history = await getAttendanceHistory(filters);
+      console.log('📋 History loaded:', history.length, 'sessions');
       setHistoryData(history);
     } catch (error) {
       console.error('❌ Error loading history:', error);
       setHistoryData([]);
+      // Don't close modal on error, just show empty state
+    } finally {
+      setHistoryLoading(false);
     }
-    setShowHistory(true);
+  };
+  
+  // Filter history
+  const handleFilterHistory = async () => {
+    if (!lecturerId) {
+      console.warn('⚠️ No lecturer ID available');
+      return;
+    }
+    
+    setHistoryLoading(true);
+    try {
+      const filters = { lecturerId: String(lecturerId) };
+      if (historyFilter.courseId) filters.courseId = historyFilter.courseId;
+      if (historyFilter.startDate) filters.startDate = historyFilter.startDate;
+      if (historyFilter.endDate) filters.endDate = historyFilter.endDate;
+      
+      const history = await getAttendanceHistory(filters);
+      setHistoryData(history);
+    } catch (error) {
+      console.error('❌ Error filtering history:', error);
+    } finally {
+      setHistoryLoading(false);
+    }
+  };
+  
+  // Open edit session modal
+  const handleEditSession = async (sessionItem) => {
+    console.log('📝 Editing session:', sessionItem.id);
+    console.log('📝 Session item attendance:', sessionItem.attendance);
+    // Load full session detail with records
+    try {
+      const fullSession = await getSessionDetail(sessionItem.id);
+      console.log('📝 Full session loaded:', fullSession);
+      console.log('📝 Full session attendance:', fullSession.attendance);
+      console.log('📝 First student record:', fullSession.attendance?.[0]);
+      setEditingSession(fullSession);
+      setEditAttendance(fullSession.attendance || []);
+    } catch (error) {
+      console.error('❌ Error loading session detail:', error);
+      // Fallback to item data
+      setEditingSession(sessionItem);
+      setEditAttendance(sessionItem.attendance || []);
+    }
+  };
+  
+  // Update attendance in edit mode
+  const handleEditStatusChange = (nim, newStatus) => {
+    setEditAttendance(prev => 
+      prev.map(student => 
+        student.nim === nim ? { ...student, status: newStatus } : student
+      )
+    );
+  };
+  
+  // Save edited session
+  const handleSaveEditedSession = async () => {
+    if (!editingSession) return;
+    try {
+      console.log('💾 Saving edited session:', editingSession.id);
+      console.log('📊 Updated attendance:', editAttendance);
+      
+      await updateSessionRecords(editingSession.id, editAttendance);
+      console.log('✅ Session saved successfully');
+      
+      // Close edit modal first
+      setEditingSession(null);
+      setEditAttendance([]);
+      
+      // Reload history to show updated data
+      if (historyFilter.courseId || historyFilter.startDate || historyFilter.endDate) {
+        await handleFilterHistory();
+      } else {
+        await handleShowHistory();
+      }
+      
+    } catch (error) {
+      console.error('❌ Error saving session:', error);
+      alert('Gagal menyimpan perubahan: ' + error.message);
+    }
   };
 
   // Date navigation
@@ -870,26 +1008,88 @@ export default function AbsensiManagement() {
       </div>
 
       {/* History Modal */}
-      {showHistory && (
+      {showHistory && !editingSession && (
         <div className="modal-overlay" onClick={() => setShowHistory(false)}>
-          <div className="modal-content history-modal" onClick={(e) => e.stopPropagation()}>
+          <div className="modal-content history-modal history-modal--large" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
               <h2>
                 <History size={20} />
                 Riwayat Absensi
               </h2>
-              <button className="modal-close" onClick={() => setShowHistory(false)}>
+              <button className="modal-close" onClick={() => { setShowHistory(false); setHistoryFilter({ courseId: '', startDate: '', endDate: '' }); }}>
                 <X size={20} />
               </button>
             </div>
+            
+            {/* Filter Section */}
+            <div className="history-filters">
+              <div className="filter-group">
+                <label>Mata Kuliah:</label>
+                <select 
+                  value={historyFilter.courseId}
+                  onChange={(e) => setHistoryFilter(prev => ({ ...prev, courseId: e.target.value }))}
+                >
+                  <option value="">Semua Mata Kuliah</option>
+                  {/* Get unique courses from history data */}
+                  {historyData && Array.isArray(historyData) && (() => {
+                    try {
+                      // Get unique courses from loaded history
+                      const uniqueCourses = [...new Map(
+                        historyData
+                          .filter(h => h && h.courseId && h.courseName)
+                          .map(h => [h.courseId, { id: h.courseId, name: h.courseName, code: h.courseCode }])
+                      ).values()];
+                      
+                      return uniqueCourses.map(course => (
+                        <option key={course.id} value={course.id}>
+                          {course.name} ({course.code})
+                        </option>
+                      ));
+                    } catch (err) {
+                      console.error('Error building course filter:', err);
+                      return null;
+                    }
+                  })()}
+                </select>
+              </div>
+              <div className="filter-group">
+                <label>Dari Tanggal:</label>
+                <input 
+                  type="date" 
+                  value={historyFilter.startDate}
+                  onChange={(e) => setHistoryFilter(prev => ({ ...prev, startDate: e.target.value }))}
+                />
+              </div>
+              <div className="filter-group">
+                <label>Sampai Tanggal:</label>
+                <input 
+                  type="date" 
+                  value={historyFilter.endDate}
+                  onChange={(e) => setHistoryFilter(prev => ({ ...prev, endDate: e.target.value }))}
+                />
+              </div>
+              <button className="btn-primary btn-small" onClick={handleFilterHistory}>
+                Terapkan Filter
+              </button>
+              <button className="btn-secondary btn-small" onClick={() => { setHistoryFilter({ courseId: '', startDate: '', endDate: '' }); handleShowHistory(); }}>
+                Reset
+              </button>
+            </div>
+            
             <div className="modal-body">
-              {historyData.length === 0 ? (
+              {historyLoading ? (
+                <div className="loading-state">
+                  <p>Memuat riwayat...</p>
+                </div>
+              ) : !Array.isArray(historyData) || historyData.length === 0 ? (
                 <div className="empty-history">
                   <p>Belum ada riwayat absensi.</p>
                 </div>
               ) : (
                 <div className="history-list">
-                  {historyData.map((item) => (
+                  {historyData.map((item) => {
+                    if (!item || !item.id) return null;
+                    return (
                     <div key={item.id} className="history-item">
                       <div className="history-item__header">
                         <strong>{item.courseName}</strong>
@@ -898,39 +1098,117 @@ export default function AbsensiManagement() {
                       <div className="history-item__details">
                         <span>{item.courseCode}</span>
                         <span>•</span>
-                        <span>{item.room}</span>
+                        <span>{item.className || item.room}</span>
                       </div>
                       <div className="history-item__stats">
                         <span className="stat-hadir">
-                          Hadir: {item.attendance?.filter((s) => s.status === "hadir").length || 0}
+                          Hadir: {item.stats?.hadir || 0}
+                        </span>
+                        <span className="stat-sakit">
+                          Sakit: {item.stats?.sakit || 0}
+                        </span>
+                        <span className="stat-izin">
+                          Izin: {item.stats?.izin || 0}
+                        </span>
+                        <span className="stat-dispensasi">
+                          Dispensasi: {item.stats?.dispensasi || 0}
                         </span>
                         <span className="stat-alpha">
-                          Alpha: {item.attendance?.filter((s) => s.status === "alpha").length || 0}
+                          Alpha: {item.stats?.alpha || 0}
                         </span>
                       </div>
-                      <button
-                        className="btn-secondary btn-small"
-                        onClick={() => {
-                          const blob = new Blob([JSON.stringify(item, null, 2)], {
-                            type: "application/json",
-                          });
-                          const url = URL.createObjectURL(blob);
-                          const a = document.createElement("a");
-                          a.href = url;
-                          a.download = `absensi_${item.courseCode}_${item.date}.json`;
-                          document.body.appendChild(a);
-                          a.click();
-                          document.body.removeChild(a);
-                          URL.revokeObjectURL(url);
-                        }}
-                      >
-                        <Download size={14} />
-                        Unduh
-                      </button>
+                      <div className="history-item__actions">
+                        <button
+                          className="btn-primary btn-small"
+                          onClick={() => handleEditSession(item)}
+                        >
+                          Edit
+                        </button>
+                        <button
+                          className="btn-secondary btn-small"
+                          onClick={() => {
+                            const blob = new Blob([JSON.stringify(item, null, 2)], {
+                              type: "application/json",
+                            });
+                            const url = URL.createObjectURL(blob);
+                            const a = document.createElement("a");
+                            a.href = url;
+                            a.download = `absensi_${item.courseCode}_${item.date}.json`;
+                            document.body.appendChild(a);
+                            a.click();
+                            document.body.removeChild(a);
+                            URL.revokeObjectURL(url);
+                          }}
+                        >
+                          <Download size={14} />
+                          Unduh
+                        </button>
+                      </div>
                     </div>
-                  ))}
+                  );
+                  })}
                 </div>
               )}
+            </div>
+          </div>
+        </div>
+      )}
+      
+      {/* Edit Session Modal */}
+      {editingSession && (
+        <div className="modal-overlay" onClick={() => setEditingSession(null)}>
+          <div className="modal-content edit-session-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h2>
+                Edit Absensi - {editingSession.courseName}
+              </h2>
+              <button className="modal-close" onClick={() => { setEditingSession(null); setEditAttendance([]); }}>
+                <X size={20} />
+              </button>
+            </div>
+            <div className="edit-session-info">
+              <span>{editingSession.courseCode}</span>
+              <span>•</span>
+              <span>{editingSession.date}</span>
+              <span>•</span>
+              <span>{editingSession.className}</span>
+            </div>
+            <div className="modal-body edit-attendance-list">
+              {editAttendance.map((student) => (
+                <div key={student.nim} className="edit-attendance-item">
+                  <div className="student-info">
+                    <strong>{student.name}</strong>
+                    <span className="nim">{student.nim}</span>
+                  </div>
+                  <div className="status-buttons">
+                    {Object.keys(ATTENDANCE_STATUS).map((key) => {
+                      const statusValue = ATTENDANCE_STATUS[key];
+                      if (statusValue === 'not_marked') return null;
+                      return (
+                        <button
+                          key={statusValue}
+                          className={`status-btn ${student.status === statusValue ? 'active' : ''}`}
+                          style={{
+                            backgroundColor: student.status === statusValue ? ATTENDANCE_STATUS_COLOR[statusValue] : '#e0e0e0',
+                            color: student.status === statusValue ? '#fff' : '#333'
+                          }}
+                          onClick={() => handleEditStatusChange(student.nim, statusValue)}
+                        >
+                          {ATTENDANCE_STATUS_LABEL[statusValue]}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              ))}
+            </div>
+            <div className="modal-footer">
+              <button className="btn-secondary" onClick={() => { setEditingSession(null); setEditAttendance([]); }}>
+                Batal
+              </button>
+              <button className="btn-primary" onClick={handleSaveEditedSession}>
+                Simpan Perubahan
+              </button>
             </div>
           </div>
         </div>

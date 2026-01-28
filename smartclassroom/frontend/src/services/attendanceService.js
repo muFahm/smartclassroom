@@ -264,6 +264,7 @@ function transformApiSessionToLocal(apiSession) {
       total: apiSession.total_students,
       hadir: apiSession.present_count,
       sakit: apiSession.sick_count,
+      izin: apiSession.izin_count,
       dispensasi: apiSession.permission_count,
       alpha: apiSession.absent_count,
     }
@@ -656,6 +657,67 @@ export function getCourseAttendanceHistory(courseCode, lecturerId = null) {
     lecturerId,
     status: 'completed' 
   });
+}
+
+/**
+ * Get session detail with all records
+ */
+export async function getSessionDetail(sessionId) {
+  try {
+    console.log('📋 Fetching session detail:', sessionId);
+    const session = await apiRequest(`/sessions/${sessionId}/`);
+    return transformApiSessionToLocal(session);
+  } catch (error) {
+    console.error('❌ Error fetching session detail:', error);
+    throw error;
+  }
+}
+
+/**
+ * Update attendance records in a session
+ */
+export async function updateSessionRecords(sessionId, attendanceData) {
+  try {
+    console.log('📝 Updating session records:', sessionId);
+    console.log('📊 Attendance data to update:', attendanceData);
+    
+    let updateCount = 0;
+    
+    // Update each record via API
+    for (const student of attendanceData) {
+      if (student.id) {
+        // Convert frontend status to backend valid choices
+        // Backend accepts: 'hadir', 'sakit', 'izin', 'dispensasi', 'alpha'
+        let backendStatus = student.status;
+        if (student.status === ATTENDANCE_STATUS.NOT_MARKED) {
+          backendStatus = 'alpha';
+        } else if (!['hadir', 'sakit', 'izin', 'dispensasi', 'alpha'].includes(student.status)) {
+          console.warn(`  Invalid status "${student.status}" for ${student.name}, defaulting to 'alpha'`);
+          backendStatus = 'alpha';
+        }
+        
+        console.log(`  Updating record ${student.id}: ${student.name} -> ${backendStatus} (from ${student.status})`);
+        
+        // Update existing record
+        await apiRequest(`/records/${student.id}/`, {
+          method: 'PATCH',
+          body: JSON.stringify({
+            status: backendStatus,
+            notes: student.notes || '',
+          }),
+        });
+        updateCount++;
+      } else {
+        console.warn(`  Skipping student without ID: ${student.name}`);
+      }
+    }
+    
+    console.log(`✅ Session records updated: ${updateCount}/${attendanceData.length} records`);
+    return true;
+  } catch (error) {
+    console.error('❌ Error updating session records:', error);
+    throw error;
+  }
 }
 
 /**
