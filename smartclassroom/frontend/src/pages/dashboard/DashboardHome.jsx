@@ -87,14 +87,15 @@ export default function DashboardHome() {
       {activeMode === "kuis" && (
         <>
           <div className="grid-left-main">
-            <div className="widget-wrapper grid-soal">
-              <SoalKuis soal={KUIS_ACTIVE} />
-            </div>
-
             {widgets.hasilPolling && (
-              <div className="widget-wrapper grid-polling">
-                <HasilPolling mode="kuis" />
-              </div>
+              <>
+                <div className="widget-wrapper grid-soal">
+                  <SoalKuis soal={KUIS_ACTIVE} />
+                </div>
+                <div className="widget-wrapper grid-polling">
+                  <HasilPolling mode="kuis" />
+                </div>
+              </>
             )}
 
             <div className="grid-mini-realtime">
