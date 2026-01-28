@@ -12,6 +12,7 @@ import SoalKuis from "../../components/SoalKuis";
 import AbsensiManagement from "../../components/AbsensiManagement";
 import EnvironmentControl from "../../components/EnvironmentControl";
 import PollingDeviceManagement from "../../components/polling/PollingDeviceManagement";
+import BiometricRegistration from "../../components/biometric/BiometricRegistration";
 import { KUIS_ACTIVE } from "../../utils/mockData";
 import ClassOverviewDetail from "./ClassOverviewDetail";
 
@@ -22,9 +23,7 @@ export default function DashboardHome() {
     widgets,
   } = useOutletContext();
 
-  const isDefaultMode = ["default", "registrasi-biometrik"].includes(
-    activeMode,
-  );
+  const isDefaultMode = ["default"].includes(activeMode);
 
   return (
     <>
@@ -96,6 +95,10 @@ export default function DashboardHome() {
 
       {activeMode === "polling-device" && (
         <PollingDeviceManagement />
+      )}
+
+      {activeMode === "registrasi-biometrik" && (
+        <BiometricRegistration />
       )}
 
       {activeMode === "kuis" && (

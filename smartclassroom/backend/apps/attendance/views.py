@@ -6,7 +6,8 @@ from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from .models import (
     AttendanceSession, AttendanceRecord,
-    SisCourse, SisLecturer, SisStudent, SisCourseClass, SisEnrollment
+    SisCourse, SisLecturer, SisStudent, SisCourseClass, SisEnrollment,
+    BiometricRegistration, BiometricFaceDataset, BiometricVoiceDataset
 )
 from .serializers import (
     AttendanceSessionSerializer,
@@ -15,7 +16,10 @@ from .serializers import (
     AttendanceRecordSerializer,
     StudentAttendanceHistorySerializer,
     StudentEnrollmentSerializer,
-    StudentCourseAttendanceSerializer
+    StudentCourseAttendanceSerializer,
+    BiometricRegistrationSerializer,
+    BiometricFaceDatasetSerializer,
+    BiometricVoiceDatasetSerializer
 )
 
 
@@ -112,9 +116,9 @@ class AttendanceRecordViewSet(viewsets.ModelViewSet):
             queryset = queryset.filter(session_id=session_id)
         
         # Filter by student_id
-        student_id = self.request.query_params.get('student_id')
-        if student_id:
-            queryset = queryset.filter(student_id=student_id)
+        student_nim = self.request.query_params.get('student_nim')
+        if student_nim:
+            queryset = queryset.filter(student_nim=student_nim)
         
         return queryset
     
@@ -146,6 +150,64 @@ class AttendanceRecordViewSet(viewsets.ModelViewSet):
         
         serializer = AttendanceRecordSerializer(record)
         return Response(serializer.data)
+
+
+class BiometricRegistrationViewSet(viewsets.ModelViewSet):
+    """
+    ViewSet untuk registrasi biometrik mahasiswa (wajah + suara)
+    """
+    queryset = BiometricRegistration.objects.all()
+    serializer_class = BiometricRegistrationSerializer
+    permission_classes = [AllowAny]
+
+    def get_queryset(self):
+        queryset = BiometricRegistration.objects.all()
+
+        student_id = self.request.query_params.get('student_id')
+        if student_id:
+            queryset = queryset.filter(student_id=student_id)
+
+        lecturer_id = self.request.query_params.get('lecturer_id')
+        if lecturer_id:
+            queryset = queryset.filter(lecturer_id=lecturer_id)
+
+        return queryset
+
+
+class BiometricFaceDatasetViewSet(viewsets.ModelViewSet):
+    """
+    ViewSet untuk dataset wajah mahasiswa
+    """
+    queryset = BiometricFaceDataset.objects.all()
+    serializer_class = BiometricFaceDatasetSerializer
+    permission_classes = [AllowAny]
+
+    def get_queryset(self):
+        queryset = BiometricFaceDataset.objects.all()
+
+        student_nim = self.request.query_params.get('student_nim')
+        if student_nim:
+            queryset = queryset.filter(student_nim=student_nim)
+
+        return queryset
+
+
+class BiometricVoiceDatasetViewSet(viewsets.ModelViewSet):
+    """
+    ViewSet untuk dataset suara mahasiswa
+    """
+    queryset = BiometricVoiceDataset.objects.all()
+    serializer_class = BiometricVoiceDatasetSerializer
+    permission_classes = [AllowAny]
+
+    def get_queryset(self):
+        queryset = BiometricVoiceDataset.objects.all()
+
+        student_nim = self.request.query_params.get('student_nim')
+        if student_nim:
+            queryset = queryset.filter(student_nim=student_nim)
+
+        return queryset
 
 
 @api_view(['GET'])

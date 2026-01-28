@@ -101,7 +101,7 @@ export function getStudentFromCache(nim) {
 export async function fetchStudentData(nim) {
   // Check cache first
   const cached = getStudentFromCache(nim);
-  if (cached) {
+  if (cached && cached.photo) {
     return cached;
   }
 

@@ -3,6 +3,9 @@ from rest_framework.routers import DefaultRouter
 from .views import (
     AttendanceSessionViewSet,
     AttendanceRecordViewSet,
+    BiometricRegistrationViewSet,
+    BiometricFaceDatasetViewSet,
+    BiometricVoiceDatasetViewSet,
     student_attendance_history,
     student_attendance_summary,
     bulk_update_attendance,
@@ -16,6 +19,9 @@ app_name = 'attendance'
 router = DefaultRouter()
 router.register(r'sessions', AttendanceSessionViewSet, basename='session')
 router.register(r'records', AttendanceRecordViewSet, basename='record')
+router.register(r'biometric-registrations', BiometricRegistrationViewSet, basename='biometric-registration')
+router.register(r'biometric-face-datasets', BiometricFaceDatasetViewSet, basename='biometric-face-dataset')
+router.register(r'biometric-voice-datasets', BiometricVoiceDatasetViewSet, basename='biometric-voice-dataset')
 
 urlpatterns = [
     path('', include(router.urls)),

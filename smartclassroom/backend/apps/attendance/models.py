@@ -265,3 +265,130 @@ class AttendanceRecord(models.Model):
         if confidence_score:
             self.confidence_score = confidence_score
         self.save()
+
+
+class BiometricRegistration(models.Model):
+    """
+    Model untuk menyimpan registrasi biometrik mahasiswa (wajah + suara)
+    """
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+
+    student = models.ForeignKey(
+        SisStudent,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name='biometric_registrations'
+    )
+    student_nim = models.CharField(max_length=50, help_text="NIM mahasiswa")
+    student_name = models.CharField(max_length=200, blank=True, default='', help_text="Nama mahasiswa")
+
+    lecturer_id = models.CharField(max_length=50, blank=True, default='', help_text="ID dosen (opsional)")
+    lecturer_name = models.CharField(max_length=200, blank=True, default='', help_text="Nama dosen (opsional)")
+
+    face_front = models.TextField(blank=True, default='', help_text="Base64 foto wajah depan")
+    face_left = models.TextField(blank=True, default='', help_text="Base64 foto wajah kiri")
+    face_right = models.TextField(blank=True, default='', help_text="Base64 foto wajah kanan")
+    face_up = models.TextField(blank=True, default='', help_text="Base64 foto wajah atas")
+
+    face_front_mime = models.CharField(max_length=50, blank=True, default='image/jpeg')
+    face_left_mime = models.CharField(max_length=50, blank=True, default='image/jpeg')
+    face_right_mime = models.CharField(max_length=50, blank=True, default='image/jpeg')
+    face_up_mime = models.CharField(max_length=50, blank=True, default='image/jpeg')
+
+    voice_prompt_1_text = models.TextField(blank=True, default='')
+    voice_prompt_2_text = models.TextField(blank=True, default='')
+    voice_recording_1 = models.TextField(blank=True, default='', help_text="Base64 audio rekaman 1")
+    voice_recording_2 = models.TextField(blank=True, default='', help_text="Base64 audio rekaman 2")
+    voice_recording_1_mime = models.CharField(max_length=50, blank=True, default='audio/webm')
+    voice_recording_2_mime = models.CharField(max_length=50, blank=True, default='audio/webm')
+    voice_recording_1_duration = models.FloatField(null=True, blank=True)
+    voice_recording_2_duration = models.FloatField(null=True, blank=True)
+
+    is_complete = models.BooleanField(default=False)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['-created_at']
+        verbose_name = 'Biometric Registration'
+        verbose_name_plural = 'Biometric Registrations'
+
+    def __str__(self):
+        return f"{self.student_nim} - Biometric Registration"
+
+
+class BiometricFaceDataset(models.Model):
+    """
+    Dataset wajah mahasiswa (disimpan terpisah)
+    """
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+
+    student = models.ForeignKey(
+        SisStudent,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name='face_datasets'
+    )
+    student_nim = models.CharField(max_length=50, help_text="NIM mahasiswa")
+    student_name = models.CharField(max_length=200, blank=True, default='', help_text="Nama mahasiswa")
+
+    face_front = models.TextField(blank=True, default='', help_text="Base64 foto wajah depan")
+    face_left = models.TextField(blank=True, default='', help_text="Base64 foto wajah kiri")
+    face_right = models.TextField(blank=True, default='', help_text="Base64 foto wajah kanan")
+    face_up = models.TextField(blank=True, default='', help_text="Base64 foto wajah atas")
+
+    face_front_mime = models.CharField(max_length=50, blank=True, default='image/jpeg')
+    face_left_mime = models.CharField(max_length=50, blank=True, default='image/jpeg')
+    face_right_mime = models.CharField(max_length=50, blank=True, default='image/jpeg')
+    face_up_mime = models.CharField(max_length=50, blank=True, default='image/jpeg')
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['-created_at']
+        verbose_name = 'Biometric Face Dataset'
+        verbose_name_plural = 'Biometric Face Datasets'
+
+    def __str__(self):
+        return f"{self.student_nim} - Face Dataset"
+
+
+class BiometricVoiceDataset(models.Model):
+    """
+    Dataset suara mahasiswa (disimpan terpisah)
+    """
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+
+    student = models.ForeignKey(
+        SisStudent,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name='voice_datasets'
+    )
+    student_nim = models.CharField(max_length=50, help_text="NIM mahasiswa")
+    student_name = models.CharField(max_length=200, blank=True, default='', help_text="Nama mahasiswa")
+
+    voice_prompt_1_text = models.TextField(blank=True, default='')
+    voice_prompt_2_text = models.TextField(blank=True, default='')
+    voice_recording_1 = models.TextField(blank=True, default='', help_text="Base64 audio rekaman 1")
+    voice_recording_2 = models.TextField(blank=True, default='', help_text="Base64 audio rekaman 2")
+    voice_recording_1_mime = models.CharField(max_length=50, blank=True, default='audio/webm')
+    voice_recording_2_mime = models.CharField(max_length=50, blank=True, default='audio/webm')
+    voice_recording_1_duration = models.FloatField(null=True, blank=True)
+    voice_recording_2_duration = models.FloatField(null=True, blank=True)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['-created_at']
+        verbose_name = 'Biometric Voice Dataset'
+        verbose_name_plural = 'Biometric Voice Datasets'
+
+    def __str__(self):
+        return f"{self.student_nim} - Voice Dataset"

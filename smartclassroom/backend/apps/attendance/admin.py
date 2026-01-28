@@ -2,7 +2,8 @@ from django.contrib import admin
 from .models import (
     AttendanceSession, AttendanceRecord,
     SisCourse, SisLecturer, SisStudent, SisCourseClass, 
-    SisCourseClassLecturer, SisEnrollment
+    SisCourseClassLecturer, SisEnrollment,
+    BiometricRegistration, BiometricFaceDataset, BiometricVoiceDataset
 )
 
 
@@ -122,6 +123,84 @@ class AttendanceRecordAdmin(admin.ModelAdmin):
         }),
         ('Face Recognition', {
             'fields': ('face_recognized', 'recognized_at', 'confidence_score'),
+            'classes': ('collapse',)
+        }),
+        ('Timestamps', {
+            'fields': ('id', 'created_at', 'updated_at'),
+            'classes': ('collapse',)
+        }),
+    )
+
+
+@admin.register(BiometricRegistration)
+class BiometricRegistrationAdmin(admin.ModelAdmin):
+    list_display = ['student_nim', 'student_name', 'lecturer_id', 'is_complete', 'created_at']
+    list_filter = ['is_complete', 'created_at']
+    search_fields = ['student_nim', 'student_name', 'lecturer_id']
+    readonly_fields = ['id', 'created_at', 'updated_at']
+
+    fieldsets = (
+        ('Student Information', {
+            'fields': ('student', 'student_nim', 'student_name')
+        }),
+        ('Lecturer Information', {
+            'fields': ('lecturer_id', 'lecturer_name')
+        }),
+        ('Face Data', {
+            'fields': ('face_front', 'face_left', 'face_right', 'face_up'),
+            'classes': ('collapse',)
+        }),
+        ('Voice Data', {
+            'fields': (
+                'voice_prompt_1_text', 'voice_recording_1',
+                'voice_prompt_2_text', 'voice_recording_2'
+            ),
+            'classes': ('collapse',)
+        }),
+        ('Status & Timestamps', {
+            'fields': ('is_complete', 'created_at', 'updated_at'),
+        }),
+    )
+
+
+@admin.register(BiometricFaceDataset)
+class BiometricFaceDatasetAdmin(admin.ModelAdmin):
+    list_display = ['student_nim', 'student_name', 'created_at']
+    list_filter = ['created_at']
+    search_fields = ['student_nim', 'student_name']
+    readonly_fields = ['id', 'created_at', 'updated_at']
+
+    fieldsets = (
+        ('Student Information', {
+            'fields': ('student', 'student_nim', 'student_name')
+        }),
+        ('Face Data', {
+            'fields': ('face_front', 'face_left', 'face_right', 'face_up'),
+            'classes': ('collapse',)
+        }),
+        ('Timestamps', {
+            'fields': ('id', 'created_at', 'updated_at'),
+            'classes': ('collapse',)
+        }),
+    )
+
+
+@admin.register(BiometricVoiceDataset)
+class BiometricVoiceDatasetAdmin(admin.ModelAdmin):
+    list_display = ['student_nim', 'student_name', 'created_at']
+    list_filter = ['created_at']
+    search_fields = ['student_nim', 'student_name']
+    readonly_fields = ['id', 'created_at', 'updated_at']
+
+    fieldsets = (
+        ('Student Information', {
+            'fields': ('student', 'student_nim', 'student_name')
+        }),
+        ('Voice Data', {
+            'fields': (
+                'voice_prompt_1_text', 'voice_recording_1',
+                'voice_prompt_2_text', 'voice_recording_2'
+            ),
             'classes': ('collapse',)
         }),
         ('Timestamps', {

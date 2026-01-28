@@ -1,7 +1,8 @@
 from rest_framework import serializers
 from .models import (
     AttendanceSession, AttendanceRecord,
-    SisCourse, SisLecturer, SisStudent, SisCourseClass, SisEnrollment
+    SisCourse, SisLecturer, SisStudent, SisCourseClass, SisEnrollment,
+    BiometricRegistration, BiometricFaceDataset, BiometricVoiceDataset
 )
 
 
@@ -174,3 +175,124 @@ class StudentCourseAttendanceSerializer(serializers.Serializer):
     summary = serializers.DictField(
         help_text="Summary counts: hadir, sakit, izin, dispensasi, alpha"
     )
+
+
+# ==========================================
+# Biometric Registration
+# ==========================================
+
+class BiometricRegistrationSerializer(serializers.ModelSerializer):
+    """Serializer for BiometricRegistration model"""
+
+    class Meta:
+        model = BiometricRegistration
+        fields = [
+            'id', 'student', 'student_nim', 'student_name',
+            'lecturer_id', 'lecturer_name',
+            'face_front', 'face_left', 'face_right', 'face_up',
+            'face_front_mime', 'face_left_mime', 'face_right_mime', 'face_up_mime',
+            'voice_prompt_1_text', 'voice_prompt_2_text',
+            'voice_recording_1', 'voice_recording_2',
+            'voice_recording_1_mime', 'voice_recording_2_mime',
+            'voice_recording_1_duration', 'voice_recording_2_duration',
+            'is_complete', 'created_at', 'updated_at'
+        ]
+        read_only_fields = ['id', 'created_at', 'updated_at', 'is_complete']
+
+    def validate(self, attrs):
+        required_fields = [
+            'student_nim',
+            'face_front', 'face_left', 'face_right', 'face_up',
+            'voice_recording_1', 'voice_recording_2'
+        ]
+        missing = [field for field in required_fields if not attrs.get(field)]
+        if missing:
+            raise serializers.ValidationError({
+                'missing_fields': missing,
+                'message': 'Lengkapi seluruh data wajah dan suara.'
+            })
+
+        student_nim = attrs.get('student_nim')
+        if student_nim and not attrs.get('student'):
+            student = SisStudent.objects.filter(nim=student_nim).first()
+            if student:
+                attrs['student'] = student
+
+        return attrs
+
+    def create(self, validated_data):
+        validated_data['is_complete'] = True
+        return super().create(validated_data)
+
+    def update(self, instance, validated_data):
+        instance = super().update(instance, validated_data)
+        instance.is_complete = all([
+            instance.face_front, instance.face_left, instance.face_right, instance.face_up,
+            instance.voice_recording_1, instance.voice_recording_2,
+        ])
+        instance.save(update_fields=['is_complete'])
+        return instance
+
+
+class BiometricFaceDatasetSerializer(serializers.ModelSerializer):
+    """Serializer for BiometricFaceDataset model"""
+
+    class Meta:
+        model = BiometricFaceDataset
+        fields = [
+            'id', 'student', 'student_nim', 'student_name',
+            'face_front', 'face_left', 'face_right', 'face_up',
+            'face_front_mime', 'face_left_mime', 'face_right_mime', 'face_up_mime',
+            'created_at', 'updated_at'
+        ]
+        read_only_fields = ['id', 'created_at', 'updated_at']
+
+    def validate(self, attrs):
+        required_fields = ['student_nim', 'face_front', 'face_left', 'face_right', 'face_up']
+        missing = [field for field in required_fields if not attrs.get(field)]
+        if missing:
+            raise serializers.ValidationError({
+                'missing_fields': missing,
+                'message': 'Lengkapi 4 foto wajah sebelum menyimpan.'
+            })
+
+        student_nim = attrs.get('student_nim')
+        if student_nim and not attrs.get('student'):
+            student = SisStudent.objects.filter(nim=student_nim).first()
+            if student:
+                attrs['student'] = student
+
+        return attrs
+
+
+class BiometricVoiceDatasetSerializer(serializers.ModelSerializer):
+    """Serializer for BiometricVoiceDataset model"""
+
+    class Meta:
+        model = BiometricVoiceDataset
+        fields = [
+            'id', 'student', 'student_nim', 'student_name',
+            'voice_prompt_1_text', 'voice_prompt_2_text',
+            'voice_recording_1', 'voice_recording_2',
+            'voice_recording_1_mime', 'voice_recording_2_mime',
+            'voice_recording_1_duration', 'voice_recording_2_duration',
+            'created_at', 'updated_at'
+        ]
+        read_only_fields = ['id', 'created_at', 'updated_at']
+
+    def validate(self, attrs):
+        required_fields = ['student_nim', 'voice_recording_1', 'voice_recording_2']
+        missing = [field for field in required_fields if not attrs.get(field)]
+        if missing:
+            raise serializers.ValidationError({
+                'missing_fields': missing,
+                'message': 'Lengkapi 2 rekaman suara sebelum menyimpan.'
+            })
+
+        student_nim = attrs.get('student_nim')
+        if student_nim and not attrs.get('student'):
+            student = SisStudent.objects.filter(nim=student_nim).first()
+            if student:
+                attrs['student'] = student
+
+        return attrs

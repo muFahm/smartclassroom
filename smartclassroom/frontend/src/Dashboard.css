@@ -218,6 +218,13 @@
   overflow: hidden;
 }
 
+/* Registrasi Biometrik - allow main area scrolling */
+.dashboard-right-content.mode-registrasi-biometrik {
+  display: block;
+  height: 100%;
+  overflow: hidden;
+}
+
 .mode-default .transkrip-content {
   max-height: calc(100% - 35px);
   overflow-y: auto;
