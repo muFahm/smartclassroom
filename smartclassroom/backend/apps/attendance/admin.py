@@ -1,5 +1,70 @@
 from django.contrib import admin
-from .models import AttendanceSession, AttendanceRecord
+from .models import (
+    AttendanceSession, AttendanceRecord,
+    SisCourse, SisLecturer, SisStudent, SisCourseClass, 
+    SisCourseClassLecturer, SisEnrollment
+)
+
+
+# ==========================================
+# SIS Master Data Admin
+# ==========================================
+
+@admin.register(SisCourse)
+class SisCourseAdmin(admin.ModelAdmin):
+    list_display = ['id', 'code', 'name', 'program', 'updated_at']
+    list_filter = ['program']
+    search_fields = ['id', 'code', 'name']
+    ordering = ['code']
+
+
+@admin.register(SisLecturer)
+class SisLecturerAdmin(admin.ModelAdmin):
+    list_display = ['id', 'name', 'id_staff', 'updated_at']
+    search_fields = ['id', 'name']
+    ordering = ['name']
+
+
+@admin.register(SisStudent)
+class SisStudentAdmin(admin.ModelAdmin):
+    list_display = ['nim', 'name', 'program', 'updated_at']
+    list_filter = ['program']
+    search_fields = ['nim', 'name']
+    ordering = ['nim']
+
+
+class SisEnrollmentInline(admin.TabularInline):
+    model = SisEnrollment
+    extra = 0
+    raw_id_fields = ['student']
+
+
+class SisCourseClassLecturerInline(admin.TabularInline):
+    model = SisCourseClassLecturer
+    extra = 0
+    raw_id_fields = ['lecturer']
+
+
+@admin.register(SisCourseClass)
+class SisCourseClassAdmin(admin.ModelAdmin):
+    list_display = ['id', 'course', 'class_code', 'day', 'room', 'start_time', 'end_time']
+    list_filter = ['day', 'course__program']
+    search_fields = ['id', 'course__name', 'course__code']
+    raw_id_fields = ['course']
+    inlines = [SisCourseClassLecturerInline, SisEnrollmentInline]
+    ordering = ['course__code', 'class_code']
+
+
+@admin.register(SisEnrollment)
+class SisEnrollmentAdmin(admin.ModelAdmin):
+    list_display = ['id', 'student', 'course_class']
+    search_fields = ['student__nim', 'course_class__course__name']
+    raw_id_fields = ['student', 'course_class']
+
+
+# ==========================================
+# Attendance Admin
+# ==========================================
 
 
 class AttendanceRecordInline(admin.TabularInline):

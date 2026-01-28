@@ -3,6 +3,135 @@ from django.utils import timezone
 import uuid
 
 
+# ==========================================
+# Master Data Models (Cache dari SIS Trisakti)
+# ==========================================
+
+class SisCourse(models.Model):
+    """
+    Cache data Mata Kuliah dari SIS Trisakti API
+    """
+    id = models.CharField(max_length=50, primary_key=True, help_text="IdCourse dari SIS")
+    code = models.CharField(max_length=50, help_text="Kode mata kuliah (KodeMk)")
+    name = models.CharField(max_length=200, help_text="Nama mata kuliah")
+    credits = models.PositiveSmallIntegerField(default=0, help_text="SKS")
+    program = models.CharField(max_length=100, blank=True, default='', help_text="Program studi")
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        ordering = ['code']
+        verbose_name = 'SIS Course'
+        verbose_name_plural = 'SIS Courses'
+    
+    def __str__(self):
+        return f"{self.code} - {self.name}"
+
+
+class SisLecturer(models.Model):
+    """
+    Cache data Dosen dari SIS Trisakti API
+    """
+    id = models.CharField(max_length=50, primary_key=True, help_text="StaffId dari SIS")
+    id_staff = models.IntegerField(null=True, blank=True, help_text="IdStaff (numeric) dari SIS")
+    name = models.CharField(max_length=200, help_text="Nama lengkap dosen (StaffName)")
+    photo_url = models.CharField(max_length=500, blank=True, default='', help_text="Path foto dosen")
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        ordering = ['name']
+        verbose_name = 'SIS Lecturer'
+        verbose_name_plural = 'SIS Lecturers'
+    
+    def __str__(self):
+        return f"{self.id} - {self.name}"
+
+
+class SisStudent(models.Model):
+    """
+    Cache data Mahasiswa dari SIS Trisakti API
+    """
+    nim = models.CharField(max_length=50, primary_key=True, help_text="NIM mahasiswa")
+    name = models.CharField(max_length=200, blank=True, default='', help_text="Nama mahasiswa")
+    photo_url = models.CharField(max_length=500, blank=True, default='', help_text="Path foto mahasiswa")
+    program = models.CharField(max_length=100, blank=True, default='', help_text="Program studi")
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        ordering = ['nim']
+        verbose_name = 'SIS Student'
+        verbose_name_plural = 'SIS Students'
+    
+    def __str__(self):
+        return f"{self.nim} - {self.name}" if self.name else self.nim
+
+
+class SisCourseClass(models.Model):
+    """
+    Kelas per Mata Kuliah dari SIS Trisakti API
+    """
+    id = models.CharField(max_length=100, primary_key=True, help_text="Composite ID: IdCourse_KodeKelas")
+    course = models.ForeignKey(SisCourse, on_delete=models.CASCADE, related_name='classes')
+    class_code = models.CharField(max_length=20, help_text="Kode kelas (KodeKelas)")
+    room = models.CharField(max_length=50, blank=True, default='', help_text="Ruangan (KodeRuang)")
+    day = models.CharField(max_length=20, blank=True, default='', help_text="Hari kuliah")
+    start_time = models.TimeField(null=True, blank=True, help_text="Jam mulai")
+    end_time = models.TimeField(null=True, blank=True, help_text="Jam selesai")
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        ordering = ['course__code', 'class_code']
+        verbose_name = 'SIS Course Class'
+        verbose_name_plural = 'SIS Course Classes'
+    
+    def __str__(self):
+        return f"{self.course.code} - Kelas {self.class_code}"
+
+
+class SisCourseClassLecturer(models.Model):
+    """
+    Relasi Many-to-Many antara Kelas dan Dosen
+    """
+    course_class = models.ForeignKey(SisCourseClass, on_delete=models.CASCADE, related_name='lecturers')
+    lecturer = models.ForeignKey(SisLecturer, on_delete=models.CASCADE, related_name='course_classes')
+    
+    class Meta:
+        unique_together = ['course_class', 'lecturer']
+        verbose_name = 'Course Class Lecturer'
+        verbose_name_plural = 'Course Class Lecturers'
+    
+    def __str__(self):
+        return f"{self.course_class} - {self.lecturer.name}"
+
+
+class SisEnrollment(models.Model):
+    """
+    Relasi Mahasiswa - Kelas (KRS)
+    """
+    course_class = models.ForeignKey(SisCourseClass, on_delete=models.CASCADE, related_name='enrollments')
+    student = models.ForeignKey(SisStudent, on_delete=models.CASCADE, related_name='enrollments')
+    
+    class Meta:
+        unique_together = ['course_class', 'student']
+        verbose_name = 'SIS Enrollment'
+        verbose_name_plural = 'SIS Enrollments'
+    
+    def __str__(self):
+        return f"{self.student.nim} enrolled in {self.course_class}"
+
+
+# ==========================================
+# Attendance Models
+# ==========================================
+
+
 class AttendanceSession(models.Model):
     """
     Model untuk menyimpan sesi absensi per pertemuan
