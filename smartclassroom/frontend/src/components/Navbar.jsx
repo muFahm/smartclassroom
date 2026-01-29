@@ -61,15 +61,23 @@ export default function Navbar({
             setUserPhoto(studentData.photo);
           }
         }
-      } else if (userRole === "dosen") {
-        // Get staff ID from user data
-        const staffId = user?.staff_id || user?.staffId || user?.id;
-        console.log("Loading photo for dosen staffId:", staffId);
-        
-        if (staffId) {
-          const photo = await fetchLecturerPhoto(staffId);
-          if (photo) {
-            setUserPhoto(photo);
+      } else {
+        const avatarUrl = user?.avatar_url || user?.avatarUrl || null;
+        if (avatarUrl) {
+          setUserPhoto(avatarUrl);
+          return;
+        }
+
+        if (userRole === "dosen") {
+          // Get staff ID from user data
+          const staffId = user?.staff_id || user?.staffId || user?.id;
+          console.log("Loading photo for dosen staffId:", staffId);
+          
+          if (staffId) {
+            const photo = await fetchLecturerPhoto(staffId);
+            if (photo) {
+              setUserPhoto(photo);
+            }
           }
         }
       }

@@ -117,6 +117,7 @@ class Command(BaseCommand):
                     classes_updated += 1
                 
                 # 3. Create/Update Lecturers and link to class
+                current_lecturer_ids = set()
                 for lecturer_key, lecturer_data in dosen.items():
                     # Handle case where lecturer_data is not a dict
                     if not isinstance(lecturer_data, dict):
@@ -132,6 +133,7 @@ class Command(BaseCommand):
                             'photo_url': lecturer_data.get('photo', '') or '',
                         }
                     )
+                    current_lecturer_ids.add(lecturer.id)
                     if created:
                         lecturers_created += 1
                     else:
@@ -144,22 +146,47 @@ class Command(BaseCommand):
                     )
                     if created:
                         class_lecturers_created += 1
+
+                # Remove lecturers no longer linked in API for this class
+                if current_lecturer_ids:
+                    SisCourseClassLecturer.objects.filter(course_class=course_class).exclude(
+                        lecturer_id__in=current_lecturer_ids
+                    ).delete()
+                else:
+                    SisCourseClassLecturer.objects.filter(course_class=course_class).delete()
                 
                 # 4. Create Students and Enrollments
+                current_student_nims = set()
                 for student_data in students:
                     nim = student_data.get('nim', '')
                     if not nim:
                         continue
+
+                    name = student_data.get('nama') or student_data.get('name') or student_data.get('NamaMhs') or ''
+                    photo = student_data.get('photo') or student_data.get('foto') or student_data.get('Photo') or ''
                     
-                    # Create student (only NIM for now, name can be filled later)
+                    # Create student (include name/photo if provided)
                     student, created = SisStudent.objects.get_or_create(
                         nim=nim,
                         defaults={
                             'program': program,
+                            'name': name or '',
+                            'photo_url': photo or '',
                         }
                     )
                     if created:
                         students_created += 1
+                    else:
+                        updates = {}
+                        if name and student.name != name:
+                            updates['name'] = name
+                        if photo and student.photo_url != photo:
+                            updates['photo_url'] = photo
+                        if program and student.program != program:
+                            updates['program'] = program
+                        if updates:
+                            SisStudent.objects.filter(nim=nim).update(**updates)
+                    current_student_nims.add(nim)
                     
                     # Create enrollment
                     _, created = SisEnrollment.objects.get_or_create(
@@ -168,6 +195,14 @@ class Command(BaseCommand):
                     )
                     if created:
                         enrollments_created += 1
+
+                # Remove enrollments no longer present in API for this class
+                if current_student_nims:
+                    SisEnrollment.objects.filter(course_class=course_class).exclude(
+                        student_id__in=current_student_nims
+                    ).delete()
+                else:
+                    SisEnrollment.objects.filter(course_class=course_class).delete()
         
         # Summary
         self.stdout.write(self.style.SUCCESS("\n=== Sync Complete ==="))

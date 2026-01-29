@@ -1,23 +1,47 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Pie } from "react-chartjs-2";
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
 import ChartDataLabels from "chartjs-plugin-datalabels";
 import "./EkspresiSuara.css";
-import { VOICE_EXPRESSION_SUMMARY } from "../utils/mockData";
+import { initVoiceAnalytics } from "../services/voiceAnalyticsService";
 
 // Register Chart.js components
 ChartJS.register(ArcElement, Tooltip, Legend, ChartDataLabels);
 
 export default function EkspresiSuara() {
+  const [summary, setSummary] = useState({
+    fokus: 0,
+    bahagia: 0,
+    sedih: 0,
+    bosan: 0,
+  });
+
+  useEffect(() => {
+    const handleEmotion = (payload) => {
+      setSummary({
+        fokus: payload.fokus ?? 0,
+        bahagia: payload.bahagia ?? 0,
+        sedih: payload.sedih ?? 0,
+        bosan: payload.bosan ?? 0,
+      });
+    };
+
+    const connection = initVoiceAnalytics(null, handleEmotion);
+
+    return () => {
+      if (connection?.disconnect) connection.disconnect();
+    };
+  }, []);
+
   const chartData = {
     labels: ["Fokus", "Bahagia", "Sedih", "Bosan"],
     datasets: [
       {
         data: [
-          VOICE_EXPRESSION_SUMMARY.fokus,
-          VOICE_EXPRESSION_SUMMARY.bahagia,
-          VOICE_EXPRESSION_SUMMARY.sedih,
-          VOICE_EXPRESSION_SUMMARY.bosan,
+          summary.fokus,
+          summary.bahagia,
+          summary.sedih,
+          summary.bosan,
         ],
         backgroundColor: [
           "#10b981", // green - Fokus

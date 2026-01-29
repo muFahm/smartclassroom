@@ -4,6 +4,7 @@ from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
+from datetime import date, timedelta
 from .models import (
     AttendanceSession, AttendanceRecord,
     SisCourse, SisLecturer, SisStudent, SisCourseClass, SisEnrollment,
@@ -21,6 +22,56 @@ from .serializers import (
     BiometricFaceDatasetSerializer,
     BiometricVoiceDatasetSerializer
 )
+
+
+# ==========================================
+# Semester Schedule Settings (Ganjil 2025)
+# ==========================================
+
+SEMESTER_GANJIL_2025_START = date(2025, 9, 8)  # Minggu ke-2, 8 Sept 2025
+SEMESTER_MEETINGS_COUNT = 17
+
+_DAY_NAME_TO_INDEX = {
+    "monday": 0,
+    "mon": 0,
+    "senin": 0,
+    "tuesday": 1,
+    "tue": 1,
+    "selasa": 1,
+    "wednesday": 2,
+    "wed": 2,
+    "rabu": 2,
+    "thursday": 3,
+    "thu": 3,
+    "kamis": 3,
+    "friday": 4,
+    "fri": 4,
+    "jumat": 4,
+    "saturday": 5,
+    "sat": 5,
+    "sabtu": 5,
+    "sunday": 6,
+    "sun": 6,
+    "minggu": 6,
+}
+
+
+def _get_weekday_index(day_name: str):
+    if not day_name:
+        return None
+    return _DAY_NAME_TO_INDEX.get(day_name.strip().lower())
+
+
+def _build_semester_meeting_dates(day_name: str):
+    """Generate 17 weekly meeting dates starting from Sep 8, 2025 (week 2)."""
+    target_idx = _get_weekday_index(day_name)
+    if target_idx is None:
+        first_date = SEMESTER_GANJIL_2025_START
+    else:
+        offset = (target_idx - SEMESTER_GANJIL_2025_START.weekday()) % 7
+        first_date = SEMESTER_GANJIL_2025_START + timedelta(days=offset)
+
+    return [first_date + timedelta(days=7 * i) for i in range(SEMESTER_MEETINGS_COUNT)]
 
 
 class AttendanceSessionViewSet(viewsets.ModelViewSet):
@@ -379,7 +430,15 @@ def student_course_attendance(request, nim, course_id):
         course_code = course.code
         course_name = course.name
     
-    # Build 17 meeting slots
+    # Get class code and day from enrollment
+    enrollment = SisEnrollment.objects.filter(
+        student__nim=nim,
+        course_class__course__id=course_id
+    ).select_related("course_class").first()
+    class_code = enrollment.course_class.class_code if enrollment else ''
+    class_day = enrollment.course_class.day if enrollment else ''
+
+    # Build 17 meeting slots based on fixed semester start (Sep 8, 2025)
     meetings = []
     summary = {
         'hadir': 0,
@@ -389,11 +448,11 @@ def student_course_attendance(request, nim, course_id):
         'alpha': 0,
         'belum': 0
     }
-    
+
     # Map existing records by date
     record_map = {}
     for record in records:
-        record_map[str(record.session.date)] = {
+        record_map[record.session.date] = {
             'date': record.session.date,
             'status': record.status,
             'day_name': record.session.day_name,
@@ -401,44 +460,27 @@ def student_course_attendance(request, nim, course_id):
             'face_recognized': record.face_recognized,
             'notes': record.notes
         }
-        # Count summary
         if record.status in summary:
             summary[record.status] += 1
-    
-    # Create 17 meeting slots
-    for i in range(1, 18):
-        if i <= len(record_map):
-            # Get the i-th record
-            record_list = list(record_map.values())
-            if i <= len(record_list):
-                meeting = record_list[i-1].copy()
-                meeting['meeting_number'] = i
-                meeting['attended'] = True
-                meetings.append(meeting)
-            else:
-                meetings.append({
-                    'meeting_number': i,
-                    'attended': False,
-                    'status': None,
-                    'date': None
-                })
-                summary['belum'] += 1
+
+    meeting_dates = _build_semester_meeting_dates(class_day)
+
+    for i, meeting_date in enumerate(meeting_dates, start=1):
+        record = record_map.get(meeting_date)
+        if record:
+            meeting = record.copy()
+            meeting['meeting_number'] = i
+            meeting['attended'] = True
+            meetings.append(meeting)
         else:
-            # Future meeting
             meetings.append({
                 'meeting_number': i,
                 'attended': False,
                 'status': None,
-                'date': None
+                'date': meeting_date,
+                'day_name': class_day or None
             })
             summary['belum'] += 1
-    
-    # Get class code from enrollment
-    enrollment = SisEnrollment.objects.filter(
-        student__nim=nim,
-        course_class__course__id=course_id
-    ).first()
-    class_code = enrollment.course_class.class_code if enrollment else ''
     
     return Response({
         'nim': nim,

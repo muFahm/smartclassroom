@@ -33,7 +33,7 @@ import {
   getSessionDetail,
   updateSessionRecords,
 } from "../services/attendanceService";
-import { fetchMultipleStudents, getStudentFromCache } from "../services/studentDataService";
+import { fetchMultipleStudents, getStudentFromCache, hasStudentPhoto } from "../services/studentDataService";
 import { fetchLecturersByCourse, getLecturersFromCache } from "../services/lecturerDataService";
 import "./AbsensiManagement.css";
 
@@ -223,7 +223,7 @@ export default function AbsensiManagement() {
     const nims = selectedCourse.Std.map((student) => student?.nim).filter(Boolean);
     if (nims.length === 0) return;
 
-    const allCached = nims.every((nim) => getStudentFromCache(nim));
+    const allCached = nims.every((nim) => hasStudentPhoto(nim));
     if (allCached) {
       const cached = new Map();
       nims.forEach((nim) => {

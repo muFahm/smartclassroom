@@ -96,6 +96,14 @@ export function getStudentFromCache(nim) {
 }
 
 /**
+ * Check if student photo is available in cache
+ */
+export function hasStudentPhoto(nim) {
+  const cached = getStudentFromCache(nim);
+  return !!cached?.photo;
+}
+
+/**
  * Fetch student data dari API
  */
 export async function fetchStudentData(nim) {
@@ -178,8 +186,11 @@ export async function fetchMultipleStudents(nims, onProgress = null) {
   const MAX_CONCURRENT = 5;
   const results = new Map();
 
-  // Filter out NIMs already in cache
-  const nimsToFetch = nims.filter((nim) => !getStudentFromCache(nim));
+  // Filter out NIMs already in cache with photo
+  const nimsToFetch = nims.filter((nim) => {
+    const cached = getStudentFromCache(nim);
+    return !cached || !cached.photo;
+  });
 
   if (nimsToFetch.length === 0) {
     // All in cache

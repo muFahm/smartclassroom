@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import "./ClassOverviewDetail.css";
-import { fetchMultipleStudents, getStudentFromCache } from "../../services/studentDataService";
+import { fetchMultipleStudents, getStudentFromCache, hasStudentPhoto } from "../../services/studentDataService";
 import { fetchLecturersByCourse, getLecturersFromCache } from "../../services/lecturerDataService";
 
 const WEEKDAY_NAMES = [
@@ -165,7 +165,7 @@ export default function ClassOverviewDetail({ showEnterDashboard = true }) {
     if (nims.length === 0) return;
 
     // Check if all students are already in cache
-    const allCached = nims.every((nim) => getStudentFromCache(nim));
+    const allCached = nims.every((nim) => hasStudentPhoto(nim));
     if (allCached) {
       // Load from cache immediately
       const cached = new Map();

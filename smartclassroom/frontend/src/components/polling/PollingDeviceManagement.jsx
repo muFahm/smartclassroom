@@ -10,6 +10,7 @@ import {
 import {
   fetchMultipleStudents,
   getStudentFromCache,
+  hasStudentPhoto,
 } from "../../services/studentDataService";
 import "./PollingDeviceManagement.css";
 
@@ -82,7 +83,7 @@ export default function PollingDeviceManagement() {
       return;
     }
 
-    const allCached = assignedNims.every((nim) => getStudentFromCache(nim));
+    const allCached = assignedNims.every((nim) => hasStudentPhoto(nim));
     if (allCached) {
       const cached = new Map();
       assignedNims.forEach((nim) => {
