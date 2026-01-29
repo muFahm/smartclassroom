@@ -10,6 +10,8 @@
  * - Endpoint: /api/attendance/
  */
 
+import ROSLIB from "roslib";
+
 // API Base URL
 const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000';
 const ATTENDANCE_API = `${API_BASE_URL}/api/attendance`;
@@ -53,6 +55,10 @@ let activeSession = null;
 let ros2Listener = null;
 let faceRecognitionCallbacks = [];
 
+const ROS_BRIDGE_URL = process.env.REACT_APP_ROS_BRIDGE_URL || 'ws://127.0.0.1:9090';
+const ROS_FACE_TOPIC = process.env.REACT_APP_FACE_RECOG_TOPIC || '/smartclassroom/face_recognition/result';
+const ROS_FACE_MSG_TYPE = process.env.REACT_APP_FACE_RECOG_MSG_TYPE || 'std_msgs/msg/String';
+
 // ==========================================
 // API Helper Functions
 // ==========================================
@@ -95,48 +101,88 @@ async function apiRequest(endpoint, options = {}) {
  * @param {Function} onFaceDetected - Callback ketika wajah terdeteksi
  */
 export function initROS2FaceRecognition(onFaceDetected) {
-  // TODO: Implementasi koneksi ke ROS2 topic
-  // Menggunakan roslibjs atau rosbridge_suite
-  
-  /*
-  Contoh implementasi dengan roslibjs:
-  
-  import ROSLIB from 'roslib';
-  
-  const ros = new ROSLIB.Ros({
-    url: 'ws://localhost:9090' // rosbridge websocket
-  });
-  
-  ros.on('connection', () => {
-    console.log('Connected to ROS2 bridge');
-  });
-  
-  ros.on('error', (error) => {
-    console.error('ROS2 connection error:', error);
-  });
-  
-  const faceRecognitionTopic = new ROSLIB.Topic({
-    ros: ros,
-    name: '/smartclassroom/face_recognition/result',
-    messageType: 'std_msgs/msg/String'
-  });
-  
-  faceRecognitionTopic.subscribe((message) => {
-    const data = JSON.parse(message.data);
-    onFaceDetected(data);
-  });
-  
-  ros2Listener = { ros, topic: faceRecognitionTopic };
-  */
-  
   faceRecognitionCallbacks.push(onFaceDetected);
-  console.log('ROS2 Face Recognition listener initialized (placeholder)');
-  
+
+  if (!ros2Listener) {
+    const ros = new ROSLIB.Ros({ url: ROS_BRIDGE_URL });
+
+    ros.on('connection', () => {
+      console.log(`✅ Connected to ROS2 bridge at ${ROS_BRIDGE_URL}`);
+    });
+
+    ros.on('error', (error) => {
+      console.error('❌ ROS2 connection error:', error);
+    });
+
+    ros.on('close', () => {
+      console.warn('🔌 Disconnected from ROS2 bridge');
+    });
+
+    const faceRecognitionTopic = new ROSLIB.Topic({
+      ros,
+      name: ROS_FACE_TOPIC,
+      messageType: ROS_FACE_MSG_TYPE,
+    });
+
+    faceRecognitionTopic.subscribe((message) => {
+      let payload = null;
+
+      try {
+        if (message?.data && typeof message.data === 'string') {
+          payload = JSON.parse(message.data);
+        } else if (message?.nim) {
+          payload = message;
+        } else {
+          payload = message;
+        }
+      } catch (error) {
+        console.error('❌ Error parsing face recognition payload:', error);
+        return;
+      }
+
+      if (!payload?.nim) {
+        console.warn('⚠️ Face recognition payload missing NIM:', payload);
+        return;
+      }
+
+      const normalized = {
+        nim: String(payload.nim),
+        name: payload.name || null,
+        confidence: typeof payload.confidence === 'number' ? payload.confidence : 0.95,
+        timestamp: payload.timestamp || Date.now(),
+        status: payload.status || null,
+      };
+
+      faceRecognitionCallbacks.forEach((cb) => cb(normalized));
+    });
+
+    ros2Listener = { ros, topic: faceRecognitionTopic };
+  }
+
+  console.log('ROS2 Face Recognition listener initialized');
+
   return {
     disconnect: () => {
-      faceRecognitionCallbacks = faceRecognitionCallbacks.filter(cb => cb !== onFaceDetected);
+      faceRecognitionCallbacks = faceRecognitionCallbacks.filter((cb) => cb !== onFaceDetected);
+
+      if (faceRecognitionCallbacks.length === 0 && ros2Listener) {
+        try {
+          ros2Listener.topic.unsubscribe();
+        } catch (error) {
+          console.warn('⚠️ Error unsubscribing ROS topic:', error);
+        }
+
+        try {
+          ros2Listener.ros.close();
+        } catch (error) {
+          console.warn('⚠️ Error closing ROS connection:', error);
+        }
+
+        ros2Listener = null;
+      }
+
       console.log('ROS2 Face Recognition listener disconnected');
-    }
+    },
   };
 }
 
@@ -895,17 +941,22 @@ export async function handleFaceRecognitionResult(faceData) {
     return;
   }
   
-  const { nim, name, confidence } = faceData;
+  const { nim, name, confidence, status } = faceData;
   
   const student = activeSession.attendance.find(s => s.nim === nim);
   if (!student) {
     console.warn('Student not found in session:', nim);
     return;
   }
-  
-  // Only update if not already marked as present
+
+  const normalizedStatus = Object.values(ATTENDANCE_STATUS).includes(status)
+    ? status
+    : ATTENDANCE_STATUS.HADIR;
+
+  // Only update if not already marked
   if (student.status === ATTENDANCE_STATUS.NOT_MARKED || student.status === ATTENDANCE_STATUS.ALPHA) {
-    await updateAttendanceStatus(nim, ATTENDANCE_STATUS.HADIR, 'face_recognition', confidence);
+    const markedBy = normalizedStatus === ATTENDANCE_STATUS.HADIR ? 'face_recognition' : 'ros_bridge';
+    await updateAttendanceStatus(nim, normalizedStatus, markedBy, confidence);
     
     // Update name if provided and not already set
     if (name && !student.name) {
@@ -913,7 +964,7 @@ export async function handleFaceRecognitionResult(faceData) {
     }
     
     // If we have record ID, also update face recognition fields via API
-    if (student.id && !activeSession.isLocal) {
+    if (student.id && !activeSession.isLocal && normalizedStatus === ATTENDANCE_STATUS.HADIR) {
       try {
         await apiRequest(`/records/${student.id}/face_recognition/`, {
           method: 'POST',
@@ -923,8 +974,8 @@ export async function handleFaceRecognitionResult(faceData) {
         console.warn('⚠️ API face recognition update failed:', error);
       }
     }
-    
-    console.log(`Face recognized: ${nim} (${name}) - Confidence: ${confidence}`);
+
+    console.log(`ROS attendance update: ${nim} (${name || '-'}) - Status: ${normalizedStatus}`);
   }
 }
 
