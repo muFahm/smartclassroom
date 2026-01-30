@@ -1,10 +1,21 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
+import {
+  BadgeCheck,
+  BarChart3,
+  ChevronLeft,
+  ChevronRight,
+  Play,
+  PlayCircle,
+  Users,
+} from "lucide-react";
 import { quizRequest } from "../api/quizClient";
 import { ROS2_CONFIG } from "../config/ros2Topics";
 import {
+  initPollingResponseBridge,
   publishMessage,
-  subscribeDeviceHeartbeats,
+  subscribeDeviceActivity,
 } from "../services/pollingDeviceService";
+import { fetchMultipleStudents, getStudentFromCache } from "../services/studentDataService";
 import { KUIS_ACTIVE } from "../utils/mockData";
 import "./LiveKuisCard.css";
 
@@ -68,7 +79,13 @@ export default function LiveKuisCard() {
   const [timeLeft, setTimeLeft] = useState(0);
   const [responseStats, setResponseStats] = useState({ total: 0, distribution: {} });
   const [showStats, setShowStats] = useState(false);
+  const [showAnswers, setShowAnswers] = useState(false);
   const [deviceSnapshot, setDeviceSnapshot] = useState(new Map());
+  const [responseStream, setResponseStream] = useState([]);
+  const [studentData, setStudentData] = useState(new Map());
+  const [rosStatus, setRosStatus] = useState({ connected: false, url: null });
+
+  const isQuestionOpenRef = useRef(isQuestionOpen);
 
   const selectedPackage = useMemo(
     () => packages.find((item) => String(item.id) === String(selectedPackageId)),
@@ -84,11 +101,48 @@ export default function LiveKuisCard() {
   const isRunning = sessionStatus === "running";
   const isStarted = sessionStatus === "running" || sessionStatus === "ended";
 
+  useEffect(() => {
+    isQuestionOpenRef.current = isQuestionOpen;
+  }, [isQuestionOpen]);
+
   const connectedDevices = useMemo(() => {
     return Array.from(deviceSnapshot.values()).sort((a, b) =>
       a.deviceCode.localeCompare(b.deviceCode)
     );
   }, [deviceSnapshot]);
+
+  const activeNims = useMemo(() => {
+    const set = new Set();
+    connectedDevices.forEach((device) => {
+      if (device?.nim) set.add(device.nim);
+    });
+    responseStream.forEach((entry) => {
+      if (entry?.nim) set.add(entry.nim);
+    });
+    return Array.from(set);
+  }, [connectedDevices, responseStream]);
+
+  useEffect(() => {
+    if (activeNims.length === 0) {
+      setStudentData(new Map());
+      return;
+    }
+
+    const cached = new Map();
+    const missing = [];
+    activeNims.forEach((nim) => {
+      const data = getStudentFromCache(nim);
+      if (data) cached.set(nim, data);
+      else missing.push(nim);
+    });
+    setStudentData(cached);
+
+    if (missing.length) {
+      fetchMultipleStudents(missing).then((results) => {
+        setStudentData((prev) => new Map([...prev, ...results]));
+      });
+    }
+  }, [activeNims]);
 
   useEffect(() => {
     let mounted = true;
@@ -127,11 +181,23 @@ export default function LiveKuisCard() {
   }, []);
 
   useEffect(() => {
-    const unsubscribe = subscribeDeviceHeartbeats((snapshot) => {
+    const connection = initPollingResponseBridge(
+      (entry) => {
+        if (isQuestionOpenRef.current) {
+          setResponseStream((prev) => [entry, ...prev].slice(0, 50));
+        }
+      },
+      (status) => {
+        setRosStatus({ connected: !!status?.connected, url: status?.url || null });
+      }
+    );
+
+    const unsubscribe = subscribeDeviceActivity((snapshot) => {
       setDeviceSnapshot(snapshot);
     });
     return () => {
       if (unsubscribe) unsubscribe();
+      if (connection?.disconnect) connection.disconnect();
     };
   }, []);
 
@@ -190,6 +256,8 @@ export default function LiveKuisCard() {
     setIsAnswerRevealed(false);
     setResponseStats({ total: 0, distribution: {} });
     setShowStats(false);
+    setShowAnswers(false);
+    setResponseStream([]);
 
     publishMessage(ROS2_CONFIG.topics.polling.sessionStart, {
       session_code: newCode,
@@ -205,6 +273,8 @@ export default function LiveKuisCard() {
     setIsAnswerRevealed(false);
     setTimeLeft(duration);
     setShowStats(false);
+    setShowAnswers(false);
+    setResponseStream([]);
 
     publishMessage(ROS2_CONFIG.topics.polling.question, {
       session_code: sessionCode,
@@ -233,7 +303,27 @@ export default function LiveKuisCard() {
     setTimeLeft(0);
     setResponseStats({ total: 0, distribution: {} });
     setShowStats(false);
+    setShowAnswers(false);
+    setResponseStream([]);
   };
+
+  const resolvePhotoSrc = (photo) => {
+    if (!photo) return null;
+    if (photo.startsWith("data:")) return photo;
+    if (photo.startsWith("http://") || photo.startsWith("https://")) return photo;
+    return `data:image/jpeg;base64,${photo}`;
+  };
+
+  const getPhotoPlaceholder = (name = "User") =>
+    `https://ui-avatars.com/api/?background=0D8ABC&color=fff&name=${encodeURIComponent(name)}`;
+
+  const buildInitials = (value = "") =>
+    value
+      .split(" ")
+      .filter(Boolean)
+      .slice(0, 2)
+      .map((part) => part[0].toUpperCase())
+      .join("") || "?";
 
   const handlePrevQuestion = () => {
     if (currentIndex === 0) return;
@@ -243,6 +333,8 @@ export default function LiveKuisCard() {
     setTimeLeft(0);
     setResponseStats({ total: 0, distribution: {} });
     setShowStats(false);
+    setShowAnswers(false);
+    setResponseStream([]);
   };
 
 
@@ -287,11 +379,45 @@ export default function LiveKuisCard() {
               <p className="muted">Belum ada device aktif.</p>
             )}
             {connectedDevices.map((device) => (
-              <div key={device.deviceCode} className={`device-item ${device.status}`}>
-                <span className="device-code">{device.deviceCode}</span>
-                <span className="device-status">{device.status === "online" ? "Online" : "Offline"}</span>
-              </div>
+              (() => {
+                const cached = device.nim ? studentData.get(device.nim) : null;
+                const displayName = device.name || cached?.name || device.nim;
+                const photoSrc = resolvePhotoSrc(cached?.photo);
+                return (
+                  <div key={device.deviceCode} className={`device-item ${device.status}`}>
+                    <span className="device-code">{device.deviceCode}</span>
+                    <span className="device-status">{device.status === "online" ? "Online" : "Offline"}</span>
+                    {device.nim && (
+                      <span className="device-student">
+                        <span className="device-avatar">
+                          {photoSrc ? (
+                            <img
+                              src={photoSrc}
+                              alt={displayName}
+                              loading="lazy"
+                              onError={(event) => {
+                                event.currentTarget.onerror = null;
+                                event.currentTarget.src = getPhotoPlaceholder(displayName);
+                              }}
+                            />
+                          ) : (
+                            <span className="device-avatar__text">{buildInitials(displayName)}</span>
+                          )}
+                        </span>
+                        <span className="device-student-text">
+                          {displayName || device.nim} · {device.nim}
+                        </span>
+                      </span>
+                    )}
+                  </div>
+                );
+              })()
             ))}
+          </div>
+          <div className="device-panel-footer">
+            <span className={`ros-chip ${rosStatus.connected ? "online" : "offline"}`}>
+              {rosStatus.connected ? "ROSBridge Live" : "ROSBridge Offline"}
+            </span>
           </div>
         </div>
 
@@ -300,7 +426,7 @@ export default function LiveKuisCard() {
         {!isStarted && (
           <div className="start-panel">
             <button className="icon-button primary" onClick={handleStartSession} disabled={!canStart || loading}>
-              <iconify-icon icon="mdi:play-circle" width="18" height="18"></iconify-icon>
+              <PlayCircle size={18} />
               Mulai Kuis
             </button>
           </div>
@@ -335,10 +461,56 @@ export default function LiveKuisCard() {
                   </div>
                 </div>
                 <div className="stats-placeholder">
-                  <iconify-icon icon="mdi:chart-bar" width="28" height="28"></iconify-icon>
+                  <BarChart3 size={28} />
                   <p>
                     Statistik jawaban akan ditampilkan secara agregat ketika data polling device sudah terhubung.
                   </p>
+                </div>
+              </div>
+            ) : showAnswers ? (
+              <div className="answers-panel">
+                <h4>Stream Jawaban</h4>
+                <div className="answers-list">
+                  {responseStream.length === 0 && (
+                    <p className="muted">Belum ada jawaban masuk.</p>
+                  )}
+                  {responseStream.map((entry, index) => {
+                    const nim = entry.nim;
+                    const cached = nim ? studentData.get(nim) : null;
+                    const displayName = entry.name || cached?.name || nim || entry.deviceCode;
+                    const photoSrc = resolvePhotoSrc(cached?.photo);
+                    return (
+                      <div key={`${entry.deviceCode}-${entry.timestamp}-${index}`} className="answer-item">
+                        <div className="answer-avatar">
+                          {photoSrc ? (
+                            <img
+                              src={photoSrc}
+                              alt={displayName}
+                              loading="lazy"
+                              onError={(event) => {
+                                event.currentTarget.onerror = null;
+                                event.currentTarget.src = getPhotoPlaceholder(displayName);
+                              }}
+                            />
+                          ) : (
+                            <div className="answer-avatar__text">
+                              {buildInitials(displayName)}
+                            </div>
+                          )}
+                        </div>
+                        <div className="answer-meta">
+                          <div className="answer-name">{displayName}</div>
+                          <div className="answer-nim">{nim || "-"}</div>
+                        </div>
+                        <div className="answer-response">
+                          <span className="answer-label">{entry.response || "-"}</span>
+                          <span className="answer-time">
+                            {entry.timestamp ? new Date(entry.timestamp).toLocaleTimeString() : "-"}
+                          </span>
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
             ) : (
@@ -379,7 +551,7 @@ export default function LiveKuisCard() {
                 disabled={!currentQuestion || isQuestionOpen}
                 title="Mulai pertanyaan"
               >
-                <iconify-icon icon="mdi:play" width="18" height="18"></iconify-icon>
+                <Play size={18} />
               </button>
               <button
                 className="icon-button"
@@ -387,7 +559,7 @@ export default function LiveKuisCard() {
                 disabled={currentIndex === 0}
                 title="Soal sebelumnya"
               >
-                <iconify-icon icon="mdi:chevron-left" width="18" height="18"></iconify-icon>
+                <ChevronLeft size={18} />
               </button>
               <button
                 className="icon-button"
@@ -395,7 +567,7 @@ export default function LiveKuisCard() {
                 disabled={currentIndex + 1 >= questions.length}
                 title="Soal berikutnya"
               >
-                <iconify-icon icon="mdi:chevron-right" width="18" height="18"></iconify-icon>
+                <ChevronRight size={18} />
               </button>
               <button
                 className="icon-button"
@@ -403,14 +575,27 @@ export default function LiveKuisCard() {
                 disabled={isQuestionOpen || !currentQuestion}
                 title="Tampilkan jawaban benar"
               >
-                <iconify-icon icon="mdi:check-decagram" width="18" height="18"></iconify-icon>
+                <BadgeCheck size={18} />
               </button>
               <button
                 className={`icon-button ${showStats ? "active" : ""}`}
-                onClick={() => setShowStats((prev) => !prev)}
+                onClick={() => {
+                  setShowStats((prev) => !prev);
+                  setShowAnswers(false);
+                }}
                 title="Statistik"
               >
-                <iconify-icon icon="mdi:chart-bar" width="18" height="18"></iconify-icon>
+                <BarChart3 size={18} />
+              </button>
+              <button
+                className={`icon-button ${showAnswers ? "active" : ""}`}
+                onClick={() => {
+                  setShowAnswers((prev) => !prev);
+                  setShowStats(false);
+                }}
+                title="Answers"
+              >
+                <Users size={18} />
               </button>
             </div>
           </div>

@@ -52,7 +52,7 @@ export const ROS2_CONFIG = {
       question: "/smartclassroom/polling/question",
       
       // Answer submissions
-      answer: "/smartclassroom/polling/answer",
+      answer: "/agent/context/polling_answer",
       answerConfirm: "/smartclassroom/polling/answer/confirm",
       
       // Results
@@ -95,7 +95,7 @@ export const ROS2_CONFIG = {
       student_nim: "string",
       quiz_id: "string",
       question_id: "string",
-      answer: "string", // "A" | "B" | "C" | "D" | "E"
+      answer: "string", // "A" | "B" | "C" | "D"
       timestamp: "number",
     },
     answerConfirm: {

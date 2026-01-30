@@ -177,6 +177,12 @@
   color: #64748b;
 }
 
+.student-response {
+  font-size: 11px;
+  color: #475569;
+  margin-top: 4px;
+}
+
 .student-empty {
   font-size: 13px;
   color: #94a3b8;
