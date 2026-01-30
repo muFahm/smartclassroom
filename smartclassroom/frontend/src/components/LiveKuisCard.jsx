@@ -183,9 +183,7 @@ export default function LiveKuisCard() {
   useEffect(() => {
     const connection = initPollingResponseBridge(
       (entry) => {
-        if (isQuestionOpenRef.current) {
-          setResponseStream((prev) => [entry, ...prev].slice(0, 50));
-        }
+        setResponseStream((prev) => [entry, ...prev].slice(0, 50));
       },
       (status) => {
         setRosStatus({ connected: !!status?.connected, url: status?.url || null });
@@ -387,6 +385,9 @@ export default function LiveKuisCard() {
                   <div key={device.deviceCode} className={`device-item ${device.status}`}>
                     <span className="device-code">{device.deviceCode}</span>
                     <span className="device-status">{device.status === "online" ? "Online" : "Offline"}</span>
+                    {device.lastResponse && (
+                      <span className="device-response">{device.lastResponse}</span>
+                    )}
                     {device.nim && (
                       <span className="device-student">
                         <span className="device-avatar">
