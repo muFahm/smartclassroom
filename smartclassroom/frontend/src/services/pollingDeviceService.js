@@ -18,6 +18,8 @@ const POLLING_RESPONSE_TOPIC =
   process.env.REACT_APP_POLLING_RESPONSE_TOPIC || ROS2_CONFIG.topics.polling.answer;
 const POLLING_RESPONSE_MSG_TYPE =
   process.env.REACT_APP_POLLING_RESPONSE_MSG_TYPE || "std_msgs/msg/String";
+const POLLING_ROSBRIDGE_URL =
+  process.env.REACT_APP_POLLING_ROSBRIDGE_URL || null;
 const DEVICE_ACTIVITY_TTL_MS = 5 * 60 * 1000;
 
 /**
@@ -371,7 +373,10 @@ export function initPollingResponseBridge(onResponse, onStatus) {
   if (onStatus) pollingStatusSubscribers.add(onStatus);
 
   if (!pollingRos) {
-    const url = getRosbridgeUrl();
+    const url = POLLING_ROSBRIDGE_URL || getRosbridgeUrl();
+    console.log(
+      `[Polling] Connecting ROSBridge ${url} | topic=${POLLING_RESPONSE_TOPIC} | type=${POLLING_RESPONSE_MSG_TYPE}`,
+    );
     pollingRos = new ROSLIB.Ros({ url });
 
     pollingRos.on("connection", () => {
@@ -403,6 +408,9 @@ export function initPollingResponseBridge(onResponse, onStatus) {
       }
 
       const normalized = normalizePollingPayload(payload);
+      if (!normalized) {
+        console.warn("[Polling] Payload tidak sesuai format:", payload);
+      }
       if (!normalized) return;
 
       updateDeviceActivity(normalized);
