@@ -1,8 +1,11 @@
 import ROSLIB from "roslib";
 
-const ROS_BRIDGE_URL = process.env.REACT_APP_ROS_BRIDGE_URL || "ws://192.168.88.144:9090";
-const ROS_VOICE_TOPIC = process.env.REACT_APP_VOICE_ANALYTICS_TOPIC || "/agent/context/nlp";
-const ROS_VOICE_MSG_TYPE = process.env.REACT_APP_VOICE_ANALYTICS_MSG_TYPE || "std_msgs/msg/String";
+const ROS_BRIDGE_URL =
+  process.env.REACT_APP_ROS_BRIDGE_URL || "ws://10.41.197.10:9090";
+const ROS_VOICE_TOPIC =
+  process.env.REACT_APP_VOICE_ANALYTICS_TOPIC || "/agent/context/nlp";
+const ROS_VOICE_MSG_TYPE =
+  process.env.REACT_APP_VOICE_ANALYTICS_MSG_TYPE || "std_msgs/msg/String";
 
 let rosListener = null;
 let transcriptCallbacks = [];
@@ -10,6 +13,13 @@ let emotionCallbacks = [];
 let statusCallbacks = [];
 const emotionWindow = [];
 const EMOTION_WINDOW_SIZE = 50;
+
+// Reconnection settings
+let reconnectAttempts = 0;
+const MAX_RECONNECT_ATTEMPTS = 10;
+const RECONNECT_DELAY = 3000; // 3 seconds
+let reconnectTimer = null;
+let isReconnecting = false;
 
 function normalizeTranscript(item) {
   if (!item) return null;
@@ -81,28 +91,98 @@ function updateEmotionSummary(labelOrSummary) {
   return labelOrSummary;
 }
 
+function attemptReconnect() {
+  if (isReconnecting || reconnectAttempts >= MAX_RECONNECT_ATTEMPTS) {
+    return;
+  }
+
+  isReconnecting = true;
+  reconnectAttempts++;
+
+  console.log(
+    `🔄 Attempting to reconnect (${reconnectAttempts}/${MAX_RECONNECT_ATTEMPTS})...`,
+  );
+
+  statusCallbacks.forEach((cb) =>
+    cb({
+      connected: false,
+      url: ROS_BRIDGE_URL,
+      reconnecting: true,
+      attempt: reconnectAttempts,
+    }),
+  );
+
+  reconnectTimer = setTimeout(() => {
+    isReconnecting = false;
+    if (rosListener) {
+      try {
+        rosListener.ros.close();
+      } catch (e) {
+        // Ignore
+      }
+      rosListener = null;
+    }
+    // Re-initialize connection
+    initVoiceAnalytics();
+  }, RECONNECT_DELAY);
+}
+
 export function initVoiceAnalytics(onTranscript, onEmotion) {
-  if (onTranscript) transcriptCallbacks.push(onTranscript);
-  if (onEmotion) emotionCallbacks.push(onEmotion);
+  if (onTranscript && !transcriptCallbacks.includes(onTranscript)) {
+    transcriptCallbacks.push(onTranscript);
+  }
+  if (onEmotion && !emotionCallbacks.includes(onEmotion)) {
+    emotionCallbacks.push(onEmotion);
+  }
   const onStatus = arguments.length > 2 ? arguments[2] : null;
-  if (onStatus) statusCallbacks.push(onStatus);
+  if (onStatus && !statusCallbacks.includes(onStatus)) {
+    statusCallbacks.push(onStatus);
+  }
 
   if (!rosListener) {
-    const ros = new ROSLIB.Ros({ url: ROS_BRIDGE_URL });
+    const ros = new ROSLIB.Ros({
+      url: ROS_BRIDGE_URL,
+      transportLibrary: "websocket",
+      transportOptions: {
+        max_reconnection_attempts: 0, // We handle reconnection manually
+      },
+    });
 
     ros.on("connection", () => {
-      console.log(`✅ Connected to ROS2 bridge at ${ROS_BRIDGE_URL}`);
-      statusCallbacks.forEach((cb) => cb({ connected: true, url: ROS_BRIDGE_URL }));
+      console.log(`✅ ROSBridge connected: ${ROS_BRIDGE_URL}`);
+      reconnectAttempts = 0; // Reset on successful connection
+      isReconnecting = false;
+      if (reconnectTimer) {
+        clearTimeout(reconnectTimer);
+        reconnectTimer = null;
+      }
+      statusCallbacks.forEach((cb) =>
+        cb({ connected: true, url: ROS_BRIDGE_URL }),
+      );
     });
 
     ros.on("error", (error) => {
       console.error("❌ ROS2 connection error:", error);
-      statusCallbacks.forEach((cb) => cb({ connected: false, url: ROS_BRIDGE_URL, error }));
+      statusCallbacks.forEach((cb) =>
+        cb({ connected: false, url: ROS_BRIDGE_URL, error: error.message || "Connection failed" }),
+      );
+      
+      // Attempt reconnection after error
+      if (!isReconnecting && reconnectAttempts < MAX_RECONNECT_ATTEMPTS) {
+        setTimeout(() => attemptReconnect(), 1000);
+      }
     });
 
     ros.on("close", () => {
-      console.warn("🔌 Disconnected from ROS2 bridge");
-      statusCallbacks.forEach((cb) => cb({ connected: false, url: ROS_BRIDGE_URL }));
+      console.warn("🔌 ROSBridge disconnected: " + ROS_BRIDGE_URL);
+      statusCallbacks.forEach((cb) =>
+        cb({ connected: false, url: ROS_BRIDGE_URL }),
+      );
+
+      // Attempt reconnection after close
+      if (!isReconnecting && reconnectAttempts < MAX_RECONNECT_ATTEMPTS) {
+        attemptReconnect();
+      }
     });
 
     const topic = new ROSLIB.Topic({
@@ -112,6 +192,7 @@ export function initVoiceAnalytics(onTranscript, onEmotion) {
     });
 
     topic.subscribe((message) => {
+      console.log("📨 Received message from ROS:", message);
       let payload = null;
       try {
         if (message?.data && typeof message.data === "string") {
@@ -133,12 +214,18 @@ export function initVoiceAnalytics(onTranscript, onEmotion) {
 
       const isSingleFormat =
         payload &&
-        (payload.speaker || payload.text || payload.emotion || payload.confidence || payload.timestamp);
+        (payload.speaker ||
+          payload.text ||
+          payload.emotion ||
+          payload.confidence ||
+          payload.timestamp);
 
       const transcripts = isSingleFormat
         ? [payload]
         : payload?.transcripts || payload?.transcript || [];
-      const transcriptList = Array.isArray(transcripts) ? transcripts : [transcripts];
+      const transcriptList = Array.isArray(transcripts)
+        ? transcripts
+        : [transcripts];
       transcriptList
         .map((entry) => {
           const normalized = normalizeTranscript(entry);
@@ -154,9 +241,14 @@ export function initVoiceAnalytics(onTranscript, onEmotion) {
 
       const emotionPayload = isSingleFormat
         ? payload?.emotion || payload?.speech_emotion
-        : payload?.emotions || payload?.emotion || payload?.speech_emotion || null;
+        : payload?.emotions ||
+          payload?.emotion ||
+          payload?.speech_emotion ||
+          null;
       const normalizedEmotion = normalizeEmotion(
-        typeof emotionPayload === "string" ? mapEmotionLabel(emotionPayload) : emotionPayload,
+        typeof emotionPayload === "string"
+          ? mapEmotionLabel(emotionPayload)
+          : emotionPayload,
       );
       const summary = updateEmotionSummary(normalizedEmotion);
       if (summary) {
@@ -169,8 +261,20 @@ export function initVoiceAnalytics(onTranscript, onEmotion) {
 
   return {
     disconnect: () => {
+      console.log("🔌 Manually disconnecting from ROS...");
+      
+      // Stop reconnection attempts
+      if (reconnectTimer) {
+        clearTimeout(reconnectTimer);
+        reconnectTimer = null;
+      }
+      reconnectAttempts = MAX_RECONNECT_ATTEMPTS; // Prevent further reconnection
+      isReconnecting = false;
+
       if (onTranscript) {
-        transcriptCallbacks = transcriptCallbacks.filter((cb) => cb !== onTranscript);
+        transcriptCallbacks = transcriptCallbacks.filter(
+          (cb) => cb !== onTranscript,
+        );
       }
       if (onEmotion) {
         emotionCallbacks = emotionCallbacks.filter((cb) => cb !== onEmotion);
@@ -179,15 +283,21 @@ export function initVoiceAnalytics(onTranscript, onEmotion) {
         statusCallbacks = statusCallbacks.filter((cb) => cb !== onStatus);
       }
 
-      if (transcriptCallbacks.length === 0 && emotionCallbacks.length === 0 && rosListener) {
+      if (
+        transcriptCallbacks.length === 0 &&
+        emotionCallbacks.length === 0 &&
+        rosListener
+      ) {
         try {
           rosListener.topic.unsubscribe();
+          console.log("✅ Topic unsubscribed");
         } catch (error) {
           console.warn("⚠️ Error unsubscribing ROS topic:", error);
         }
 
         try {
           rosListener.ros.close();
+          console.log("✅ ROS connection closed");
         } catch (error) {
           console.warn("⚠️ Error closing ROS connection:", error);
         }
