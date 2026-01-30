@@ -4,7 +4,9 @@ import {
   getAllDeviceAssignments,
   getDeviceHeartbeatSnapshot,
   initializeDeviceHeartbeatBridge,
+  initPollingResponseBridge,
   resetDevice,
+  subscribeDeviceActivity,
   subscribeDeviceHeartbeats,
 } from "../../services/pollingDeviceService";
 import {
@@ -40,8 +42,20 @@ export default function PollingDeviceManagement() {
   const [loadingStudents, setLoadingStudents] = useState(false);
   const [resettingCode, setResettingCode] = useState(null);
   const [heartbeatMap, setHeartbeatMap] = useState(() => getDeviceHeartbeatSnapshot());
+  const [activityMap, setActivityMap] = useState(new Map());
 
-  const devices = pollingDevicesData.devices || [];
+  const baseDevices = pollingDevicesData.devices || [];
+
+  const devices = useMemo(() => {
+    const map = new Map();
+    baseDevices.forEach((device) => map.set(device.code, device));
+    activityMap.forEach((_, code) => {
+      if (!map.has(code)) {
+        map.set(code, { code, name: "Device" });
+      }
+    });
+    return Array.from(map.values());
+  }, [baseDevices, activityMap]);
 
   const deviceToNimMap = useMemo(() => {
     const map = new Map();
@@ -51,7 +65,19 @@ export default function PollingDeviceManagement() {
     return map;
   }, [assignments]);
 
+  const activityNims = useMemo(() => {
+    const list = [];
+    activityMap.forEach((entry) => {
+      if (entry?.nim) list.push(entry.nim);
+    });
+    return list;
+  }, [activityMap]);
+
   const assignedNims = useMemo(() => Array.from(deviceToNimMap.values()), [deviceToNimMap]);
+  const allNims = useMemo(() => {
+    const set = new Set([...assignedNims, ...activityNims]);
+    return Array.from(set);
+  }, [assignedNims, activityNims]);
 
   useEffect(() => {
     setAssignments(getAllDeviceAssignments());
@@ -72,21 +98,28 @@ export default function PollingDeviceManagement() {
       setHeartbeatMap(snapshot);
     });
 
+    const pollingConnection = initPollingResponseBridge();
+    const unsubscribeActivity = subscribeDeviceActivity((snapshot) => {
+      setActivityMap(snapshot);
+    });
+
     return () => {
       if (unsubscribe) unsubscribe();
+      if (unsubscribeActivity) unsubscribeActivity();
+      if (pollingConnection?.disconnect) pollingConnection.disconnect();
     };
   }, []);
 
   useEffect(() => {
-    if (assignedNims.length === 0) {
+    if (allNims.length === 0) {
       setStudentData(new Map());
       return;
     }
 
-    const allCached = assignedNims.every((nim) => hasStudentPhoto(nim));
+    const allCached = allNims.every((nim) => hasStudentPhoto(nim));
     if (allCached) {
       const cached = new Map();
-      assignedNims.forEach((nim) => {
+      allNims.forEach((nim) => {
         const data = getStudentFromCache(nim);
         if (data) cached.set(nim, data);
       });
@@ -95,26 +128,27 @@ export default function PollingDeviceManagement() {
     }
 
     setLoadingStudents(true);
-    fetchMultipleStudents(assignedNims)
+    fetchMultipleStudents(allNims)
       .then((results) => {
         setStudentData(results);
       })
       .finally(() => {
         setLoadingStudents(false);
       });
-  }, [assignedNims]);
+  }, [allNims]);
 
   const assignedCount = assignedNims.length;
   const onlineCount = useMemo(() => {
     let count = 0;
     devices.forEach((device) => {
       const status = heartbeatMap.get(device.code);
-      if (status?.status === "online") {
+      const activity = activityMap.get(device.code);
+      if (activity?.status === "online" || status?.status === "online") {
         count += 1;
       }
     });
     return count;
-  }, [devices, heartbeatMap]);
+  }, [devices, heartbeatMap, activityMap]);
 
   const handleReset = (deviceCode) => {
     const nim = deviceToNimMap.get(deviceCode);
@@ -158,12 +192,16 @@ export default function PollingDeviceManagement() {
 
       <div className="polling-device-management__grid">
         {devices.map((device) => {
-          const nim = deviceToNimMap.get(device.code);
+          const activity = activityMap.get(device.code);
+          const nim = activity?.nim || deviceToNimMap.get(device.code);
           const student = nim ? studentData.get(nim) : null;
           const photoSrc = resolvePhotoSrc(student?.photo);
-          const displayName = student?.name || nim || "Belum ter-assign";
+          const displayName = activity?.name || student?.name || nim || "Belum ter-assign";
           const heartbeat = heartbeatMap.get(device.code);
-          const isOnline = heartbeat?.status === "online";
+          const isOnline = activity?.status === "online" || heartbeat?.status === "online";
+          const lastResponse = activity?.lastResponse || null;
+          const lastSeen = activity?.lastSeen ? new Date(activity.lastSeen).toLocaleTimeString() : null;
+          const deviceLabel = nim ? "Assigned" : activity ? "Active" : "Available";
 
           return (
             <div
@@ -177,7 +215,7 @@ export default function PollingDeviceManagement() {
                     {isOnline ? "Online" : "Offline"}
                   </span>
                 </div>
-                <span className="device-chip">{nim ? "Assigned" : "Available"}</span>
+                <span className="device-chip">{deviceLabel}</span>
               </div>
 
               <div className="device-card__body">
@@ -202,6 +240,12 @@ export default function PollingDeviceManagement() {
                     <div>
                       <div className="student-name">{displayName}</div>
                       <div className="student-nim">{nim}</div>
+                      {lastResponse && (
+                        <div className="student-response">
+                          Jawaban: <strong>{lastResponse}</strong>
+                          {lastSeen ? ` · ${lastSeen}` : ""}
+                        </div>
+                      )}
                     </div>
                   </div>
                 ) : (

@@ -5,12 +5,20 @@
  * and real-time communication for the polling system.
  */
 
+import ROSLIB from "roslib";
 import { ROS2_CONFIG } from "../config/ros2Topics";
+import { getRosbridgeUrl } from "./environmentService";
 import pollingDevicesData from "../data/polling_devices.json";
 
 // Storage keys
 const STORAGE_KEY = "polling_device_assignment";
 const DEVICE_HISTORY_KEY = "polling_device_history";
+
+const POLLING_RESPONSE_TOPIC =
+  process.env.REACT_APP_POLLING_RESPONSE_TOPIC || ROS2_CONFIG.topics.polling.answer;
+const POLLING_RESPONSE_MSG_TYPE =
+  process.env.REACT_APP_POLLING_RESPONSE_MSG_TYPE || "std_msgs/msg/String";
+const DEVICE_ACTIVITY_TTL_MS = 5 * 60 * 1000;
 
 /**
  * Get all available polling devices
@@ -240,6 +248,206 @@ const HEARTBEAT_TTL_MS = 45_000; // 3x 15s interval from device firmware
 let heartbeatTimer = null;
 const heartbeatStatusMap = new Map(); // deviceCode -> status
 const heartbeatSubscribers = new Set();
+
+// ============================================
+// Polling Response Activity Tracking (ROSBridge)
+// ============================================
+
+let pollingRos = null;
+let pollingTopic = null;
+const pollingResponseSubscribers = new Set();
+const pollingStatusSubscribers = new Set();
+const deviceActivityMap = new Map();
+let activityTimer = null;
+
+function normalizePollingTimestamp(value) {
+  if (!value) return Date.now();
+  const num = Number(value);
+  if (Number.isNaN(num)) return Date.now();
+  return num < 1e12 ? num * 1000 : num;
+}
+
+function normalizePollingPayload(payload = {}) {
+  const deviceRaw = payload.device_id || payload.deviceCode || payload.device_code || "";
+  const deviceCode = String(deviceRaw).trim().toUpperCase();
+  if (!deviceCode) return null;
+
+  const nim = payload.nim || payload.student_nim || payload.studentId || null;
+  const name = payload.nama || payload.name || payload.student_name || null;
+  const response = payload.response || payload.answer || payload.choice || null;
+  const timestamp = normalizePollingTimestamp(payload.timestamp || payload.ts || payload.time);
+
+  return {
+    deviceCode,
+    nim: nim ? String(nim) : null,
+    name: name ? String(name) : null,
+    response: response ? String(response).toUpperCase() : null,
+    timestamp,
+    raw: payload,
+  };
+}
+
+function notifyPollingStatus(status) {
+  pollingStatusSubscribers.forEach((callback) => {
+    try {
+      callback(status);
+    } catch {
+      // ignore
+    }
+  });
+}
+
+function notifyPollingResponses(entry) {
+  pollingResponseSubscribers.forEach((callback) => {
+    try {
+      callback(entry);
+    } catch {
+      // ignore
+    }
+  });
+}
+
+function updateDeviceActivity(entry) {
+  if (!entry?.deviceCode) return;
+  deviceActivityMap.set(entry.deviceCode, {
+    deviceCode: entry.deviceCode,
+    status: "online",
+    lastSeen: entry.timestamp || Date.now(),
+    nim: entry.nim || null,
+    name: entry.name || null,
+    lastResponse: entry.response || null,
+    raw: entry.raw || {},
+  });
+}
+
+function refreshDeviceActivity() {
+  const now = Date.now();
+  let changed = false;
+  deviceActivityMap.forEach((status, code) => {
+    const isOnline = status.lastSeen && now - status.lastSeen <= DEVICE_ACTIVITY_TTL_MS;
+    if (status.status === "online" && !isOnline) {
+      deviceActivityMap.set(code, { ...status, status: "offline" });
+      changed = true;
+    }
+  });
+  if (changed) {
+    deviceActivitySubscribers.forEach((callback) => {
+      try {
+        callback(new Map(deviceActivityMap));
+      } catch {
+        // ignore
+      }
+    });
+  }
+}
+
+function ensureActivityTimer() {
+  if (activityTimer) return;
+  activityTimer = setInterval(refreshDeviceActivity, 15000);
+}
+
+const deviceActivitySubscribers = new Set();
+
+export function subscribeDeviceActivity(callback) {
+  deviceActivitySubscribers.add(callback);
+  ensureActivityTimer();
+  callback(new Map(deviceActivityMap));
+
+  return () => {
+    deviceActivitySubscribers.delete(callback);
+    if (deviceActivitySubscribers.size === 0 && activityTimer) {
+      clearInterval(activityTimer);
+      activityTimer = null;
+    }
+  };
+}
+
+export function getDeviceActivitySnapshot() {
+  return new Map(deviceActivityMap);
+}
+
+export function initPollingResponseBridge(onResponse, onStatus) {
+  if (onResponse) pollingResponseSubscribers.add(onResponse);
+  if (onStatus) pollingStatusSubscribers.add(onStatus);
+
+  if (!pollingRos) {
+    const url = getRosbridgeUrl();
+    pollingRos = new ROSLIB.Ros({ url });
+
+    pollingRos.on("connection", () => {
+      notifyPollingStatus({ connected: true, url });
+    });
+
+    pollingRos.on("error", (error) => {
+      notifyPollingStatus({ connected: false, url, error });
+    });
+
+    pollingRos.on("close", () => {
+      notifyPollingStatus({ connected: false, url });
+    });
+
+    pollingTopic = new ROSLIB.Topic({
+      ros: pollingRos,
+      name: POLLING_RESPONSE_TOPIC,
+      messageType: POLLING_RESPONSE_MSG_TYPE,
+    });
+
+    pollingTopic.subscribe((message) => {
+      let payload = message;
+      try {
+        if (message?.data && typeof message.data === "string") {
+          payload = JSON.parse(message.data);
+        }
+      } catch {
+        payload = message;
+      }
+
+      const normalized = normalizePollingPayload(payload);
+      if (!normalized) return;
+
+      updateDeviceActivity(normalized);
+      deviceActivitySubscribers.forEach((callback) => {
+        try {
+          callback(new Map(deviceActivityMap));
+        } catch {
+          // ignore
+        }
+      });
+      notifyPollingResponses(normalized);
+    });
+  }
+
+  return {
+    disconnect: () => {
+      if (onResponse) pollingResponseSubscribers.delete(onResponse);
+      if (onStatus) pollingStatusSubscribers.delete(onStatus);
+
+      if (
+        pollingResponseSubscribers.size === 0 &&
+        pollingStatusSubscribers.size === 0 &&
+        pollingRos
+      ) {
+        try {
+          pollingTopic?.unsubscribe();
+        } catch {
+          // ignore
+        }
+        try {
+          pollingRos.close();
+        } catch {
+          // ignore
+        }
+        pollingRos = null;
+        pollingTopic = null;
+      }
+    },
+  };
+}
+
+export function subscribePollingResponses(callback) {
+  pollingResponseSubscribers.add(callback);
+  return () => pollingResponseSubscribers.delete(callback);
+}
 
 function normalizeDeviceCode(payload = {}) {
   const raw = payload.device_code || payload.device_id || "";
@@ -563,4 +771,8 @@ export default {
   subscribeDeviceHeartbeats,
   getDeviceHeartbeatSnapshot,
   initializeDeviceHeartbeatBridge,
+  initPollingResponseBridge,
+  subscribePollingResponses,
+  subscribeDeviceActivity,
+  getDeviceActivitySnapshot,
 };
