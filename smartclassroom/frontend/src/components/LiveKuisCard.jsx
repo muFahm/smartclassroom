@@ -533,6 +533,26 @@ export default function LiveKuisCard() {
                   {!revealableOptions.length && <p className="muted">Belum ada opsi jawaban.</p>}
                 </div>
 
+                <div className="answers-inline">
+                  <div className="answers-inline-header">Stream Jawaban</div>
+                  <div className="answers-inline-list">
+                    {responseStream.length === 0 && (
+                      <p className="muted">Belum ada jawaban masuk.</p>
+                    )}
+                    {responseStream.slice(0, 6).map((entry, index) => {
+                      const nim = entry.nim;
+                      const cached = nim ? studentData.get(nim) : null;
+                      const displayName = entry.name || cached?.name || nim || entry.deviceCode;
+                      return (
+                        <div key={`${entry.deviceCode}-${entry.timestamp}-${index}`} className="answers-inline-item">
+                          <span className="answers-inline-name">{displayName}</span>
+                          <span className="answers-inline-response">{entry.response || "-"}</span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+
                 <div className="question-footer">
                   <div className="answer-status">
                     <span className="muted">Jawaban benar:</span>

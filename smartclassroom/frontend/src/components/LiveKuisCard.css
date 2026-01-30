@@ -371,6 +371,45 @@
   color: #1f2937;
 }
 
+.answers-inline {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 8px;
+  border: 1px dashed #cbd5f5;
+  border-radius: 8px;
+  background: #f8fafc;
+}
+
+.answers-inline-header {
+  font-size: 12px;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.answers-inline-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.answers-inline-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 12px;
+  color: #334155;
+}
+
+.answers-inline-name {
+  font-weight: 600;
+}
+
+.answers-inline-response {
+  font-weight: 700;
+  color: #1d4ed8;
+}
+
 .question-footer {
   display: flex;
   flex-direction: column;
