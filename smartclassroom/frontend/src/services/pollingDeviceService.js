@@ -272,12 +272,23 @@ function normalizePollingTimestamp(value) {
 function normalizePollingPayload(payload = {}) {
   const deviceRaw = payload.device_id || payload.deviceCode || payload.device_code || "";
   const deviceCode = String(deviceRaw).trim().toUpperCase();
-  if (!deviceCode) return null;
+  if (!deviceCode) {
+    console.log("[Polling] No device_id found. Available keys:", Object.keys(payload));
+    return null;
+  }
 
   const nim = payload.nim || payload.student_nim || payload.studentId || null;
   const name = payload.nama || payload.name || payload.student_name || null;
   const response = payload.response || payload.answer || payload.choice || null;
   const timestamp = normalizePollingTimestamp(payload.timestamp || payload.ts || payload.time);
+
+  console.log("[Polling] ✅ Normalized payload:", {
+    deviceCode,
+    nim,
+    name,
+    response,
+    timestamp,
+  });
 
   return {
     deviceCode,
@@ -405,6 +416,11 @@ export function initPollingResponseBridge(onResponse, onStatus) {
         }
       } catch {
         payload = message;
+      }
+
+      // Unwrap dari context_aggregator "polling" field jika ada
+      if (payload?.polling && !payload.device_id) {
+        payload = payload.polling;
       }
 
       const normalized = normalizePollingPayload(payload);
