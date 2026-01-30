@@ -30,7 +30,7 @@ export const ROS2_ENVIRONMENT_CONFIG = {
   // ROSBridge WebSocket Configuration
   rosbridge: {
     // Default URL - can be overridden via localStorage or environment variable
-    url: process.env.REACT_APP_ROS_BRIDGE_URL || process.env.REACT_APP_ROSBRIDGE_URL || 'ws://localhost:9090',
+    url: process.env.REACT_APP_ROS_BRIDGE_URL || process.env.REACT_APP_ROSBRIDGE_URL || 'ws://10.41.197.10:9090',
     reconnectInterval: 3000, // ms
     maxReconnectAttempts: 10,
   },
