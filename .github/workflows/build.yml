@@ -1,0 +1,22 @@
+name: SonarQube Scan
+
+on:
+  push:
+    branches:
+      - dashboard  # Trigger hanya saat ada update di dashboard
+
+jobs:
+  sonarqube:
+    name: SonarQube Scan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 
+      
+      - name: SonarQube Scan
+        uses: sonarsource/sonarqube-scan-action@master
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }} 
+          # Pastikan Anda sudah set Secrets di Settings > Secrets and variables > Actions
