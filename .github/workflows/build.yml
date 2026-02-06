@@ -28,3 +28,4 @@ jobs:
             -Dsonar.projectKey=muFahm_smartclassroom
             -Dsonar.sources=.
             -Dsonar.verbose=true
+            -Dsonar.branch.name=dashboard
