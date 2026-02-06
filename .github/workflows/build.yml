@@ -3,7 +3,7 @@ name: SonarCloud Analysis
 on:
   push:
     branches:
-      - dashboard  # Analisis jalan saat push ke dashboard
+      - dashboard
   pull_request:
     types: [opened, synchronize, reopened]
 
@@ -14,16 +14,17 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+          fetch-depth: 0
       
-      - name: SonarCloud Scan
-        uses: SonarSource/sonarcloud-github-action@master
+      - name: SonarQube Scan
+        # Menggunakan action versi terbaru (v4)
+        uses: sonarsource/sonarqube-scan-action@v4
         env:
-          # GITHUB_TOKEN sudah otomatis disediakan GitHub (tidak perlu disetting manual)
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          # Token yang barusan Anda buat
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         with:
           args: >
             -Dsonar.organization=mufahm
             -Dsonar.projectKey=muFahm_smartclassroom
+            -Dsonar.sources=.
+            -Dsonar.verbose=true
